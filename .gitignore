@@ -15,7 +15,7 @@ ED/build/ed_2.1-*
 # very general rules to ignore files in bin folder
 ED/build/bin*/*
 
-# ignore run directory to avoid overwrite outputs
+# ignore run directory
 ED/run/*
 
 # specific rules
