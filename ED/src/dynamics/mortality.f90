@@ -13,7 +13,7 @@ module mortality
    !=======================================================================================!
    !    This subroutine computes the total PFT-dependent mortality rate:                   !
    !---------------------------------------------------------------------------------------!
-   subroutine mortality_rates(cpatch,ico,avg_daily_temp, patch_age)
+   subroutine mortality_rates(cpatch,ico,avg_daily_temp, patch_age,tdr_py)
       use ed_state_vars , only : patchtype                  ! ! Structure
       use pft_coms      , only : mort0                      & ! intent(in)
                                , mort1                      & ! intent(in)
@@ -33,6 +33,7 @@ module mortality
       integer        , intent(in) :: ico             ! Current cohort ID
       real           , intent(in) :: avg_daily_temp  ! Mean temperature yesterday
       real           , intent(in) :: patch_age       ! Patch age
+      real           , intent(in) :: tdr_py          ! Spatially varying tree disturbance rate
       !----- Local variables --------------------------------------------------------------!
       integer                     :: ipft            ! PFT 
       real                        :: temp_dep        ! Temp. function  (frost mortality)
@@ -64,7 +65,7 @@ module mortality
       ! 3.  Mortality due to treefall.                                                     !
       !------------------------------------------------------------------------------------!
       if (cpatch%hite(ico) <= treefall_hite_threshold .and. patch_age > time2canopy) then
-         cpatch%mort_rate(3,ico) = treefall_disturbance_rate
+         cpatch%mort_rate(3,ico) = tdr_py
       else
          cpatch%mort_rate(3,ico) = 0.
       end if

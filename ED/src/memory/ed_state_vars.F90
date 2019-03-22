@@ -2260,6 +2260,9 @@ module ed_state_vars
       real,pointer,dimension(:) :: total_agb_recruit
       !<AGB used to generate recruits (kgC/m2/yr)
 
+      real, pointer, dimension(:) :: tdr_py
+      !<Treefall Disturbance Rate, polygon-level (1/yr)
+
 
 
       ! CHANGED THE FOLLOWING UNIT DESCRIPTORS: FROM (cm2/m2/yr) RGK 6-13-08
@@ -3243,6 +3246,7 @@ module ed_state_vars
       allocate(cgrid%total_agb_growth           (                    npolygons))
       allocate(cgrid%total_agb_mort             (                    npolygons))
       allocate(cgrid%total_agb_recruit          (                    npolygons))
+      allocate(cgrid%tdr_py                     (                    npolygons))
       allocate(cgrid%total_basal_area_growth    (                    npolygons))
       allocate(cgrid%total_basal_area_mort      (                    npolygons))
       allocate(cgrid%total_basal_area_recruit   (                    npolygons))
@@ -5237,6 +5241,7 @@ module ed_state_vars
       nullify(cgrid%total_agb_growth        )
       nullify(cgrid%total_agb_mort          )
       nullify(cgrid%total_agb_recruit       )
+      nullify(cgrid%tdr_py                  )
       nullify(cgrid%total_basal_area_growth )
       nullify(cgrid%total_basal_area_mort   )
       nullify(cgrid%total_basal_area_recruit)
@@ -11711,6 +11716,13 @@ module ed_state_vars
          call metadata_edio(nvar,igr,'Polygon AGB used to generate recruits','[kgC/m2/yr]','ipoly')
       end if
       
+      if (associated(cgrid%tdr_py)) then
+         nvar=nvar+1
+         call vtable_edio_r(npts,cgrid%tdr_py,nvar,igr,init,cgrid%pyglob_id, &
+              var_len,var_len_global,max_ptrs,'TREE_DIST_RATE_PY :11:hist:anal:year')
+         call metadata_edio(nvar,igr,'Treefall disturbance rate by polygon','[1/yr]','ipoly')
+      end if
+
       if (associated(cgrid%total_basal_area_growth)) then
          nvar=nvar+1
          call vtable_edio_r(npts,cgrid%total_basal_area_growth,nvar,igr,init,cgrid%pyglob_id, &

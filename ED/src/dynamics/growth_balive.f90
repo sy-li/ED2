@@ -304,7 +304,8 @@ module growth_balive
                   !      We no longer include mortality rates due to disturbance in the    !
                   ! big-leaf simulations, this is now done at disturbance.f90.             !
                   !------------------------------------------------------------------------!
-                  call mortality_rates(cpatch,ico,csite%avg_daily_temp(ipa),csite%age(ipa))
+                  call mortality_rates(cpatch,ico,csite%avg_daily_temp(ipa),csite%age(ipa),&
+                                       cgrid%tdr_py(ipy))
                   dlnndt   = - sum(cpatch%mort_rate(1:4,ico))
                   dndt     = dlnndt * cpatch%nplant(ico)
                   !------------------------------------------------------------------------!
@@ -612,7 +613,8 @@ module growth_balive
                   !------------------------------------------------------------------------!
                   !      Do mortality --- note that only frost mortality changes daily.    !
                   !------------------------------------------------------------------------!
-                  call mortality_rates(cpatch,ico,csite%avg_daily_temp(ipa),csite%age(ipa))
+                  call mortality_rates(cpatch,ico,csite%avg_daily_temp(ipa),csite%age(ipa),&
+                                       cgrid%tdr_py(ipy))
                   select case (ibigleaf)
                   case (0)
                      dlnndt   = - sum(cpatch%mort_rate(1:4,ico))

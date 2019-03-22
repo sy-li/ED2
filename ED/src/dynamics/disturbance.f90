@@ -1327,6 +1327,9 @@ module disturbance_utils
             !------------------------------------------------------------------------------!
 
 
+            !------ Replace tree disturbance rate with spatially-varying data -------------!
+            treefall_disturbance_rate = cgrid%tdr_py(ipy)
+
 
             !------------------------------------------------------------------------------!
             !      Tree fall and fires also occur in plantations.  Treefall allows the     !

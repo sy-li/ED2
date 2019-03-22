@@ -316,3 +316,18 @@ subroutine vegetation_dynamics_eq_0(new_month,new_year)
 end subroutine vegetation_dynamics_eq_0
 !==========================================================================================!
 !==========================================================================================!
+
+
+subroutine read_disturbance_rates(cgrid)
+  use ed_state_vars, only: edtype,polygontype
+  implicit none
+  type(edtype), target :: cgrid
+  type(polygontype), pointer :: cpoly
+  integer :: ipy
+  open (12,file = 'residencetime',form = 'formatted', status = 'old')
+  do ipy = 1,cgrid%npolygons
+   print*, cgrid%lat(ipy), cgrid%lon(ipy)
+  enddo
+  close (12)
+  return
+end subroutine read_disturbance_rates

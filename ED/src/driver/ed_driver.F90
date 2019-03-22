@@ -213,6 +213,14 @@ subroutine ed_driver()
       call update_met_drivers(edgrid_g(ifm))
    end do
 
+   !---------------------------------------------------------------------------------------! 
+   !      Read spatially-varying treefall disturbance rate                                 ! 
+   !---------------------------------------------------------------------------------------!  
+   if (mynum == nnodetot) write (unit=*,fmt='(a)') ' [+] read_tdr...'
+   do ifm=1,ngrids
+      call read_tdr(edgrid_g(ifm))
+   end do
+
 
    !---------------------------------------------------------------------------------------!
    !      Initialize ed fields that depend on the atmosphere.                              !
@@ -307,11 +315,58 @@ subroutine ed_driver()
 
    return
 end subroutine ed_driver
+
+
+
 !==========================================================================================!
 !==========================================================================================!
+!     This sub-routine read the residence time data from external sources.                 !   
+!------------------------------------------------------------------------------------------!   
+subroutine read_tdr(cgrid)
+  use ed_state_vars, only: edtype
+  implicit none
 
+  type(edtype), target :: cgrid
+  integer :: ipy
+  integer :: idat
+                                                                                              
+  real, parameter :: latmin = -23.50  ! bottom boundary of bottom cell                           
+  real, parameter :: lonmin = -110.25  ! left boundary of leftmost cell                         
+  real:: v2,v3
+  character(len=10):: v1
+  ! Change these numbers to reflect the number of unique longitudes                         
+  ! and the number of unique latitudes in input file.                                  
+  integer, parameter :: nlon=305
+  integer, parameter :: nlat=188
 
+  integer, parameter :: ndat = nlon * nlat
+  real, dimension(ndat) :: residence_time
+  real :: latdiff, latoff, londiff, lonoff, fulloff
 
+  ! Read file                                                                       
+   open(12, file='residencetime', form='formatted', status='old')
+   read(12,*)
+   do idat = 1, ndat
+     read(12,*) v1, v2, v3, residence_time(idat)                                               
+     if(residence_time(idat)<0.01) then
+       residence_time(idat) = 71.42857
+     endif
+   enddo
+   close(12)
+
+  ! Assign values                                                                          
+  do ipy = 1, cgrid%npolygons
+     latdiff = cgrid%lat(ipy) - latmin
+     latoff = floor(latdiff / 0.25)
+     londiff = cgrid%lon(ipy) - lonmin
+     lonoff = floor(londiff / 0.25)
+     fulloff = latoff * nlon + lonoff + 1
+     cgrid%tdr_py(ipy) = 1.0 / residence_time(fulloff)
+     print*,cgrid%lat(ipy),cgrid%lon(ipy),cgrid%tdr_py(ipy)
+  enddo 
+
+  return
+end subroutine read_tdr
 
 
 
