@@ -1497,6 +1497,7 @@ subroutine init_ed_poly_vars(cgrid)
       cgrid%total_agb_growth            (ipy) = 0.0
       cgrid%total_agb_mort              (ipy) = 0.0
       cgrid%total_agb_recruit           (ipy) = 0.0
+      cgrid%tdr_py                      (ipy) = 0.0
       cgrid%total_basal_area_growth     (ipy) = 0.0
       cgrid%total_basal_area_mort       (ipy) = 0.0
       cgrid%total_basal_area_recruit    (ipy) = 0.0
