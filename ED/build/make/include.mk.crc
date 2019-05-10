@@ -197,9 +197,9 @@ USE_MPIWTIME=1
 
 #-----------------  LINUX INTEL FORTRAN-95 Compiler/GCC  ---------
 CMACH=PC_LINUX1
-F_COMP=mpif90
+F_COMP=mpif90 -heap-arrays
 C_COMP=mpicc
-LOADER=mpif90
+LOADER=mpif90 -heap-arrays
 C_LOADER=mpicc
 LIBS=
 MOD_EXT=mod
@@ -239,42 +239,43 @@ KIND_COMP=E
 #------------------------------------------------------------------------------------------#
 ifeq ($(KIND_COMP),A)
    USE_INTERF=0
-   F_OPTS= -FR -O0 -recursive -Vaxlib  -check all -g -fpe0 -ftz -gen-interfaces            \
+   F_OPTS= -FR -O0 -recursive   -check all -g -fpe0 -ftz -gen-interfaces            \
             -warn interfaces -debug extended -debug inline_debug_info                      \
-             -debug-parameters all -traceback -ftrapuv
+             -debug-parameters all -traceback -ftrapuv -fp-speculation safe
    C_OPTS= -O0 -DLITTLE  -g -traceback -debug extended
-   LOADER_OPTS= -FR -O0 -Vaxlib  -check all -g -fpe0 -ftz -gen-interfaces \
+   LOADER_OPTS= -FR -O0   -check all -g -fpe0 -ftz -gen-interfaces \
               -warn interfaces -debug extended -debug inline_debug_info  \
-              -debug-parameters all -traceback -ftrapuv
+              -debug-parameters all -traceback -ftrapuv -fp-speculation safe
    C_LOADER_OPTS=-v -g -traceback
    #---------------------------------------------------------------------------------------#
 endif
 ifeq ($(KIND_COMP),B)
    USE_INTERF=1
-   F_OPTS= -FR -O0 -recursive -Vaxlib  -check all -g -fpe0 -ftz  -debug extended           \
-           -debug inline_debug_info -debug-parameters all -traceback -ftrapuv
+   F_OPTS= -FR -O0 -recursive    -check all -g -fpe0 -ftz  -debug extended           \
+           -debug inline_debug_info -debug-parameters all -traceback -ftrapuv -fp-speculation safe
    C_OPTS= -O0 -DLITTLE  -g -traceback -debug extended
-   LOADER_OPTS= -FR -O0 -Vaxlib  -check all -g -fpe0 -ftz -debug extended                  \
-                -debug inline_debug_info -debug-parameters all -traceback -ftrapuv
+   LOADER_OPTS= -FR -O0    -check all -g -fpe0 -ftz -debug extended                  \
+                -debug inline_debug_info -debug-parameters all -traceback -ftrapuv -fp-speculation safe
    C_LOADER_OPTS=-v -g -traceback
    #---------------------------------------------------------------------------------------#
 endif
 ifeq ($(KIND_COMP),C)
-    USE_INTERF=1
-    F_OPTS= -FR -O2 -recursive -Vaxlib  -check all -g -fpe0 -ftz  -debug extended          \
+   USE_INTERF=1
+   F_OPTS= -FR -O2   -check all -g -fpe0 -ftz  -debug extended          \
             -debug inline_debug_info -debug-parameters all -traceback -ftrapuv
-    C_OPTS= -O2 -DLITTLE  -g -traceback -debug extended
-    LOADER_OPTS= -FR -O2 -Vaxlib  -check all -g -fpe0 -ftz -debug extended                 \
+   C_OPTS= -O2 -DLITTLE  -g -traceback -debug extended
+   LOADER_OPTS= -FR -O2  -check all -g -fpe0 -ftz -debug extended                 \
                  -debug inline_debug_info -debug-parameters all -traceback -ftrapuv
-    C_LOADER_OPTS=-v -g -traceback
+   C_LOADER_OPTS=-v -g -traceback
+
    #---------------------------------------------------------------------------------------#
 endif
 ifeq ($(KIND_COMP),D)
    USE_INTERF=1
-   F_OPTS= -FR -O2 -recursive -Vaxlib -check all -fpe0 -ftz  -traceback -ftrapuv
+   F_OPTS= -FR -O2 -recursive   -check all -fpe0 -ftz  -traceback -ftrapuv -fp-speculation safe
    C_OPTS= -O2 -DLITTLE -traceback
-   LOADER_OPTS= -FR -O2 -Vaxlib  -check all -fpe0 -ftz -traceback -ftrapuv
-   C_LOADER_OPTS=-v -traceback
+   LOADER_OPTS= -FR -O2    -check all -fpe0 -ftz -traceback -ftrapuv -fp-speculation safe
+   C_LOADER_OPTS=-v -traceback 
    #---------------------------------------------------------------------------------------#
 endif
 ifeq ($(KIND_COMP),E)
@@ -282,7 +283,7 @@ ifeq ($(KIND_COMP),E)
    F_OPTS=-O2 -static -traceback
    F_SIMPLE_OPTS=-static -traceback -no-ip
 #   F_OPTS=-O0 -g -traceback -fpe-all=0 -check all \
-#          -debug extended -ftrapuv -fp-model strict
+#          -debug extended -ftrapuv -fp-speculation safe -fp-model strict
    C_OPTS= -O3 -DUNDERSCORE -DLITTLE
    LOADER_OPTS=#$(F_OPTS)
    C_LOADER_OPTS=-v -traceback
