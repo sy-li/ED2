@@ -161,7 +161,7 @@ subroutine heun_timestep(cgrid)
             !----- Get plant water flow driven by plant hydraulics ------------------------!
             !     This must be placed before canopy_photosynthesis because                 !
             !  plant_hydro_driver needs fs_open from last timestep                         !
-            call plant_hydro_driver(csite,ipa,cpoly%ntext_soil(:,isi))
+            call plant_hydro_driver(csite,ipa,cpoly%ntext_soil(:,isi),cgrid%lat(ipy),cgrid%lon(ipy))
             !------------------------------------------------------------------------------!
 
 

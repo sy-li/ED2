@@ -27,7 +27,7 @@ module plant_hydro
    !>
    !> \author Xiangtao Xu, 30 Jan. 2018
    !---------------------------------------------------------------------------------------!
-   subroutine plant_hydro_driver(csite,ipa,ntext_soil)
+   subroutine plant_hydro_driver(csite,ipa,ntext_soil,lat,lon)
       use ed_state_vars        , only : sitetype               & !structure
                                       , patchtype              ! !structure
       use ed_misc_coms         , only : dtlsm                  & !intent(in)
@@ -59,6 +59,7 @@ module plant_hydro
       real                                    :: crown_area ! crown area              [m2]
       real                                    :: transp     ! transpiration rate      [kg/s]
       real                                    :: c_leaf     ! leaf capacitance        [kg/m]
+      real :: lat,lon
       !----- Variables for debugging purposes ---------------------------------------------!
       integer,parameter                       :: dco        = 0 ! the cohort to debug
       logical                                 :: error_flag
@@ -147,7 +148,6 @@ module plant_hydro
                               + (1. - cpatch%fs_open(ico)) * cpatch%psi_closed(ico)      &
                               ) * cpatch%lai(ico) / cpatch%nplant(ico)     ! kg / s
 
-
                 ! Please notice that the current leaf_water_int has included the
                 ! transpirational lost of this time step but not the sapflow. So
                 ! leaf psi can be very low.
@@ -156,8 +156,19 @@ module plant_hydro
                 ! leaf_water_int
                 ! In this case, leaf_psi represents the water potential at the
                 ! START of the timestep.
+
+      if(cpatch%leaf_psi(ico)>0 .or. cpatch%wood_psi(ico)>0) then
+         print*,'before driver rwc2psi',cpatch%leaf_psi(ico),cpatch%wood_psi(ico)
+         
+      endif
+
                 call rwc2psi(cpatch%leaf_rwc(ico),cpatch%wood_rwc(ico),cpatch%pft(ico)     &
                             ,cpatch%leaf_psi(ico),cpatch%wood_psi(ico))
+
+      if(cpatch%leaf_psi(ico)>0 .or. cpatch%wood_psi(ico)>0) then
+        print*,'after driver rwc2psi',cpatch%leaf_psi(ico),cpatch%wood_psi(ico)
+        
+      endif
 
                 c_leaf = leaf_water_cap(cpatch%pft(ico)) * C2B * cpatch%bleaf(ico)
                 if (c_leaf > 0.) then
@@ -172,7 +183,8 @@ module plant_hydro
 !                    call psi2rwc(cpatch%leaf_psi(ico),cpatch%wood_psi(ico),cpatch%pft(ico) &
 !                                 cpatch%leaf_rwc(ico),cpatch%wood_rwc(ico))
                 endif
-                
+
+           
                 !--------------------------------------------------------------------------
                 ! Handling Potential Errors and Help Debugging
                 !--------------------------------------------------------------------------
@@ -184,8 +196,11 @@ module plant_hydro
                    write (unit=*,fmt='(a)') ' '
                    write (unit=*,fmt='(92a)') ('=',k=1,92)
                    write (unit=*,fmt='(92a)') ('=',k=1,92)
-                   write (unit=*,fmt='(a)'  ) ' Input leaf_psi is too high for plant hydodynamics'
+                   write (unit=*,fmt='(a)'  ) ' Input leaf_psi is too high for plant hydrodynamics'
                    write (unit=*,fmt='(92a)') ('-',k=1,92)
+                   write (unit=*,fmt=efmt   ) ' + LATITUDE         =',lat
+                   write (unit=*,fmt=efmt   ) ' + LONGITUDE        =',lon
+
                    write (unit=*,fmt=ifmt   ) ' + IPA              =',ipa
   
                    write (unit=*,fmt='(a)'  ) ' '
@@ -205,7 +220,6 @@ module plant_hydro
   
                    write (unit=*,fmt='(a)'  ) ' '
                    write (unit=*,fmt=efmt   ) ' + TRANSP           =',transp
-                   write (unit=*,fmt=efmt   ) ' + c_leaf           =',c_leaf
                    write (unit=*,fmt=efmt   ) ' + PSI_OPEN         =',cpatch%psi_open(ico)
                    write (unit=*,fmt=efmt   ) ' + PSI_CLOSED       =',cpatch%psi_closed(ico)
                    write (unit=*,fmt=efmt   ) ' + FS_OPEN          =',cpatch%fs_open(ico)   
@@ -243,7 +257,7 @@ module plant_hydro
                        ,cpatch%leaf_psi(ico),cpatch%wood_psi(ico)     &!input
                        ,soil_psi,soil_cond,ipa,ico                    &!input
                        ,cpatch%wflux_wl(ico),cpatch%wflux_gw(ico)     &!output
-                       ,cpatch%wflux_gw_layer(:,ico))                 !!output
+                       ,cpatch%wflux_gw_layer(:,ico),lat,lon)                 !!output
 
             !else
             !    cpatch%wflux_wl(ico) = 0.
@@ -344,7 +358,7 @@ module plant_hydro
                ,transp,leaf_psi,wood_psi                                & !plant input
                ,soil_psi,soil_cond                                      & !soil  input
                ,ipa,ico                                                 & !for debugging
-               ,wflux_wl,wflux_gw,wflux_gw_layer)                       ! !flux  output
+               ,wflux_wl,wflux_gw,wflux_gw_layer,lat,lon)                       ! !flux  output
       use soil_coms       , only : slz8                 & ! intent(in)
                                  , dslz8                ! ! intent(in)
       use grid_coms       , only : nzg                  ! ! intent(in)
@@ -384,7 +398,7 @@ module plant_hydro
       real   ,                 intent(out) :: wflux_wl        !wood-leaf flux  [kg/s]
       real   ,                 intent(out) :: wflux_gw        !ground-wood flux [kg/s]
       real   , dimension(nzg), intent(out) :: wflux_gw_layer  !wflux_gw for each soil layer
-
+      real   :: lat,lon
       !----- Local Vars  --------------------------------------------------------------------!
       !----- temporary double precision variables for input and output variables
       real(kind=8)                 :: dt_d              
@@ -724,6 +738,9 @@ module plant_hydro
          write (unit=*,fmt='(92a)') ('=',k=1,92)
          write (unit=*,fmt='(a)'  ) ' plant hydrodynamics inconsistency detected!!'
          write (unit=*,fmt='(92a)') ('-',k=1,92)
+
+         write (unit=*,fmt=efmt   ) ' + LATITUDE         =',lat
+         write (unit=*,fmt=efmt   ) ' + LONGITUDE        =',lon
          write (unit=*,fmt=ifmt   ) ' + IPA              =',ipa
 
          write (unit=*,fmt='(a)'  ) ' '
@@ -731,7 +748,6 @@ module plant_hydro
          write (unit=*,fmt=ifmt   ) ' + PFT              =',ipft
          write (unit=*,fmt=ifmt   ) ' + KRDEPTH          =',krdepth
          write (unit=*,fmt=efmt   ) ' + HEIGHT           =',hite
-         write (unit=*,fmt=lfmt   ) ' + SMALL_TREE_FLAG  =',small_tree_flag
 
          write (unit=*,fmt='(a)'  ) ' '
          write (unit=*,fmt=efmt   ) ' + BLEAF            =',bleaf                      
@@ -741,7 +757,7 @@ module plant_hydro
          write (unit=*,fmt=efmt   ) ' + CROWN_AERA       =',crown_area
 
          write (unit=*,fmt='(a)'  ) ' '
-         write (unit=*,fmt=efmt   ) ' + TRANSP           =',transp                     
+         write (unit=*,fmt=efmt   ) ' + TRANSP           =',transp   
          write (unit=*,fmt=efmt   ) ' + LEAF_PSI (INPUT) =',leaf_psi                   
          write (unit=*,fmt=efmt   ) ' + WOOD_PSI (INPUT) =',wood_psi                   
          write (unit=*,fmt=efmt   ) ' + LEAF_PSI (PROJ.) =',proj_leaf_psi              

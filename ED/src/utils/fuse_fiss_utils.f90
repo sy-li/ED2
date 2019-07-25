@@ -1073,7 +1073,9 @@ module fuse_fiss_utils
       use plant_hydro        , only : rwc2psi                & ! subroutine
                                     , tw2rwc                 & ! subroutine 
                                     , psi2tw                 & ! subroutine
-                                    , tw2psi                 ! ! subroutine
+                                    , tw2psi                 & ! subroutine
+                                    , rwc2tw                 &
+                                    , psi2rwc
       implicit none
       !----- Arguments --------------------------------------------------------------------!
       type(patchtype) , target     :: cpatch            ! Current patch
@@ -1098,9 +1100,18 @@ module fuse_fiss_utils
       real                         :: rnplant           ! nplant of receiver
       real                         :: dnplant           ! nplant of donor
       real                         :: total_transp      ! total transpiration to conserve
+      real::rbdead,dbdead
       !------------------------------------------------------------------------------------!
 
+      if(cpatch%leaf_psi(recc)>0) then
+        print*,'begining of fuse_2_cohorts',recc,cpatch%leaf_psi(recc)
+        stop
+      endif
 
+      if(cpatch%leaf_psi(donc)>0) then
+        print*,'begining of fuse_2_cohorts',recc,cpatch%leaf_psi(donc)
+        stop
+      endif
 
       !------------------------------------------------------------------------------------!
       !    Find the scaling factor for variables that are not "extensive".                 !
@@ -1112,6 +1123,10 @@ module fuse_fiss_utils
       newni   = 1.0 / (cpatch%nplant(recc) + cpatch%nplant(donc))
       rnplant = cpatch%nplant(recc) / (cpatch%nplant(recc) + cpatch%nplant(donc))
       dnplant = 1.d0 - dble(rnplant)
+
+      rbdead = (cpatch%bdead(recc) * cpatch%nplant(recc)) / (cpatch%bdead(recc) * &
+                cpatch%nplant(recc) + cpatch%bdead(donc) * cpatch%bdead(donc))
+      dbdead = 1.d0 - dble(rbdead)
       !------------------------------------------------------------------------------------!
 
 
@@ -1490,10 +1505,13 @@ module fuse_fiss_utils
       ! Now we update cpatch%fs_open by conserving total_transp
       if ((cpatch%psi_open(recc) - cpatch%psi_closed(recc)) == 0.) then
           ! This is the original scaling
-          cpatch%fs_open(recc)  = cpatch%fsw(recc) * cpatch%fsn(recc)
-      else
-          cpatch%fs_open (recc) = max(0.,min(1.,(total_transp - cpatch%psi_closed(recc))   &
+          ! print*,'original'
+           cpatch%fs_open(recc)  = cpatch%fsw(recc) * cpatch%fsn(recc)
+       else
+          ! print*,'high photorespiration'
+           cpatch%fs_open (recc) = max(0.,min(1.,(total_transp - cpatch%psi_closed(recc))   &
                                     / (cpatch%psi_open(recc) - cpatch%psi_closed(recc))))
+
       endif
       !------------------------------------------------------------------------------------!
 
@@ -1569,10 +1587,14 @@ module fuse_fiss_utils
       ! is updated
       !------------------------------------------------------------------------------------!
 
+!      print*,'before weighted',cpatch%leaf_psi(recc),cpatch%leaf_rwc(recc),cpatch%leaf_water_int(recc)
+!      print*,'before weighted',cpatch%leaf_psi(donc),cpatch%leaf_rwc(donc),cpatch%leaf_water_int(donc)
+!      print*,'before weighted',rnplant,dnplant
 
       !------------------------------------------------------------------------------------!
       !    Plant hydrodynamics characteristics (XXT)                                       !
       !------------------------------------------------------------------------------------!
+
       ! Internal water content and water fluxes are weighted by nplant
       cpatch%leaf_water_int(recc) = cpatch%leaf_water_int(recc) * rnplant                  &
                                   + cpatch%leaf_water_int(donc) * dnplant
@@ -1591,12 +1613,98 @@ module fuse_fiss_utils
       ! Now, we recalculate rwc and psi from water_int
       ! This ensures that psi, rwc, and total water are consistent with each
       ! other
+      
       call tw2rwc(cpatch%leaf_water_int(recc),cpatch%wood_water_int(recc)                  &
                  ,cpatch%bleaf(recc),cpatch%bdead(recc),cpatch%broot(recc)                 &
                  ,dbh2sf(cpatch%dbh(recc),cpatch%pft(recc)),cpatch%pft(recc)               &
                  ,cpatch%leaf_rwc(recc),cpatch%wood_rwc(recc))
+      
       call rwc2psi(cpatch%leaf_rwc(recc),cpatch%wood_rwc(recc),cpatch%pft(recc)            &
                   ,cpatch%leaf_psi(recc),cpatch%wood_psi(recc))
+
+      ! special case, since sapwood area is not conserved in the fusion
+      ! we need to check whether the resulting rwc is higher than 1.0, which can happen when both
+      ! cohorts are nearly saturated and sapwood area allometry is highly convex....
+      if (cpatch%wood_rwc(recc) > 1.) then
+          ! if this is the case, reset wood_psi to 0. m and recalculate wood_rwc and wood_tw
+          ! This can lead to small 'leak' of wood water but should be within the error tolerance
+          ! during ecosystem budget calculations
+          cpatch%wood_psi(recc) = 0. ! fully saturated
+          call psi2rwc(cpatch%leaf_psi(recc),cpatch%wood_psi(recc),cpatch%pft(recc)        &
+                      ,cpatch%leaf_rwc(recc),cpatch%wood_rwc(recc))
+          call rwc2tw(cpatch%leaf_rwc(recc),cpatch%wood_rwc(recc)                          &
+                     ,cpatch%bleaf(recc),cpatch%bdead(recc),cpatch%broot(recc)             &
+                     ,dbh2sf(cpatch%dbh(recc),cpatch%pft(recc)),cpatch%pft(recc)           &
+                     ,cpatch%leaf_water_int(recc),cpatch%wood_water_int(recc))
+      endif
+
+
+go to 200      
+      ! II. weight by rwc
+      ! relative water content and water fluxes are weighted by nplant                             
+      cpatch%leaf_rwc(recc) = cpatch%leaf_rwc(recc) * rbdead                  &
+                              + cpatch%leaf_rwc(donc) * dbdead
+      cpatch%wood_rwc(recc) = cpatch%wood_rwc(recc) * rbdead                  &
+                              + cpatch%wood_rwc(donc) * dbdead
+
+      cpatch%wflux_gw      (recc) = cpatch%wflux_gw     (recc) * rnplant                   &
+                                  + cpatch%wflux_gw     (donc) * dnplant
+      cpatch%wflux_wl      (recc) = cpatch%wflux_wl     (recc) * rnplant                   &
+                                  + cpatch%wflux_wl     (donc) * dnplant
+      do isl = 1,nzg
+         cpatch%wflux_gw_layer(isl,recc) = cpatch%wflux_gw_layer(isl,recc) * rnplant       &
+                                         + cpatch%wflux_gw_layer(isl,donc) * dnplant
+      enddo
+
+      ! Now, we recalculate water_int and psi from rwc                                          
+      ! This ensures that psi, rwc, and total water are consistent with each other
+
+!      print*,'before rwc2',cpatch%leaf_psi(recc),cpatch%leaf_rwc(recc),cpatch%leaf_water_int(recc)
+
+      call rwc2tw(cpatch%leaf_rwc(recc),cpatch%wood_rwc(recc)                              &
+                 ,cpatch%bleaf(recc),cpatch%bdead(recc),cpatch%broot(recc)                 &
+                 ,dbh2sf(cpatch%dbh(recc),cpatch%pft(recc)),cpatch%pft(recc)               &
+                 ,cpatch%leaf_water_int(recc),cpatch%wood_water_int(recc))
+
+!      print*,'after rwc2tw',cpatch%leaf_psi(recc),cpatch%leaf_rwc(recc),cpatch%leaf_water_int(recc)
+
+      call rwc2psi(cpatch%leaf_rwc(recc),cpatch%wood_rwc(recc),cpatch%pft(recc)            &
+                  ,cpatch%leaf_psi(recc),cpatch%wood_psi(recc))
+
+!      print*,'after rwc2psi',cpatch%leaf_psi(recc),cpatch%leaf_rwc(recc),cpatch%leaf_water_int(recc)
+
+
+      !III.
+      ! weight water fluxes by nplant
+      cpatch%wflux_gw      (recc) = cpatch%wflux_gw     (recc) * rnplant                   &
+                                  + cpatch%wflux_gw     (donc) * dnplant
+      cpatch%wflux_wl      (recc) = cpatch%wflux_wl     (recc) * rnplant                   &
+                                  + cpatch%wflux_wl     (donc) * dnplant
+      do isl = 1,nzg
+         cpatch%wflux_gw_layer(isl,recc) = cpatch%wflux_gw_layer(isl,recc) * rnplant       &
+                                         + cpatch%wflux_gw_layer(isl,donc) * dnplant
+      enddo
+
+      ! weight leaf internal water content
+      cpatch%leaf_water_int(recc) = cpatch%leaf_water_int(recc) * rnplant                  &
+                                  + cpatch%leaf_water_int(donc) * dnplant
+      call tw2rwc(cpatch%leaf_water_int(recc),cpatch%wood_water_int(recc)                  &
+                 ,cpatch%bleaf(recc),cpatch%bdead(recc),cpatch%broot(recc)                 &
+                 ,dbh2sf(cpatch%dbh(recc),cpatch%pft(recc)),cpatch%pft(recc)               &
+                 ,cpatch%leaf_rwc(recc),cpatch%wood_rwc(recc))
+  
+      ! weight wood relative water content
+      cpatch%wood_rwc(recc) = cpatch%wood_rwc(recc) * rnplant                  &
+                              + cpatch%wood_rwc(donc) * dnplant
+      call rwc2tw(cpatch%leaf_rwc(recc),cpatch%wood_rwc(recc)                              &
+                 ,cpatch%bleaf(recc),cpatch%bdead(recc),cpatch%broot(recc)                 &
+                 ,dbh2sf(cpatch%dbh(recc),cpatch%pft(recc)),cpatch%pft(recc)               &
+                 ,cpatch%leaf_water_int(recc),cpatch%wood_water_int(recc))
+ 
+
+      call rwc2psi(cpatch%leaf_rwc(recc),cpatch%wood_rwc(recc),cpatch%pft(recc)            &
+                  ,cpatch%leaf_psi(recc),cpatch%wood_psi(recc))
+200 continue
 
       !------------------------------------------------------------------------------------!
 
@@ -2941,6 +3049,11 @@ module fuse_fiss_utils
                                     + cpatch%sla         (donc) * dnplant
       endif
 
+      if(cpatch%leaf_psi(recc)>0) then
+        print*,'end of fuse_2_cohorts',recc,cpatch%leaf_psi(recc)
+        stop
+      endif
+   
       return
    end subroutine fuse_2_cohorts
    !=======================================================================================!
@@ -3233,6 +3346,12 @@ module fuse_fiss_utils
                do ico = 1, cpatch%ncohorts
                   old_nplant_tot = old_nplant_tot + cpatch%nplant(ico) * csite%area(ipa)
                   old_lai_tot    = old_lai_tot    + cpatch%lai(ico)    * csite%area(ipa)
+
+                  if(cpatch%leaf_psi(ico)>0) then
+                     print*, 'pre-fusion',cpatch%leaf_psi(ico)
+                     stop
+                  endif
+
                end do
             end do
             !------------------------------------------------------------------------------!
@@ -4138,7 +4257,15 @@ module fuse_fiss_utils
             do ipa=1,csite%npatches
                cpatch => csite%patch(ipa)
                tot_ncohorts = tot_ncohorts + cpatch%ncohorts
-            end do
+                 do ico=1,cpatch%ncohorts
+
+                   if(cpatch%leaf_psi(ico)>0)then
+                     print*, 'post-fusion',cpatch%leaf_psi(ico)
+                     stop
+                   endif
+
+                 enddo
+             end do
          end do
       end do
       write (unit=*,fmt='(6(a,1x,i8,1x))')                                                 &
@@ -4210,6 +4337,7 @@ module fuse_fiss_utils
       real                                 :: newarea           ! new patch area
       real                                 :: newareai          ! 1./(new patch area)
       real                                 :: area_scale        ! Cohort rescaling factor.
+      integer::ico
       !------------------------------------------------------------------------------------!
      
       !------------------------------------------------------------------------------------!
@@ -4219,6 +4347,22 @@ module fuse_fiss_utils
       ! patch.                                                                             !
       !------------------------------------------------------------------------------------!
     
+      cpatch =>csite%patch(recp)
+      do ico=1,cpatch%ncohorts
+         if (cpatch%leaf_psi(ico)>0)then
+           print*,'before fuse_2_patches recp',recp,cpatch%leaf_psi(ico)
+           stop
+         endif
+      enddo
+
+      cpatch =>csite%patch(donp)
+      do ico=1,cpatch%ncohorts
+         if (cpatch%leaf_psi(ico)>0)then
+           print*,'before fuse_2_patches donp',donp,cpatch%leaf_psi(ico)
+           stop
+         endif
+      enddo
+
       !----- The new area is simply the sum of each patch area. ---------------------------!
       newarea  = csite%area(donp) + csite%area(recp)
       newareai = 1.0/newarea
@@ -6155,6 +6299,21 @@ module fuse_fiss_utils
       call update_cohort_extensive_props(cpatch,1,ndc,area_scale)
       !------------------------------------------------------------------------------------!
 
+      cpatch => csite%patch(recp)
+      do ico=1,cpatch%ncohorts
+        if (cpatch%leaf_psi(ico)>0)then
+           print*, 'after density adjustment, recp',recp,cpatch%leaf_psi(ico)
+           stop
+        endif
+      enddo
+
+      cpatch => csite%patch(donp)
+      do ico=1,cpatch%ncohorts
+        if (cpatch%leaf_psi(ico)>0)then
+           print*, 'after density adjustment, donp',donp,cpatch%leaf_psi(ico)
+           stop
+        endif
+      enddo
 
       !------------------------------------------------------------------------------------!
       !    Fill a new patch with the donor and recipient cohort vectors.                   !
@@ -6178,14 +6337,47 @@ module fuse_fiss_utils
          !----- Sort cohorts in the new patch ---------------------------------------------!
          cpatch => csite%patch(recp)
          call sort_cohorts(cpatch)
+
+      cpatch => csite%patch(recp)
+      do ico=1,cpatch%ncohorts
+        if (cpatch%leaf_psi(ico)>0) then
+           print*, 'after sort',recp,cpatch%leaf_psi(ico)
+           stop
+        endif
+      enddo
+
          !---------------------------------------------------------------------------------!
          !    We just combined two patches, so we may be able to fuse some cohorts and/or  !
          ! eliminate others.                                                               !
          !---------------------------------------------------------------------------------!
          if (cpatch%ncohorts > 0 .and. maxcohort >= 0) then
             call fuse_cohorts(csite,recp,lsl,fuse_initial)
+
+      do ico=1,cpatch%ncohorts
+        if (cpatch%leaf_psi(ico)>0) then
+          print*, 'after fuse',recp,cpatch%leaf_psi(ico)
+          stop
+        endif
+      enddo
+
             call terminate_cohorts(csite,recp,elim_nplant,elim_lai)
+
+      do ico=1,cpatch%ncohorts
+        if (cpatch%leaf_psi(ico)>0) then
+          print*, 'after terminate',recp,cpatch%leaf_psi(ico)
+          stop
+        endif
+      enddo
+
             call split_cohorts(cpatch,green_leaf_factor)
+
+      do ico=1,cpatch%ncohorts
+        if (cpatch%leaf_psi(ico)>0)then
+          print*, 'after split',recp,cpatch%leaf_psi(ico)
+          stop
+        endif
+      enddo
+
          end if
          !---------------------------------------------------------------------------------!
       end if
@@ -6221,6 +6413,14 @@ module fuse_fiss_utils
 
       !----- Last, but not the least, we update the patch area ----------------------------!
       csite%area(recp) = newarea
+      
+      cpatch => csite%patch(recp)
+      do ico=1,cpatch%ncohorts
+        if (cpatch%leaf_psi(ico)>0) then
+          print*, 'after fuse_2_patches',recp,cpatch%leaf_psi(ico)
+          stop
+        endif
+      enddo
 
       return
 
