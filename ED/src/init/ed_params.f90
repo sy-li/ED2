@@ -1541,9 +1541,9 @@ subroutine init_pft_photo_params()
    end select
    !---- Define Vm0 for all PFTs. ---------------------------------------------------------!
    Vm0(1)                    = 12.500000 * ssfact * vmfact_c4
-   Vm0(2)                    = 18.750000 * ssfact * vmfact_c3
-   Vm0(3)                    = 12.500000 * ssfact * vmfact_c3
-   Vm0(4)                    =  6.250000 * ssfact * vmfact_c3
+   Vm0(2)                    = 19.800000 * ssfact * vmfact_c3
+   Vm0(3)                    = 15.400000 * ssfact * vmfact_c3
+   Vm0(4)                    = 11.000000 * ssfact * vmfact_c3
    Vm0(5)                    = 18.300000 * ssfact * vmfact_c3
    Vm0(6)                    = 11.350000 * ssfact * vmfact_c3
    Vm0(7)                    = 11.350000 * ssfact * vmfact_c3
@@ -1576,9 +1576,10 @@ subroutine init_pft_photo_params()
    !    Dark_respiration_factor is the lower-case gamma in Moorcroft et al. (2001).        !
    !---------------------------------------------------------------------------------------!
    dark_respiration_factor(1)     = gamma_c4
-   dark_respiration_factor(2)     = gamma_c3
-   dark_respiration_factor(3)     = gamma_c3
-   dark_respiration_factor(4)     = gamma_c3
+!   dark_respiration_factor(2)     = gamma_c3
+!   dark_respiration_factor(3)     = gamma_c3
+!   dark_respiration_factor(4)     = gamma_c3
+   dark_respiration_factor(2:4)   = 0.015000
    dark_respiration_factor(5)     = gamma_c3
    dark_respiration_factor(6)     = gamma_c3
    dark_respiration_factor(7)     = gamma_c3
@@ -1882,9 +1883,9 @@ subroutine init_pft_resp_params()
    implicit none
 
    growth_resp_factor(1)          = growthresp
-   growth_resp_factor(2)          = growthresp
-   growth_resp_factor(3)          = growthresp
-   growth_resp_factor(4)          = growthresp
+   growth_resp_factor(2)          = 0.28 !growthresp
+   growth_resp_factor(3)          = 0.28 !growthresp
+   growth_resp_factor(4)          = 0.28 !growthresp
    growth_resp_factor(5)          = onethird
    growth_resp_factor(6)          = 0.4503 ! 0.333
    growth_resp_factor(7)          = 0.4503
@@ -1900,9 +1901,9 @@ subroutine init_pft_resp_params()
    growth_resp_factor(17)         = growthresp
 
    leaf_turnover_rate(1)          = 2.0
-   leaf_turnover_rate(2)          = 1.0
+   leaf_turnover_rate(2)          = 0.5 !1.0
    leaf_turnover_rate(3)          = 0.5
-   leaf_turnover_rate(4)          = onethird
+   leaf_turnover_rate(4)          = 0.5 !onethird
    leaf_turnover_rate(5)          = 2.0
    leaf_turnover_rate(6)          = onethird
    leaf_turnover_rate(7)          = onethird
@@ -1937,9 +1938,9 @@ subroutine init_pft_resp_params()
    root_turnover_rate(17)         = leaf_turnover_rate(17)
 
    storage_turnover_rate(1)       = onethird
-   storage_turnover_rate(2)       = onesixth
-   storage_turnover_rate(3)       = onesixth
-   storage_turnover_rate(4)       = onesixth
+   storage_turnover_rate(2)       = 0.0 !onesixth
+   storage_turnover_rate(3)       = 0.0 !onesixth
+   storage_turnover_rate(4)       = 0.0 !onesixth
    storage_turnover_rate(5)       = 0.00
    storage_turnover_rate(6)       = 0.00 ! 0.25
    storage_turnover_rate(7)       = 0.00 ! 0.25
@@ -2140,7 +2141,7 @@ subroutine init_pft_mort_params()
    mort3(1)  = m3_scale * ( m3_slope * (1. - rho( 1) / rho( 4)) )
    mort3(2)  = 0.07235222
    mort3(3)  = 0.04156404
-   mort3(4)  = 0.0!check
+   mort3(4)  = 0.0 ! check
    mort3(5)  = 0.066
    mort3(6)  = 0.0033928
    mort3(7)  = 0.0043
@@ -2244,7 +2245,7 @@ subroutine init_pft_mort_params()
          select case (iallom)
             case (0,1)
                seedling_mortality(1)     = 0.9500
-               seedling_mortality(2:4)   = onethird
+               seedling_mortality(2:4)   = 1.0 !onethird
                seedling_mortality(5)     = 0.9500
                seedling_mortality(6:8)   = onethird
                seedling_mortality(9:11)  = onethird
@@ -2448,9 +2449,9 @@ subroutine init_pft_alloc_params()
    !---------------------------------------------------------------------------------------!
    !---- [KIM] new tropical parameters. ---------------------------------------------------!
    rho(1)     = 0.20   ! 0.40
-   rho(2)     = 0.53   ! 0.40
-   rho(3)     = 0.71   ! 0.60
-   rho(4)     = 0.90   ! 0.87
+   rho(2)     = 0.52   ! 0.40
+   rho(3)     = 0.74   ! 0.60
+   rho(4)     = 0.84   ! 0.87
    rho(5)     = 0.20   ! Copied from C4 grass
    rho(6)     = 0.45   ! white pine - ponderosa pine
    rho(7)     = 0.57   ! Loblolly pine               
@@ -2479,9 +2480,9 @@ subroutine init_pft_alloc_params()
 
    !----- [KIM] - new tropical parameters. ------------------------------------------------!
    SLA( 1) = 22.7 !--value from Mike Dietze: mean: 22.7, median 19.1, 95% CI: 5.7, 78.6
-   SLA( 2) = 10.0**(sla_inter + sla_slope * log10(12.0/leaf_turnover_rate( 2))) * sla_scale
-   SLA( 3) = 10.0**(sla_inter + sla_slope * log10(12.0/leaf_turnover_rate( 3))) * sla_scale
-   SLA( 4) = 10.0**(sla_inter + sla_slope * log10(12.0/leaf_turnover_rate( 4))) * sla_scale
+   SLA( 2) = 20.5 !10.0**(sla_inter + sla_slope * log10(12.0/leaf_turnover_rate( 2))) * sla_scale
+   SLA( 3) = 18.7 !10.0**(sla_inter + sla_slope * log10(12.0/leaf_turnover_rate( 3))) * sla_scale
+   SLA( 4) = 15.7 !10.0**(sla_inter + sla_slope * log10(12.0/leaf_turnover_rate( 4))) * sla_scale
    SLA( 5) = 22.0
    SLA( 6) =  6.0
    SLA( 7) =  9.0
@@ -2544,6 +2545,7 @@ subroutine init_pft_alloc_params()
    ! it is updated...                                                                      !
    !---------------------------------------------------------------------------------------!
    qsw(1:4)    = SLA(1:4)   / sapwood_ratio(1:4)    !new is SLA(1:4)/(3900.0*2.0/1000.0)
+   qsw(2:4)    = 1.0
    qsw(5:13)   = SLA(5:13)  / sapwood_ratio(5:13)
    qsw(14:15)  = SLA(14:15) / sapwood_ratio(14:15)  !new is SLA(14:15)(3900.0*2.0/1000.0)
    qsw(16)     = SLA(16)    / sapwood_ratio(16)
@@ -2582,6 +2584,9 @@ subroutine init_pft_alloc_params()
    ! 
    !---------------------------------------------------------------------------------------!
    root_beta(1:17)   =   0.001
+   root_beta(2)      =   0.000285
+   root_beta(3)      =   0.002261
+   root_beta(4)      =   0.017588
 
 
 
@@ -2620,7 +2625,10 @@ subroutine init_pft_alloc_params()
    ! temperate PFTs, and the meaning for tropical PFTs depends on IALLOM...                !
    !---------------------------------------------------------------------------------------!
    !----- DBH-height allometry intercept [m]. ---------------------------------------------!
-   b1Ht(1:4)   = 0.0
+   b1Ht(1)     = 0.0
+   b1Ht(2)     = -0.0682
+   b1Ht(3)     = 0.9800
+   b1Ht(4)     = 0.3444
    b1Ht(5)     = 0.4778
    b1Ht(6)     = 27.14
    b1Ht(7)     = 27.14
@@ -2633,7 +2641,10 @@ subroutine init_pft_alloc_params()
    b1Ht(16)    = 0.0
    b1Ht(17)    = 0.0!check for what it is used, if for total biomass it's very different than if for putting leaves at that eight
    !----- DBH-height allometry slope [1/cm]. ----------------------------------------------!
-   b2Ht(1:4)   =  0.00
+   b2Ht(1)     =  0.00
+   b2Ht(2)     =  0.8368
+   b2Ht(3)     =  0.4756
+   b2Ht(4)     =  0.6571
    b2Ht(5)     = -0.75
    b2Ht(6)     = -0.03884
    b2Ht(7)     = -0.03884
@@ -2698,7 +2709,7 @@ subroutine init_pft_alloc_params()
    !    Minimum and maximum height allowed for each cohort.                                !
    !---------------------------------------------------------------------------------------!
    hgt_min(1)     = 0.50
-   hgt_min(2:4)   = 0.50
+   hgt_min(2:4)   = 1.50 !0.50
    hgt_min(5)     = 0.15
    hgt_min(6)     = 1.50
    hgt_min(7)     = 1.50
@@ -2790,7 +2801,10 @@ subroutine init_pft_alloc_params()
    ! size-and-age structure case, but we may overwrite them depending on the allometry.    !
    !---------------------------------------------------------------------------------------!
    !----- DBH-leaf allometry intercept [kg leaf biomass / plant * cm^(-b2Bl)]. ------------!
-   b1Bl_small(1:4)   = 0.0
+   b1Bl_small(1)     = 0.0
+   b1Bl_small(2)     = 0.0240
+   b1Bl_small(3)     = 0.0160
+   b1Bl_small(4)     = 0.0460
    b1Bl_small(5)     = 0.08
    b1Bl_small(6)     = 0.024
    b1Bl_small(7)     = 0.024
@@ -2803,7 +2817,10 @@ subroutine init_pft_alloc_params()
    b1Bl_small(16)    = 0.0
    b1Bl_small(17)    = 0.0
    !-----  DBH-leaf allometry slope [dimensionless]. --------------------------------------!
-   b2Bl_small(1:4)   = 0.0
+   b2Bl_small(1)     = 0.0
+   b2Bl_small(2)     = 1.750
+   b2Bl_small(3)     = 2.120
+   b2Bl_small(4)     = 1.930
    b2Bl_small(5)     = 1.0
    b2Bl_small(6)     = 1.899
    b2Bl_small(7)     = 1.899
@@ -2889,7 +2906,10 @@ subroutine init_pft_alloc_params()
       !------------------------------------------------------------------------------------!
    end do
    !----- DBH-stem allometry intercept [kg stem biomass / plant * cm^(-b2Bs)] -------------!
-   b1Bs_small(1:4)   = 0.0
+   b1Bs_small(1)     = 0.0
+   b1Bs_small(2)     = 0.042559
+   b1Bs_small(3)     = 0.073032
+   b1Bs_small(4)     = 0.074507
    b1Bs_small(5)     = 1.0e-5
    b1Bs_small(6)     = 0.147
    b1Bs_small(7)     = 0.147
@@ -2902,7 +2922,10 @@ subroutine init_pft_alloc_params()
    b1Bs_small(16)    = 0.0
    b1Bs_small(17)    = 0.0
    !----- DBH-stem allometry slope [dimensionless]. ---------------------------------------!
-   b2Bs_small(1:4)   = 0.0
+   b2Bs_small(1)     = 0.0
+   b2Bs_small(2)     = 2.32
+   b2Bs_small(3)     = 2.28
+   b2Bs_small(4)     = 2.33
    b2Bs_small(5)     = 1.0
    b2Bs_small(6)     = 2.238
    b2Bs_small(7)     = 2.238
@@ -3120,7 +3143,7 @@ subroutine init_pft_alloc_params()
    !    Users are welcome to update those numbuers based on literatures or measurements
    !---------------------------------------------------------------------------------------!
    b1SA(1)      = pio4 * 1.0
-   b1SA(2:4)    = pio4 * 0.75
+   b1SA(2:4)    = 0.545779 !pio4 * 0.75
    b1SA(5)      = pio4 * 1.0
    b1SA(6:8)    = pio4 * 0.3
    b1SA(9:11)   = pio4 * 0.3
@@ -3146,6 +3169,7 @@ subroutine init_pft_alloc_params()
 
    !----- Fraction of structural stem that is assumed to be above ground. -----------------!
    agf_bs(1:17)   = 0.7
+   agf_bs(2:4)    = 0.8
    !---------------------------------------------------------------------------------------!
 
 
@@ -3183,14 +3207,17 @@ subroutine init_pft_alloc_params()
    select case (iallom)
       case (0)
          b1Rd(1)     = - 0.700
-         b1Rd(2:4)   = - exp(0.545 * log(10.))
+         !b1Rd(2:4)   = - exp(0.545 * log(10.))
+         b1Rd(2)     = - 0.131120
+         b1Rd(3)     = - 0.174827
+         b1Rd(4)     = - 0.218533
          b1Rd(5)     = - 0.700
          b1Rd(6:11)  = - exp(0.545 * log(10.))
          b1Rd(12:16) = - 0.700
          b1Rd(17)    = - exp(0.545 * log(10.))
 
          b2Rd(1)     = 0.000
-         b2Rd(2:4)   = 0.277
+         b2Rd(2:4)   = 0.543644 !0.277
          b2Rd(5)     = 0.000
          b2Rd(6:11)  = 0.277
          b2Rd(12:16) = 0.000
@@ -3548,7 +3575,14 @@ subroutine init_pft_hydro_params()
    ! Parameters related with stomata conductance
    
    stoma_lambda(1:n_pft)         = max(3.,(rho(1:n_pft) - 0.25) * 15. + 3.)
+   stoma_lambda(2)               = 6.0 
+   stoma_lambda(3)               = 9.0
+   stoma_lambda(4)               = 12.0
    stoma_beta(1:n_pft)           = min(-0.1,(rho(1:n_pft) - 0.25) * 1.5 - 1.0) / MPa2m
+   stoma_beta(2)                 = -0.006863
+   stoma_beta(3)                 = -0.003922
+   stoma_beta(4)                 = -0.000980
+ 
    ! Estimated from Manzoni et al. 2011
 
    stoma_psi_b(1:n_pft)          = leaf_psi_tlp(1:n_pft)   ! default
@@ -3557,7 +3591,49 @@ subroutine init_pft_hydro_params()
    ! for tropical tolerant, use -2.83 * MPa2m, 3.5
    ! Powell et al. 2017
     
+   ! overwrite some parameters specifically for PFT 2,3,4
+   leaf_water_cap(2) = 0.000151
+   wood_water_cap(2) = 0.001546
+   leaf_psi_min(2)   = -673.017137
+   wood_psi_min(2)   = -826.874687
+   leaf_water_sat(2) = 1.850000
+   wood_water_sat(2) = 0.700000
+   leaf_rwc_min(2)   = 0.945164
+   wood_rwc_min(2)   = 0.000000
+   leaf_psi_tlp(2)   = -200.462756
+   wood_psi_tlp(2)   = -690.031223
+   wood_Kmax(2)      = 0.038997
+   wood_Kexp(2)      = 4.000000
+   wood_psi50(2)     = -220.218000
 
+   leaf_water_cap(3) = 0.000137
+   wood_water_cap(3) = 0.000406
+   leaf_psi_min(3)   = -644.505463
+   wood_psi_min(3)   = -1052.481948
+   leaf_water_sat(3) = 1.850000
+   wood_water_sat(3) = 0.700000
+   leaf_rwc_min(3)   = 0.952098
+   wood_rwc_min(3)   = 0.389126
+   leaf_psi_tlp(3)   = -247.660545
+   wood_psi_tlp(3)   = -485.747477
+   wood_Kmax(3)      = 0.022723
+   wood_Kexp(3)      = 4.000000
+   wood_psi50(3)     = -287.538000
+
+   leaf_water_cap(4) = 0.000115
+   wood_water_cap(4) = 0.000195
+   leaf_psi_min(4)   = -655.136290
+   wood_psi_min(4)   = -1414.987894
+   leaf_water_sat(4) = 1.850000
+   wood_water_sat(4) = 0.700000
+   leaf_rwc_min(4)   = 0.959119
+   wood_rwc_min(4)   = 0.606791
+   leaf_psi_tlp(4)   = -273.586844
+   wood_psi_tlp(4)   = -468.005838
+   wood_Kmax(4)      = 0.017777
+   wood_Kexp(4)      = 4.000000
+   wood_psi50(4)     = -318.138000
+   
    return
 end subroutine init_pft_hydro_params
 !==========================================================================================!
@@ -3720,7 +3796,8 @@ subroutine init_pft_leaf_params()
    !              has been replaced by 2.5.  Perhaps to account for the C:B ratio, but if  !
    !              this is the case, it is accounting for it twice.                         !
    !---------------------------------------------------------------------------------------!
-   wat_dry_ratio_grn(  1:4) = 1.85
+   wat_dry_ratio_grn(  1  ) = 1.85
+   wat_dry_ratio_grn(  2:4) = 2.50
    wat_dry_ratio_grn( 5:13) = 2.50
    wat_dry_ratio_grn(14:17) = 1.85
    !---------------------------------------------------------------------------------------!
@@ -3824,7 +3901,7 @@ subroutine init_pft_repro_params()
    nonlocal_dispersal(17)  =  1.000 ! 0.600
 
    repro_min_h(1)          =  0.0
-   repro_min_h(2:4)        = 18.0
+   repro_min_h(2:4)        = 15.0 !18.0
    repro_min_h(5)          =  0.0
    repro_min_h(6:11)       = 18.0
    repro_min_h(12:15)      =  0.0
