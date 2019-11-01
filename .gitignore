@@ -14,6 +14,7 @@ ED/build/ed_2.1-*
 
 # very general rules to ignore files in bin folder
 ED/build/bin*/*
+ED/run/*
 
 # specific rules
 BRAMS/*/bin/*.mod

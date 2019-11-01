@@ -1,0 +1,39 @@
+#Makefile include include.mk.opt
+
+MAKE=/usr/bin/make
+
+BASE=$(ED_ROOT)/build/
+
+USE_HDF5=1
+HDF5_INCS=-I$(HDF5_DIR)/include -I$(HDF5_DIR)/lib
+HDF5_LIBS=-L$(HDF5_DIR)/lib -lhdf5hl_fortran -lhdf5_hl -lhdf5_fortran -lhdf5 -lz -lm
+
+USE_COLLECTIVE_MPIO=0
+
+USENC=0
+NC_LIBS=L/dev/null
+
+USE_INTERF=1
+
+USE_MPIWTIME=1
+
+CMACH=PC_LINUX1
+F_COMP=mpif90 -heap-arrays
+C_COMP=mpicc
+LOADER=mpif90 -heap-arrays
+C_LOADER=mpicc
+LIBS=
+MOD_EXT=mod
+
+F_OPTS=-O2 -static -traceback
+F_SIMPLE_OPTS=-static -traceback -no-ip
+C_OPTS= -O3 -DUNDERSCORE -DLITTLE
+LOADER_OPTS=
+C_LOADER_OPTS=-v -traceback
+
+MPI_PATH=
+PAR_INCS=
+PAR_LIBS=
+PAR_DEFS=-DRAMS_MPI
+
+ARCHIVE=ar rs
