@@ -1599,7 +1599,7 @@ module fuse_fiss_utils
                   ,cpatch%leaf_psi(recc),cpatch%wood_psi(recc))
 
       if(cpatch%wood_rwc(recc) > 1.)then
-         cpatch%wood_psi(recc) = .
+         cpatch%wood_psi(recc) = 0.
          call psi2rwc(cpatch%leaf_psi(recc), cpatch%wood_psi(recc),cpatch%pft(recc) &
               ,cpatch%leaf_rwc(recc),cpatch%wood_rwc(recc))
          call rwc2tw(cpatch%leaf_rwc(recc),cpatch%wood_rwc(recc), &
