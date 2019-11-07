@@ -562,7 +562,7 @@ $ED_NL
    NL%LU_DATABASE       = ''
    NL%PLANTATION_FILE   = ''
    NL%THSUMS_DATABASE   = '/afs/crc/group/dmedvigy/'
-   NL%ED_MET_DRIVER_DB  = '/afs/crc/group/dmedvigy/HEADER/CA_HEADER'
+   NL%ED_MET_DRIVER_DB  = '/afs/crc/group/dmedvigy/HEADER/PV_MET_HEADER'
    NL%OBSTIME_DB        = '' !Reference file: /ED/run/obstime_template.time
    NL%SOILSTATE_DB      = '/n/gstore/Labs/moorcroft_lab_protected/data/ed2_data/ed_inputs/STW1996OCT.dat'
    NL%SOILDEPTH_DB      = '/n/gstore/Labs/moorcroft_lab_protected/data/ed2_data/ed_inputs/soil_depths.dat'
@@ -1329,7 +1329,7 @@ $ED_NL
    ! 7 - southern pines                   | 17 - "Araucaria" (non-optimised                !
    ! 8 - late conifers                    |      Southern Pines).                          !
    !---------------------------------------------------------------------------------------!
-   NL%INCLUDE_THESE_PFT = 2,3,4,17
+   NL%INCLUDE_THESE_PFT = 2,3,4,13,14,15,16,17
    NL%AGRI_STOCK        = 5
    NL%PLANTATION_STOCK  = 11
    !---------------------------------------------------------------------------------------!
@@ -1513,8 +1513,8 @@ $ED_NL
    !---------------------------------------------------------------------------------------!
    NL%IMETTYPE    = 1
    NL%ISHUFFLE    = 0
-   NL%METCYC1     = 2013
-   NL%METCYCF     = 2013
+   NL%METCYC1     = 2009
+   NL%METCYCF     = 2009
    NL%IMETAVG     = 0
    NL%IMETRAD     = 0
    NL%INITIAL_CO2 = 390.
@@ -1551,7 +1551,7 @@ $ED_NL
    !               simulation.                                                             !
    ! PHENPATH   -- path and prefix of the prescribed phenology data.                       !
    !---------------------------------------------------------------------------------------!
-   NL%IEDCNFGF   = '/afs/crc/group/dmedvigy/Shuyue/PV_mort.xml'
+   NL%IEDCNFGF   = '/afs/crc/group/dmedvigy/Shuyue/FertEx.xml'
    NL%EVENT_FILE = ''
    !---------------------------------------------------------------------------------------!
 
