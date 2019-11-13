@@ -649,7 +649,25 @@ subroutine read_ed10_ed20_history_file
                   ipft(ic) = ipft(ic) - 100
                end if
             end if
-
+            
+            ! Re-numbering PFTs for FertEx file compatibility
+            if(ipft(ic) == 27)then
+               ipft(ic) = 2
+            elseif(ipft(ic) == 26)then
+               ipft(ic) = 3
+            elseif(ipft(ic) == 24)then
+               ipft(ic) = 4
+            elseif(ipft(ic) == 29)then
+               ipft(ic) = 5
+            elseif(ipft(ic) == 38)then
+               ipft(ic) = 6
+            elseif(ipft(ic) == 37)then
+               ipft(ic) = 7
+            elseif(ipft(ic) == 36)then
+               ipft(ic) = 8
+            elseif(ipft(ic) == 39)then
+               ipft(ic) = 9
+            endif
             !----- Check if the year matches.  If not, we will ignore this cohort. --------!
             year = int(ctime(ic))
             if(use_target_year == 1 .and. year /= restart_target_year) then
