@@ -1551,7 +1551,7 @@ $ED_NL
    !               simulation.                                                             !
    ! PHENPATH   -- path and prefix of the prescribed phenology data.                       !
    !---------------------------------------------------------------------------------------!
-   NL%IEDCNFGF   = './FertEx_1PFT.xml'
+   NL%IEDCNFGF   = './FertEx_4PFT.xml'
    NL%EVENT_FILE = ''
    !---------------------------------------------------------------------------------------!
 

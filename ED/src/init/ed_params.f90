@@ -3873,7 +3873,8 @@ subroutine init_pft_derived_params()
       , negligible_nplant    & ! intent(out)
       , c2n_recruit          & ! intent(out)
       , veg_hcap_min         & ! intent(out)
-      , seed_rain            ! ! intent(out)
+      , seed_rain,b1Ht,b2Ht,b1CA,b2CA,bdead_crit,min_bdead,min_dbh,b2Bl_large,b1Bl_large &
+      , C2B, bleaf_adult, dbh_adult! ! intent(out)
    use allometry            , only : h2dbh                & ! function
       , dbh2h                & ! function
       , size2bl          & ! function
@@ -3942,7 +3943,17 @@ subroutine init_pft_derived_params()
    do ipft = 1,n_pft
 
       !----- Find the DBH and carbon pools associated with a newly formed recruit. --------!
+      dbh_crit(ipft)          = h2dbh(hgt_max(ipft),ipft)
+      dbh_bigleaf(ipft) = dbh_crit(ipft)
+      bleaf_adult(ipft) = b1Bl_large(ipft) / C2B * dbh_adult(ipft) ** b2Bl_large(ipft)
       dbh          = h2dbh(hgt_min(ipft),ipft)
+      min_dbh(ipft) = dbh
+      min_bdead (ipft) = dbh2bd(min_dbh (ipft),ipft)
+      bdead_crit(ipft) = dbh2bd(dbh_crit(ipft),ipft)
+
+      b1Ca(ipft) = exp(-1.853) * exp(b1Ht(ipft)) ** 1.888
+      b2Ca(ipft) = b2Ht(ipft) * 1.888
+
       bleaf_min    = size2bl(dbh,hgt_min(ipft),ipft)
       broot_min    = bleaf_min * q(ipft)
       bsapwood_min = bleaf_min * qsw(ipft) * hgt_min(ipft)
@@ -4050,9 +4061,10 @@ subroutine init_pft_derived_params()
          ,broot_min,dbh,leaf_rwc_min(ipft),wood_rwc_min(ipft)                              &
          ,leaf_hcap_min,wood_hcap_min)
 
-      leaf_hcap_min = 0. ! recommend by Xiangtao's config file
-
       veg_hcap_min(ipft) = elongf_min * leaf_hcap_min
+
+      veg_hcap_min(ipft) = 0. ! recommend by Xiangtao's config file
+
       lai_min            = elongf_min * init_density(ipft) * bleaf_min * sla(ipft)
       !------------------------------------------------------------------------------------!
 
