@@ -1329,7 +1329,7 @@ $ED_NL
    ! 7 - southern pines                   | 17 - "Araucaria" (non-optimised                !
    ! 8 - late conifers                    |      Southern Pines).                          !
    !---------------------------------------------------------------------------------------!
-   NL%INCLUDE_THESE_PFT = 2
+   NL%INCLUDE_THESE_PFT = 2,3,4,5
    NL%AGRI_STOCK        = 5
    NL%PLANTATION_STOCK  = 11
    !---------------------------------------------------------------------------------------!
