@@ -4049,6 +4049,9 @@ subroutine init_pft_derived_params()
       call calc_veg_hcap(bleaf_min,bdead_min,bsapwood_min,init_density(ipft),ipft          &
          ,broot_min,dbh,leaf_rwc_min(ipft),wood_rwc_min(ipft)                              &
          ,leaf_hcap_min,wood_hcap_min)
+
+      leaf_hcap_min = 0. ! recommend by Xiangtao's config file
+
       veg_hcap_min(ipft) = elongf_min * leaf_hcap_min
       lai_min            = elongf_min * init_density(ipft) * bleaf_min * sla(ipft)
       !------------------------------------------------------------------------------------!
@@ -5641,5 +5644,65 @@ subroutine overwrite_with_xml_config(thisnode)
 !   call write_ed_xml_config()
    return
 end subroutine overwrite_with_xml_config
+
+subroutine test_xml_params()
+  use pft_coms
+  use decomp_coms
+  use canopy_radiation_coms
+  use rk4_coms
+  implicit none
+  integer :: ipft
+
+  ipft=2
+
+  print*,is_tropical(ipft), is_liana(ipft), is_grass(ipft)
+  print*,D0(ipft), Vm_low_temp(ipft), Vm_high_temp(ipft), Vm_decay_e(ipft), Vm_decay_a(ipft)
+  print*,Vm_decay_b(ipft),Vm0(ipft),vm_hor(ipft),vm_q10(ipft)
+  print*
+  print*,dark_respiration_factor(ipft),Rd_low_temp(ipft),Rd_high_temp(ipft),Rd_decay_e(ipft)
+  print*,Rd_hor(ipft),Rd_q10(ipft),Rd0(ipft),stomatal_slope(ipft),cuticular_cond(ipft)
+  print*,quantum_efficiency(ipft),water_conductance(ipft),photosyn_pathway(ipft),leaf_width(ipft)
+  print*
+  print*,growth_resp_factor(ipft),leaf_turnover_rate(ipft),root_turnover_rate(ipft),storage_turnover_rate(ipft)
+  print*,f_labile(ipft),root_respiration_factor(ipft),rrf_low_temp(ipft),rrf_high_temp(ipft),rrf_decay_e(ipft)
+  print*,rrf_hor(ipft),rrf_q10(ipft),rho(ipft),sla(ipft),horiz_branch(ipft)
+  print*
+  print*,4
+  print*,q(ipft),sapwood_ratio(ipft),qsw(ipft),sra(ipft),root_beta(ipft)
+  print*,init_density(ipft),b1Ht(ipft),b2Ht(ipft),hgt_ref(ipft),hgt_min(ipft)
+  print*,hgt_max(ipft),dbh_adult(ipft),dbh_bigleaf(ipft),b1Bl_small(ipft),b2Bl_large(ipft)
+  print*
+  print*,5
+  print*,bleaf_adult(ipft),b1Bs_small(ipft),b1Bs_large(ipft),b2Bs_small(ipft),b2Bs_large(ipft)
+  print*,min_bdead(ipft),b1Ca(ipft),b2Ca(ipft),b1WAI(ipft),b2WAI(ipft)
+  print*,b1SA(ipft),b2SA(ipft),agf_bs(ipft),brf_wd(ipft),b1Vol(ipft)
+  print*
+  print*,6
+  print*,b2Vol(ipft),b1Rd(ipft),b2Rd(ipft),init_laimax(ipft),frost_mort(ipft)
+  print*,mort0(ipft),mort1(ipft),mort2(ipft),mort3(ipft),cbr_severe_stress(ipft)
+  print*,seedling_mortality(ipft),treefall_s_ltht(ipft),treefall_s_gtht(ipft),fire_s_gtht(ipft),fire_s_ltht(ipft)
+  print*
+  print*,7
+  print*,plant_min_temp(ipft),c2n_leaf(ipft),vessel_curl_factor(ipft),stoma_psi_c(ipft),phenology(ipft)
+  print*,high_psi_threshold(ipft),low_psi_threshold(ipft),leaf_shed_rate(ipft),leaf_grow_rate(ipft),c_grn_leaf_dry(ipft)
+  print*,wat_dry_ratio_ngrn(ipft),wat_dry_ratio_grn(ipft),c_ngrn_biom_dry(ipft),delta_c(ipft),b1Cl(ipft)
+  print*
+  print*,8
+  print*,b2Cl(ipft),r_fract(ipft),st_fract(ipft),nonlocal_dispersal(ipft),repro_min_h(ipft)
+  print*,clumping_factor(ipft),orient_factor(ipft),leaf_emiss_tir(ipft),wood_emiss_tir(ipft),leaf_reflect_vis(ipft)
+  print*,leaf_reflect_nir(ipft),wood_reflect_vis(ipft),wood_reflect_nir(ipft),leaf_trans_vis(ipft),leaf_trans_nir(ipft)
+  print*
+  print*,9
+  print*,wood_trans_vis(ipft),wood_trans_nir(ipft),leaf_backscatter_tir(ipft),wood_backscatter_tir(ipft),effarea_transp(ipft)
+  print*,stoma_lambda(ipft),stoma_beta(ipft),leaf_water_cap(ipft),wood_water_cap(ipft),leaf_psi_min(ipft)
+  print*,wood_psi_min(ipft),leaf_water_sat(ipft),wood_water_sat(ipft),leaf_rwc_min(ipft),wood_rwc_min(ipft)
+  print*
+  print*,10
+  print*,leaf_psi_tlp(ipft),wood_psi_tlp(ipft),wood_Kmax(ipft),wood_Kexp(ipft),wood_psi50(ipft)
+
+
+  return
+end subroutine test_xml_params
+
 !==========================================================================================!
 !==========================================================================================!
