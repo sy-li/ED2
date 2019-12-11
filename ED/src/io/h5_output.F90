@@ -52,6 +52,7 @@ subroutine h5_output(vtype)
                            , sitetype              & ! structure
                            , patchtype             & ! structure
                            , gdpy                  ! ! intent(in)
+   use mend_state_vars, only: npom
    implicit none
 
    !------ Include standard common blocks. ------------------------------------------------!
@@ -852,7 +853,7 @@ subroutine geth5dims(idim_type,varlen,globid,var_len_global,dsetrank,varn,nrec,i
                                  , n_dbh          & ! intent(in)
                                  , n_age          & ! intent(in)
                                  , n_mort         & ! intent(in)
-                                 , n_radprof      ! ! intent(in)
+                                 , n_radprof,nlitter      ! ! intent(in)
    use hdf5_coms          , only : chnkdims       & ! intent(in)
                                  , chnkoffs       & ! intent(in)
                                  , cnt            & ! intent(in)
@@ -860,7 +861,7 @@ subroutine geth5dims(idim_type,varlen,globid,var_len_global,dsetrank,varn,nrec,i
                                  , globdims       ! ! intent(in)
    use fusion_fission_coms, only : ff_nhgt        ! ! intent(in)
    use ed_misc_coms       , only : ndcycle        ! ! intent(in)
-
+   use mend_state_vars, only: npom
    implicit none
    !----- Arguments. ----------------------------------------------------------------------!
    character(len=*), intent(in)  :: varn
@@ -1304,6 +1305,18 @@ subroutine geth5dims(idim_type,varlen,globid,var_len_global,dsetrank,varn,nrec,i
       cnt(1:2)    = 1_8
       stride(1:2) = 1_8
 
+   case (311) !(npom,npatches)
+      
+      dsetrank = 2
+      globdims(1) = int(npom,8)
+      chnkdims(1) = int(npom,8)
+      chnkoffs(1) = 0_8
+      globdims(2) = int(var_len_global,8)
+      chnkdims(2) = int(varlen,8)
+      chnkoffs(2) = int(globid,8)
+      cnt(1:2)    = 1_8
+      stride(1:2) = 1_8
+
    case (34) !(n_pft,npatches)
       
       ! PFT type
@@ -1341,6 +1354,18 @@ subroutine geth5dims(idim_type,varlen,globid,var_len_global,dsetrank,varn,nrec,i
       dsetrank = 2
       globdims(1) = int(n_dbh,8)
       chnkdims(1) = int(n_dbh,8)
+      chnkoffs(1) = 0_8
+      globdims(2) = int(var_len_global,8)
+      chnkdims(2) = int(varlen,8)
+      chnkoffs(2) = int(globid,8)
+      cnt(1:2)    = 1_8
+      stride(1:2) = 1_8
+  
+   case (332) !(nlitter,npatches)
+      
+      dsetrank = 2
+      globdims(1) = int(nlitter,8)
+      chnkdims(1) = int(nlitter,8)
       chnkoffs(1) = 0_8
       globdims(2) = int(var_len_global,8)
       chnkdims(2) = int(varlen,8)

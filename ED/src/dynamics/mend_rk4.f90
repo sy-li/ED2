@@ -14,13 +14,13 @@ Contains
     type(mend_model) :: dy
     type(mend_model) :: scale
     real, intent(in) :: htry
-    integer :: iwood
+!    integer :: iwood
 
     call mend_rk4_scale_type(y%som, dy%som, scale%som, htry)
-    call mend_rk4_scale_type(y%litt, dy%litt, scale%litt, htry)
-    do iwood = 1, nwood
-       call mend_rk4_scale_type(y%wood(iwood), dy%wood(iwood), scale%wood(iwood), htry)
-    enddo
+!    call mend_rk4_scale_type(y%litt, dy%litt, scale%litt, htry)
+!    do iwood = 1, nwood
+!       call mend_rk4_scale_type(y%wood(iwood), dy%wood(iwood), scale%wood(iwood), htry)
+!    enddo
 
     return
   end subroutine mend_rk4_scale
@@ -93,15 +93,15 @@ Contains
     type(mend_model) :: y
     type(mend_model) :: dy
     real, intent(in) :: step
-    integer :: iwood
+!    integer :: iwood
     integer, intent(in) :: ip1
     integer, intent(in) :: ip2
 
     call mend_rk4_inc_type(y%som, dy%som, step, ip1, ip2)
-    call mend_rk4_inc_type(y%litt, dy%litt, step, ip1, ip2)
-    do iwood = 1, nwood
-       call mend_rk4_inc_type(y%wood(iwood), dy%wood(iwood), step, ip1, ip2)
-    enddo
+!    call mend_rk4_inc_type(y%litt, dy%litt, step, ip1, ip2)
+!    do iwood = 1, nwood
+!       call mend_rk4_inc_type(y%wood(iwood), dy%wood(iwood), step, ip1, ip2)
+!    enddo
 
     return
   end subroutine mend_rk4_inc
@@ -222,13 +222,13 @@ Contains
     type(mend_model) :: errv
     type(mend_model) :: scalev
     real(kind=8), intent(inout) :: errmax
-    integer :: iwood
+!    integer :: iwood
 
     call mend_rk4_errmax_type(scalev%som, errv%som, errmax)
-    call mend_rk4_errmax_type(scalev%litt, errv%litt, errmax)
-    do iwood = 1, nwood
-       call mend_rk4_errmax_type(scalev%wood(iwood), errv%wood(iwood), errmax)
-    enddo
+!    call mend_rk4_errmax_type(scalev%litt, errv%litt, errmax)
+!    do iwood = 1, nwood
+!       call mend_rk4_errmax_type(scalev%wood(iwood), errv%wood(iwood), errmax)
+!    enddo
 
     return
   end subroutine mend_rk4_errmax
@@ -301,7 +301,7 @@ Contains
     implicit none
     
     type(mend_model) :: mend
-    integer :: iwood
+!    integer :: iwood
     logical, intent(inout) :: reject_step
 
     call mend_rk4_sanity_type(mend%som, reject_step)

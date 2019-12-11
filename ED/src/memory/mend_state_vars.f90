@@ -2,7 +2,7 @@ Module mend_state_vars
   implicit none
 
   integer, parameter :: npom=2
-  integer, parameter :: nwood=4
+  integer, parameter :: nwood=0
   real :: mend_mm_time
 
   ! Can be used for SOM or litter
@@ -84,8 +84,8 @@ Module mend_state_vars
 
   type mend_model
      type(mend_vars) :: som
-     type(mend_vars) :: litt
-     type(mend_vars), dimension(nwood) :: wood
+!     type(mend_vars) :: litt
+!     type(mend_vars), dimension(nwood) :: wood
      type(exchange_vars) :: exchange
      real, allocatable, dimension(:) :: bulk_den  ! kg/m3
      real, allocatable, dimension(:) :: pH
@@ -97,13 +97,13 @@ Contains
     implicit none
     integer, intent(in) :: npatches
     type(mend_model) :: mend
-    integer :: iwood
+!    integer :: iwood
 
     call mend_allocate_type(mend%som, npatches)
-    call mend_allocate_type(mend%litt, npatches)
-    do iwood = 1, nwood
-       call mend_allocate_type(mend%wood(iwood), npatches)
-    enddo
+!    call mend_allocate_type(mend%litt, npatches)
+!    do iwood = 1, nwood
+!       call mend_allocate_type(mend%wood(iwood), npatches)
+!    enddo
 !    call mend_allocate_exchange(mend%exchange, npatches)
 
     allocate(mend%bulk_den(npatches))
@@ -203,13 +203,13 @@ Contains
   subroutine mend_deallocate(mend)
     implicit none
     type(mend_model) :: mend
-    integer :: iwood
+!    integer :: iwood
 
     call mend_deallocate_type(mend%som)
-    call mend_deallocate_type(mend%litt)
-    do iwood = 1, nwood
-       call mend_deallocate_type(mend%wood(iwood))
-    enddo
+!    call mend_deallocate_type(mend%litt)
+!    do iwood = 1, nwood
+!       call mend_deallocate_type(mend%wood(iwood))
+!    enddo
 !    call mend_deallocate_exchange(mend%exchange)
 
     deallocate(mend%bulk_den)
@@ -308,13 +308,13 @@ Contains
     type(mend_model) :: omend
     integer, intent(in) :: iipa
     integer, intent(in) :: oipa
-    integer :: iwood
+!    integer :: iwood
 
     call copy_mendtype_type(imend%som,omend%som,iipa,oipa)
-    call copy_mendtype_type(imend%litt,omend%litt,iipa,oipa)
-    do iwood = 1, nwood
-       call copy_mendtype_type(imend%wood(iwood),omend%wood(iwood),iipa,oipa)
-    enddo
+!    call copy_mendtype_type(imend%litt,omend%litt,iipa,oipa)
+!    do iwood = 1, nwood
+!       call copy_mendtype_type(imend%wood(iwood),omend%wood(iwood),iipa,oipa)
+!    enddo
 !    call copy_mendtype_exchange(imend%exchange, omend%exchange, ipa)
 
     omend%bulk_den(oipa) = imend%bulk_den(iipa)
@@ -442,13 +442,13 @@ Contains
     logical, dimension(masksz), intent(in) :: logmask
     type(mend_model) :: omend
     integer, intent(in) :: inc
-    integer :: iwood
+!    integer :: iwood
 
     call copy_mendtype_mask_type(imend%som, omend%som, masksz, logmask, inc)
-    call copy_mendtype_mask_type(imend%litt, omend%litt, masksz, logmask, inc)
-    do iwood = 1, nwood
-       call copy_mendtype_mask_type(imend%wood(iwood), omend%wood(iwood), masksz, logmask, inc)
-    enddo
+!    call copy_mendtype_mask_type(imend%litt, omend%litt, masksz, logmask, inc)
+!    do iwood = 1, nwood
+!       call copy_mendtype_mask_type(imend%wood(iwood), omend%wood(iwood), masksz, logmask, inc)
+!    enddo
 !    call copy_mendtype_mask_exchange(imend%exchange, omend%exchange, masksz, logmask, inc)
 
     omend%bulk_den(1:inc) = pack(imend%bulk_den, logmask)
@@ -605,15 +605,15 @@ Contains
     call filltab_mendtype_type(nvar, npatches, mend%som, igr, init, paglob_id, var_len, &
               var_len_global, max_ptrs, type_string)
 
-    type_string = 'MEND_LITT_'
+!    type_string = 'MEND_LITT_'
 !    call filltab_mendtype_type(nvar, npatches, mend%litt, igr, init, paglob_id, var_len, &
 !              var_len_global, max_ptrs, type_string)
 
-    do iwood = 1, nwood
-       write(type_string,'(a,i1.1,a)')'MEND_WOOD',iwood,'_'
+!    do iwood = 1, nwood
+!       write(type_string,'(a,i1.1,a)')'MEND_WOOD',iwood,'_'
 !       call filltab_mendtype_type(nvar, npatches, mend%wood(iwood), igr, init, paglob_id,  &
 !            var_len, var_len_global, max_ptrs, type_string)
-    enddo
+!    enddo
 
 !    type_string = 'MEND_EX_'
 !    call filltab_mendtype_exchange(nvar, npatches, mend%exchange, igr, init, paglob_id,   &
@@ -885,10 +885,10 @@ Contains
     integer, intent(in) :: ip2
 
     call mend_zero_rk4_type(mend%som, ip1, ip2)
-    call mend_zero_rk4_type(mend%litt, ip1, ip2)
-    do iwood = 1, nwood
-       call mend_zero_rk4_type(mend%wood(iwood), ip1, ip2)
-    enddo
+!    call mend_zero_rk4_type(mend%litt, ip1, ip2)
+!    do iwood = 1, nwood
+!       call mend_zero_rk4_type(mend%wood(iwood), ip1, ip2)
+!    enddo
     
 !    mend%bulk_den = 0.
 !    mend%pH = 0.
