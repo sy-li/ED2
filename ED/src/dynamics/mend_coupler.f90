@@ -299,10 +299,10 @@ Contains
 !    use mend_litter, only: litt_extern_forcing
     use mend_som, only: som_extern_forcing
     use mend_consts_coms, only: som_consts
-    use nutrient_constants, only: ndep_rate, pdep_rate, ndep_appl, pdep_appl
+    use nutrient_constants, only: ndep_rate, pdep_rate, ndep_appl, pdep_appl, nlsl
     use ed_misc_coms, only: current_time
     use mend_plant, only: som_plant_enzymes, litt_plant_enzymes, wood_plant_enzymes
-    use soil_coms, only: nzg,nlsl
+    use soil_coms, only: nzg
     implicit none
     type(mend_model) :: mend
     integer, intent(in) :: ipa
@@ -376,8 +376,9 @@ Contains
     use mend_consts_coms, only: som_consts, litt_consts, wood_consts
     use mend_state_vars, only: mend_vars, exchange_vars, npom, nwood
     use grid_coms, only: nzg
-    use soil_coms, only: dslz, nlsl, soil
+    use soil_coms, only: dslz, soil
     use consts_coms, only: wdns, pi1
+    use nutrient_constants, only: nlsl
 
     implicit none
 
