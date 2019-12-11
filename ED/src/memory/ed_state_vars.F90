@@ -48,6 +48,8 @@ module ed_state_vars
                                  , history_eorq      & ! intent(in)
                                  , ndcycle           ! ! intent(in)
 
+   use mend_state_vars, only: mend_model
+
    implicit none
    !=======================================================================================!
    !=======================================================================================!
@@ -1785,6 +1787,10 @@ module ed_state_vars
       real,pointer,dimension(:,:)   :: qmsqu_sensible_ac
       !====================================================================================!
       !====================================================================================!
+
+      type(mend_model) :: mend
+      type(mend_model) :: mend_mm
+
    end type sitetype
    !=======================================================================================!
    !=======================================================================================!
@@ -4162,6 +4168,8 @@ module ed_state_vars
    !---------------------------------------------------------------------------------------!
    subroutine allocate_sitetype(csite,npatches)
 
+     use mend_state_vars, only: mend_allocate
+
       implicit none
 
       !----- Arguments. -------------------------------------------------------------------!
@@ -4203,6 +4211,9 @@ module ed_state_vars
          csite%patch(ipa)%ncohorts = 0
       end do
       !------------------------------------------------------------------------------------!
+
+      call mend_allocate(csite%mend, npatches)
+      call mend_allocate(csite%mend_mm, npatches)
 
       allocate(csite%paco_id                       (              npatches))
       allocate(csite%paco_n                        (              npatches))
@@ -7047,6 +7058,7 @@ module ed_state_vars
    !> \brief   De-allocates all patch pointers
    !---------------------------------------------------------------------------------------!
    subroutine deallocate_sitetype(csite)
+     use mend_state_vars, only: mend_deallocate
       implicit none
 
       !----- Arguments. -------------------------------------------------------------------!
@@ -7054,6 +7066,11 @@ module ed_state_vars
       !----- Local variables. -------------------------------------------------------------!
       integer                   :: ipa
       !------------------------------------------------------------------------------------!
+
+      if(allocated(csite%mend%som%cvars%mom))then
+         call mend_deallocate(csite%mend)
+         call mend_deallocate(csite%mend_mm)
+      endif
 
 
       !------------------------------------------------------------------------------------!
@@ -8047,6 +8064,7 @@ module ed_state_vars
    !>          allocated, so this should be never used in a previously allocated patch.
    !---------------------------------------------------------------------------------------!
    subroutine copy_sitetype(isite,osite,ipaa,ipaz,opaa,opaz)
+     use mend_state_vars, only: copy_mendtype
       implicit none
       !----- Arguments. -------------------------------------------------------------------!
       type(sitetype)  , target     :: isite ! Input  (donor) site
@@ -8093,6 +8111,10 @@ module ed_state_vars
          call copy_patchtype    (isite%patch(ipa),osite%patch(opa)                         &
                                 ,1,isite%patch(ipa)%ncohorts,1,isite%patch(ipa)%ncohorts)
          !---------------------------------------------------------------------------------!
+
+         call copy_mendtype(isite%mend, osite%mend, ipa, ipa)
+         call copy_mendtype(isite%mend_mm, osite%mend_mm, ipa, ipa)
+
 
 
          !----- Scalars. ------------------------------------------------------------------!
@@ -8639,7 +8661,7 @@ module ed_state_vars
    !---------------------------------------------------------------------------------------!
 
    subroutine copy_sitetype_mask(isite,osite,lmask,isize,osize)
-
+     use mend_state_vars, only: copy_mendtype_mask
 
       implicit none
       !----- Arguments. -------------------------------------------------------------------!
@@ -8685,6 +8707,8 @@ module ed_state_vars
       end do
       !------------------------------------------------------------------------------------!
 
+      call copy_mendtype_mask(isite%mend,z,lmask,osite%mend,isize)
+      call copy_mendtype_mask(isite%mend_mm,z,lmask,osite%mend_mm,isize)
 
       !------------------------------------------------------------------------------------!
       !      We break the subroutines into smaller pieces so Fortran doesn't complain...   !
@@ -19836,7 +19860,7 @@ module ed_state_vars
    !> into smaller routines.
    !---------------------------------------------------------------------------------------!
    subroutine filltab_sitetype(igr,ipy,isi,init)
-
+     use mend_state_vars, only: filltab_mendtype
       implicit none
       !----- Arguments. -------------------------------------------------------------------!
       integer       , intent(in) :: init
@@ -20021,6 +20045,11 @@ module ed_state_vars
            var_len,var_len_global,max_ptrs,'AREA :31:hist:anal:dail:mont:dcyc:year') 
          call metadata_edio(nvar,igr,'No metadata available','[NA]','NA') 
       end if
+
+      if(allocated(csite%mend%som%cvars%dom))then
+         call filltab_mendtype(nvar,npts,csite%mend_mm,igr,init,csite%paglob_id, &
+              var_len, var_len_global, max_ptrs)
+      endif
 
       if (associated(csite%fast_soil_C)) then
          nvar=nvar+1
