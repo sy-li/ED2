@@ -99,6 +99,7 @@ OBJ_MODEL =                        \
 	mortality.o                \
 	multiple_scatter.o         \
 	numutils.o                 \
+	nutrient_constants.o \
 	old_twostream_rad.o        \
 	phenology_aux.o            \
 	phenology_coms.o           \
