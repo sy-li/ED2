@@ -85,6 +85,16 @@ OBJ_MODEL =                        \
 	libxml2f90.f90_pp.o        \
 	lsm_hyd.o                  \
 	mem_polygons.o             \
+	mend_coupler.o \
+	mend_derivs.o \
+	mend_diagnose.o \
+	mend_exchange.o \
+	mend_plant.o \
+	mend_rk4.o \
+	mend_som.o \
+	mend_averages.o \
+	mend_consts_coms.o \
+	mend_state_vars.o \
 	met_driver_coms.o          \
 	mortality.o                \
 	multiple_scatter.o         \
