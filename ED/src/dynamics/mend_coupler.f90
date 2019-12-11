@@ -366,7 +366,7 @@ Contains
 
   subroutine mend_derivs_coupler(som, d_som, litt, d_litt, wood, d_wood, &
        csite, ipa, som_water_drainage, soil_water, d_can_co2, &
-       d_co2budget_storage,ccapcani)
+       d_co2budget_storage,ccapcani, ntext_soil)
     use mend_exchange, only: litt2som_exchange, plant2litt_exchange, &
          plant2som_exchange, plant2wood_exchange, wood2litt_exchange, &
          wood2som_exchange, zero_exchange_vars, inc_exchange_vars, &
@@ -424,8 +424,10 @@ Contains
     real(kind=8), intent(inout) :: d_can_co2
     real(kind=8), intent(inout) :: d_co2budget_storage
     real :: wfp
+    integer, dimension(nzg) :: ntext_soil
 
-    wfp = soil_water(nzg) / soil(csite%ntext_soil(nzg,ipa))%slmsts
+    wfp = soil_water(nzg) / soil(ntext_soil(nzg))%slmsts
+!    wfp = soil_water(nzg) / soil(csite%ntext_soil(nzg,ipa))%slmsts
     gm2_mgg = 1. / (som_consts%eff_soil_depth * csite%mend%bulk_den(ipa))
     total_water = 0.
     do k = nlsl, nzg
