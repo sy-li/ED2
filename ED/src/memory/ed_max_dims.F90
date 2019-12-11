@@ -250,6 +250,8 @@ module ed_max_dims
    integer, parameter :: maxpvars = 50
    !---------------------------------------------------------------------------------------!
 
+   integer, parameter :: nlitter = 3
+
 
 
    !----- Maximum number of files that can be read by filelist. ---------------------------!

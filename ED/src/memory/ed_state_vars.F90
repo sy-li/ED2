@@ -28,7 +28,7 @@ module ed_state_vars
                                  , n_radprof         & ! intent(in)
                                  , maxmach           & ! intent(in)
                                  , maxgrds           & ! intent(in)
-                                 , str_len           ! ! intent(in)
+                                 , str_len,nlitter           ! ! intent(in)
    use disturb_coms       , only : lutime            & ! intent(in)
                                  , num_lu_trans      & ! intent(in)
                                  , max_lu_years      ! ! intent(in)
@@ -1032,6 +1032,10 @@ module ed_state_vars
       !!4.  Fire.\n
       !!5.  Forest regrowth.\n
       !!6.  Logged forest.\n
+
+      real, pointer, dimension(:,:) :: plant_input_C
+      real, pointer, dimension(:,:) :: plant_input_N
+      real, pointer, dimension(:,:) :: plant_input_P
 
       real , pointer,dimension(:) :: fast_soil_C 
       !<Soil carbon concentration, fast pool (kg/m2)
@@ -4215,6 +4219,10 @@ module ed_state_vars
       call mend_allocate(csite%mend, npatches)
       call mend_allocate(csite%mend_mm, npatches)
 
+      allocate(csite%plant_input_C(nlitter,npatches))
+      allocate(csite%plant_input_N(nlitter,npatches))
+      allocate(csite%plant_input_P(nlitter,npatches))
+
       allocate(csite%paco_id                       (              npatches))
       allocate(csite%paco_n                        (              npatches))
       allocate(csite%cohort_count                  (              npatches))
@@ -6104,6 +6112,10 @@ module ed_state_vars
       type(sitetype), target :: csite
       !------------------------------------------------------------------------------------!
 
+      nullify(csite%plant_input_C)
+      nullify(csite%plant_input_N)
+      nullify(csite%plant_input_P)
+
       nullify(csite%paco_id                    )
       nullify(csite%paco_n                     )
       nullify(csite%patch                      )
@@ -7072,6 +7084,9 @@ module ed_state_vars
          call mend_deallocate(csite%mend_mm)
       endif
 
+      if(associated(csite%plant_input_C))deallocate(csite%plant_input_C)
+      if(associated(csite%plant_input_N))deallocate(csite%plant_input_N)
+      if(associated(csite%plant_input_P))deallocate(csite%plant_input_P)
 
       !------------------------------------------------------------------------------------!
       !     First thing we must do is to deallocate the nested dimensions.                 !
@@ -8078,6 +8093,7 @@ module ed_state_vars
       integer                      :: opa   ! Counter for the output site patches
       integer                      :: m     ! First counter
       integer                      :: n     ! Second counter
+      integer :: ilitter
       !------------------------------------------------------------------------------------!
 
 
@@ -8114,7 +8130,11 @@ module ed_state_vars
 
          call copy_mendtype(isite%mend, osite%mend, ipa, ipa)
          call copy_mendtype(isite%mend_mm, osite%mend_mm, ipa, ipa)
-
+         do ilitter = 1, nlitter
+            osite%plant_input_C(ilitter,ipa) = isite%plant_input_C(ilitter,ipa)
+            osite%plant_input_N(ilitter,ipa) = isite%plant_input_N(ilitter,ipa)
+            osite%plant_input_P(ilitter,ipa) = isite%plant_input_P(ilitter,ipa)
+         enddo
 
 
          !----- Scalars. ------------------------------------------------------------------!
@@ -8751,7 +8771,10 @@ module ed_state_vars
       !----- Local variables. -------------------------------------------------------------!
       integer                                      :: m
       integer                                      :: n
+      integer :: ilitter
       !------------------------------------------------------------------------------------!
+
+
 
 
       !----- Scalars. ---------------------------------------------------------------------!
@@ -8903,6 +8926,11 @@ module ed_state_vars
       end do
       !------------------------------------------------------------------------------------!
 
+      do ilitter = 1, nlitter
+         osite%plant_input_C(ilitter,1:z) = pack(isite%plant_input_C(ilitter,:),lmask)
+         osite%plant_input_N(ilitter,1:z) = pack(isite%plant_input_N(ilitter,:),lmask)
+         osite%plant_input_P(ilitter,1:z) = pack(isite%plant_input_P(ilitter,:),lmask)
+      enddo
 
       !----- Soil variables. --------------------------------------------------------------!
       do m=1,nzg
@@ -19910,6 +19938,12 @@ module ed_state_vars
       call filltab_sitetype_p346    (csite,igr,init,var_len,var_len_global,max_ptrs,nvar)
       !------------------------------------------------------------------------------------!
 
+      if(allocated(csite%mend%som%cvars%dom))then
+         call filltab_mendtype(nvar,csite%npatches,csite%mend_mm,igr,init,csite%paglob_id, &
+              var_len, var_len_global, max_ptrs)
+      endif
+
+
       !----- Save the number of patch-level (sitetype) variables that go to the output. ---!
       if (init == 0) niosite=nvar-niopoly-niogrid-nioglobal
       !------------------------------------------------------------------------------------!
@@ -20045,11 +20079,6 @@ module ed_state_vars
            var_len,var_len_global,max_ptrs,'AREA :31:hist:anal:dail:mont:dcyc:year') 
          call metadata_edio(nvar,igr,'No metadata available','[NA]','NA') 
       end if
-
-      if(allocated(csite%mend%som%cvars%dom))then
-         call filltab_mendtype(nvar,npts,csite%mend_mm,igr,init,csite%paglob_id, &
-              var_len, var_len_global, max_ptrs)
-      endif
 
       if (associated(csite%fast_soil_C)) then
          nvar=nvar+1
@@ -23799,6 +23828,25 @@ module ed_state_vars
       !------------------------------------------------------------------------------------!
 
 
+      npts = csite%npatches * nlitter
+      if (associated(csite%plant_input_C)) then
+         nvar=nvar+1
+           call vtable_edio_r(npts,csite%plant_input_C,nvar,igr,init,csite%paglob_id, &
+           var_len,var_len_global,max_ptrs,'PLANT_INPUT_C :332:hist:mont:year') 
+         call metadata_edio(nvar,igr,'No metadata available','[NA]','NA') 
+      end if
+      if (associated(csite%plant_input_N)) then
+         nvar=nvar+1
+           call vtable_edio_r(npts,csite%plant_input_N,nvar,igr,init,csite%paglob_id, &
+           var_len,var_len_global,max_ptrs,'PLANT_INPUT_N :332:hist:mont:year') 
+         call metadata_edio(nvar,igr,'No metadata available','[NA]','NA') 
+      end if
+      if (associated(csite%plant_input_P)) then
+         nvar=nvar+1
+           call vtable_edio_r(npts,csite%plant_input_P,nvar,igr,init,csite%paglob_id, &
+           var_len,var_len_global,max_ptrs,'PLANT_INPUT_P :332:hist:mont:year') 
+         call metadata_edio(nvar,igr,'No metadata available','[NA]','NA') 
+      end if
 
 
 
