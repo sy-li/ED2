@@ -95,6 +95,7 @@ module ename_coms
       !----- Soil/surface water variables. ------------------------------------------------!
       integer                                           :: nzg
       integer                                           :: nzs
+      integer :: nlsl
       integer               , dimension(maxgrds)        :: isoilflg
       integer                                           :: nslcon
       integer                                           :: isoilcol

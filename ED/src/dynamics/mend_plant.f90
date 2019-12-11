@@ -11,8 +11,8 @@ Contains
        nstorage, pstorage, nstorage_min, pstorage_min, water_supply, lai)
     use mend_consts_coms, only: decomp_consts
     use pft_coms, only: root_beta
-    use soil_coms, only: slz, nlsl
-    use nutrient_constants, only: nstorage_max_factor, pstorage_max_factor
+    use soil_coms, only: slz
+    use nutrient_constants, only: nstorage_max_factor, pstorage_max_factor, nlsl
     use ed_max_dims, only: n_pft
     implicit none
 
@@ -253,10 +253,10 @@ Contains
        nplant, broot, rh, co2_lost, pft, krdepth, water_supply_layer_frac, lai)
     use ed_misc_coms, only: dtlsm
     use mend_consts_coms, only: decomp_consts
-    use nutrient_constants, only: nstorage_max_factor, pstorage_max_factor
+    use nutrient_constants, only: nstorage_max_factor, pstorage_max_factor, nlsl
     use ed_max_dims, only: n_pft
     use pft_coms, only: root_beta
-    use soil_coms, only: slz, nlsl, nzg
+    use soil_coms, only: slz, nzg
     implicit none
 
     real :: broot_nl

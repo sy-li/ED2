@@ -36,6 +36,7 @@ module nutrient_constants
   real :: Cmyco_init, Nmin_init, Psol_init, Ndep_appl,Pdep_appl
 
   real :: soil_bulk_den, soil_ph, soil_cpct, soil_som_c2n, soil_totp, soil_extrp
+  integer :: nlsl
 
 ! when creating a new file, add to bin/rules.mk and bin/objects.mk
 

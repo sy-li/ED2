@@ -273,6 +273,7 @@ subroutine copy_nl(copy_type)
                                    , hr_sec                    & ! intent(in)
                                    , min_sec                   ! ! intent(in)
 
+   use nutrient_constants, only: nlsl
    implicit none
    !----- Arguments. ----------------------------------------------------------------------!
    character(len=*), intent(in) :: copy_type
@@ -562,6 +563,7 @@ subroutine copy_nl(copy_type)
 
       nzg           = nl%nzg
       nzs           = nl%nzs
+      nlsl = nl%nlsl
 
       slz(1:nzgmax) = nl%slz(1:nzgmax)
       
@@ -590,6 +592,7 @@ subroutine copy_nl(copy_type)
 
       nzg           = nl%nzg
       nzs           = nl%nzs
+      nlsl = nl%nlsl
 
       slz(1:nzgmax) = nl%slz(1:nzgmax)
       

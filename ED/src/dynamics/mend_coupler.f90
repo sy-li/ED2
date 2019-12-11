@@ -295,9 +295,9 @@ Contains
        krdepth, slden, nstorage, pstorage, nstorage_min, pstorage_min, &
        water_supply_layer_frac, lai)
     use mend_state_vars, only: mend_model, nwood
-    use mend_wood, only: wood_extern_forcing
+!    use mend_wood, only: wood_extern_forcing
 !    use mend_litter, only: litt_extern_forcing
-!    use mend_som, only: som_extern_forcing
+    use mend_som, only: som_extern_forcing
     use mend_consts_coms, only: som_consts
     use nutrient_constants, only: ndep_rate, pdep_rate, ndep_appl, pdep_appl
     use ed_misc_coms, only: current_time
