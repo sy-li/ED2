@@ -507,8 +507,7 @@ Contains
   end subroutine inc_exchange_vars
 
   subroutine som2canopy_exchange(d_co2_lost, slden, consts, d_can_co2, &
-       d_co2budget_storage)
-    use rk4_coms, only: ccapcani
+       d_co2budget_storage,ccapcani)
     use mend_consts_coms, only: decomp_consts
     implicit none
 
@@ -518,6 +517,7 @@ Contains
     real :: d_co2_lost_units
     real(kind=8), intent(inout) :: d_co2budget_storage
     real(kind=8), intent(inout) :: d_can_co2
+    real(kind=8), intent(in) :: ccapcani
 
     ! gC/kgSoil/s
     d_co2_lost_units = d_co2_lost
