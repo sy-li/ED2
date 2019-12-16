@@ -1767,7 +1767,8 @@ subroutine init_decomp_params()
       , rh_dry_smoist               & ! intent(out)
       , rh_wet_smoist               & ! intent(out)
       , rh_active_depth             & ! intent(out)
-      , k_rh_active                 ! ! intent(out)
+      , k_rh_active, litter_partition                 ! ! intent(out)
+   use mend_consts_coms, only: npom
 
    resp_opt_water            = 0.8938
    resp_water_below_opt      = 5.0786
@@ -1842,6 +1843,18 @@ subroutine init_decomp_params()
          k_rh_active = k_rh_active + 1
    end select
    !---------------------------------------------------------------------------------------!
+
+   allocate(litter_partition(npom+1,4))
+   litter_partition(:,:) = 0.
+   litter_partition(1,1) = 1.
+   litter_partition(1,2) = 0.39
+   litter_partition(1,3) = 0.30
+   litter_partition(2,2) = 0.17
+   litter_partition(2,3) = 0.25
+   litter_partition(2,4) = 0.75
+   litter_partition(3,2) = 0.44
+   litter_partition(3,3) = 0.45
+   litter_partition(3,4) = 0.25
 
    return
 
@@ -3296,7 +3309,8 @@ end subroutine init_pft_alloc_params
 subroutine init_pft_nitro_params()
 
    use pft_coms, only: c2n_leaf, Vm0, SLA, &
-      c2n_slow,c2n_structural,c2n_storage,c2n_stem,l2n_stem,plant_N_supply_scale
+      c2n_slow,c2n_structural,c2n_storage,c2n_stem,l2n_stem,plant_N_supply_scale,&
+      c2p_leaf, c2p_wood
 
    implicit none
 
@@ -3306,6 +3320,8 @@ subroutine init_pft_nitro_params()
    c2n_stem       = 150.0 ! Carbon to Nitrogen ratio, structural stem.
    l2n_stem       = 150.0 ! Carbon to Nitrogen ratio, structural stem.
 
+   c2p_wood(:) = 3000.
+   c2p_leaf(:) = 600.
 
    plant_N_supply_scale = 0.5
 

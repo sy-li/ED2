@@ -396,6 +396,10 @@ module pft_coms
    real, dimension(n_pft) :: brf_wd
    !----- Supply coefficient for plant nitrogen uptake [m2/kgC_fine_root/day].  -----------!
    real :: plant_N_supply_scale
+
+   real, dimension(n_pft) :: c2p_wood
+   real, dimension(n_pft) :: c2p_leaf
+
    !---------------------------------------------------------------------------------------!
    !    Supply coefficient for plant water uptake [m2_ground/kgC_root/sec].                !
    !---------------------------------------------------------------------------------------!

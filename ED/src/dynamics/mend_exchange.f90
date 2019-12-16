@@ -46,6 +46,7 @@ Contains
        input_dom_c, input_dom_n, input_dom_p, &
        input_nh4, input_no3, input_psol, plant_input_C, plant_input_N, &
        plant_input_P)
+    use decomp_coms, only: litter_partition
     implicit none
     
     integer, intent(in) :: npom
@@ -61,48 +62,33 @@ Contains
     real, dimension(4), intent(in) :: plant_input_C
     real, dimension(4), intent(in) :: plant_input_N
     real, dimension(4), intent(in) :: plant_input_P
+    integer :: iplant, ipom
 
-!    input_pom_c(1) = (plant_input_C(2) + plant_input_C(3) +   &
-!         plant_input_C(4))*1000./86400. ! gC/m2/s
-!    input_pom_n(1) = (plant_input_N(2) + plant_input_N(3) +   &
-!         plant_input_N(4))*1000./86400. ! gN/m2/s
-!    input_pom_p(1) = (plant_input_P(2) + plant_input_P(3) +   &
-!         plant_input_P(4))*1000./86400. ! gP/m2/s
+    input_dom_c=0;input_dom_n=0;input_dom_p=0
+    input_pom_c(:)=0;input_pom_n(:)=0;input_pom_p(:)=0
 
-!    input_pom_c(2) = (plant_input_C(1) +   &
-!         0. * plant_input_C(4))*1000./86400. ! gC/m2/s
-!    input_pom_n(2) = (plant_input_N(1) +   &
-!         0. * plant_input_N(4))*1000./86400. ! gN/m2/s
-!    input_pom_p(2) = (plant_input_P(1) +   &
-!         0. * plant_input_P(4))*1000./86400. ! gP/m2/s
+    do iplant = 1, 4
+       input_dom_c = input_dom_c + litter_partition(1,iplant) * plant_input_C(iplant) * &
+            1000./86400.
+       input_dom_n = input_dom_n + litter_partition(1,iplant) * plant_input_N(iplant) * &
+            1000./86400.
+       input_dom_p = input_dom_p + litter_partition(1,iplant) * plant_input_P(iplant) * &
+            1000./86400.
+    enddo
 
-!    input_dom_c = 0. * plant_input_C(1) * 1000. / 86400. ! gC/m2/s
-!    input_dom_n = 0. * plant_input_N(1) * 1000. / 86400. ! gC/m2/s
-!    input_dom_p = 0. * plant_input_P(1) * 1000. / 86400. ! gC/m2/s
+    do ipom = 1, npom
+       do iplant = 1,4
+          input_pom_c(ipom) = input_pom_c(ipom) + litter_partition(1+ipom,iplant) * &
+               plant_input_C(iplant) * 1000. / 86400.
+          input_pom_n(ipom) = input_pom_n(ipom) + litter_partition(1+ipom,iplant) * &
+               plant_input_N(iplant) * 1000. / 86400.
+          input_pom_p(ipom) = input_pom_p(ipom) + litter_partition(1+ipom,iplant) * &
+               plant_input_P(iplant) * 1000. / 86400.
+       enddo
+    enddo
+       
+    ! all in gC,N,P/m2/s
 
-    input_pom_c(1) = (plant_input_C(3) +   &
-         0.75 * plant_input_C(4))*1000./86400. ! gC/m2/s
-    input_pom_n(1) = (plant_input_N(3) +   &
-         0.75 * plant_input_N(4))*1000./86400. ! gN/m2/s
-    input_pom_p(1) = (plant_input_P(3) +   &
-         0.75 * plant_input_P(4))*1000./86400. ! gP/m2/s
-
-    input_pom_c(2) = (plant_input_C(2) +   &
-         0.25 * plant_input_C(4))*1000./86400. ! gC/m2/s
-    input_pom_n(2) = (plant_input_N(2) +   &
-         0.25 * plant_input_N(4))*1000./86400. ! gN/m2/s
-    input_pom_p(2) = (plant_input_P(2) +   &
-         0.25 * plant_input_P(4))*1000./86400. ! gP/m2/s
-
-    input_dom_c = plant_input_C(1) * 1000. / 86400. ! gC/m2/s
-    input_dom_n = plant_input_N(1) * 1000. / 86400. ! gC/m2/s
-    input_dom_p = plant_input_P(1) * 1000. / 86400. ! gC/m2/s
-!if(plant_input_C(4) > 0.)then
-!print*
-!print*,plant_input_C
-!print*,plant_input_C/plant_input_N
-!print*,plant_input_C/plant_input_P
-!endif
     input_nh4 = 0. 
     input_no3 = 0.
     input_psol = 0.
