@@ -4219,9 +4219,9 @@ module ed_state_vars
       call mend_allocate(csite%mend, npatches)
       call mend_allocate(csite%mend_mm, npatches)
 
-      allocate(csite%plant_input_C(nlitter,npatches))
-      allocate(csite%plant_input_N(nlitter,npatches))
-      allocate(csite%plant_input_P(nlitter,npatches))
+      allocate(csite%plant_input_C(nlitter+1,npatches))
+      allocate(csite%plant_input_N(nlitter+1,npatches))
+      allocate(csite%plant_input_P(nlitter+1,npatches))
 
       allocate(csite%paco_id                       (              npatches))
       allocate(csite%paco_n                        (              npatches))
@@ -8130,7 +8130,7 @@ module ed_state_vars
 
          call copy_mendtype(isite%mend, osite%mend, ipa, ipa)
          call copy_mendtype(isite%mend_mm, osite%mend_mm, ipa, ipa)
-         do ilitter = 1, nlitter
+         do ilitter = 1, nlitter+1
             osite%plant_input_C(ilitter,ipa) = isite%plant_input_C(ilitter,ipa)
             osite%plant_input_N(ilitter,ipa) = isite%plant_input_N(ilitter,ipa)
             osite%plant_input_P(ilitter,ipa) = isite%plant_input_P(ilitter,ipa)
@@ -8926,7 +8926,7 @@ module ed_state_vars
       end do
       !------------------------------------------------------------------------------------!
 
-      do ilitter = 1, nlitter
+      do ilitter = 1, nlitter+1
          osite%plant_input_C(ilitter,1:z) = pack(isite%plant_input_C(ilitter,:),lmask)
          osite%plant_input_N(ilitter,1:z) = pack(isite%plant_input_N(ilitter,:),lmask)
          osite%plant_input_P(ilitter,1:z) = pack(isite%plant_input_P(ilitter,:),lmask)
@@ -23828,7 +23828,7 @@ module ed_state_vars
       !------------------------------------------------------------------------------------!
 
 
-      npts = csite%npatches * nlitter
+      npts = csite%npatches * (nlitter+1)
       if (associated(csite%plant_input_C)) then
          nvar=nvar+1
            call vtable_edio_r(npts,csite%plant_input_C,nvar,igr,init,csite%paglob_id, &

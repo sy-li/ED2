@@ -42,7 +42,7 @@ Contains
     return
   end subroutine plant2litt_exchange
 
-  subroutine plant2som_exchange(npom, input_pom_c, input_pom_n, input_pom_p, &
+  subroutine mend_plant2som_exchange(npom, input_pom_c, input_pom_n, input_pom_p, &
        input_dom_c, input_dom_n, input_dom_p, &
        input_nh4, input_no3, input_psol, plant_input_C, plant_input_N, &
        plant_input_P)
@@ -68,22 +68,19 @@ Contains
     input_pom_c(:)=0;input_pom_n(:)=0;input_pom_p(:)=0
 
     do iplant = 1, 4
-       input_dom_c = input_dom_c + litter_partition(1,iplant) * plant_input_C(iplant) * &
-            1000./86400.
-       input_dom_n = input_dom_n + litter_partition(1,iplant) * plant_input_N(iplant) * &
-            1000./86400.
-       input_dom_p = input_dom_p + litter_partition(1,iplant) * plant_input_P(iplant) * &
-            1000./86400.
+       input_dom_c = input_dom_c + litter_partition(1,iplant) * plant_input_C(iplant)
+       input_dom_n = input_dom_n + litter_partition(1,iplant) * plant_input_N(iplant)
+       input_dom_p = input_dom_p + litter_partition(1,iplant) * plant_input_P(iplant)
     enddo
 
     do ipom = 1, npom
        do iplant = 1,4
           input_pom_c(ipom) = input_pom_c(ipom) + litter_partition(1+ipom,iplant) * &
-               plant_input_C(iplant) * 1000. / 86400.
+               plant_input_C(iplant)
           input_pom_n(ipom) = input_pom_n(ipom) + litter_partition(1+ipom,iplant) * &
-               plant_input_N(iplant) * 1000. / 86400.
+               plant_input_N(iplant)
           input_pom_p(ipom) = input_pom_p(ipom) + litter_partition(1+ipom,iplant) * &
-               plant_input_P(iplant) * 1000. / 86400.
+               plant_input_P(iplant)
        enddo
     enddo
        
@@ -94,7 +91,7 @@ Contains
     input_psol = 0.
 
     return
-  end subroutine plant2som_exchange
+  end subroutine mend_plant2som_exchange
 
   subroutine litt2som_exchange(npom,  &
        litt_pom_c, litt_pom_n, litt_pom_p, &

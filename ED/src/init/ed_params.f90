@@ -3310,7 +3310,7 @@ subroutine init_pft_nitro_params()
 
    use pft_coms, only: c2n_leaf, Vm0, SLA, &
       c2n_slow,c2n_structural,c2n_storage,c2n_stem,l2n_stem,plant_N_supply_scale,&
-      c2p_leaf, c2p_wood
+      c2p_leaf, c2p_wood, N_resorption_factor, P_resorption_factor
 
    implicit none
 
@@ -3319,9 +3319,12 @@ subroutine init_pft_nitro_params()
    c2n_storage    = 150.0 ! Carbon to Nitrogen ratio, storage pool.
    c2n_stem       = 150.0 ! Carbon to Nitrogen ratio, structural stem.
    l2n_stem       = 150.0 ! Carbon to Nitrogen ratio, structural stem.
+   N_resorption_factor(:) = 0.48
+
 
    c2p_wood(:) = 3000.
    c2p_leaf(:) = 600.
+   P_resorption_factor(:) = 0.48
 
    plant_N_supply_scale = 0.5
 

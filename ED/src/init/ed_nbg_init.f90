@@ -67,6 +67,10 @@ subroutine near_bare_ground_init(cgrid)
          csite%sum_chd            (1) = 0.0
          csite%plant_ag_biomass   (1) = 0.
 
+         csite%plant_input_C(:,1) = 0.
+         csite%plant_input_N(:,1) = 0.
+         csite%plant_input_P(:,1) = 0.
+
          !----- We now populate the cohorts with near bare ground condition. --------------!
          select case (ied_init_mode)
          case (-8)

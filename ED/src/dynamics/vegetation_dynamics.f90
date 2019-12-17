@@ -71,6 +71,17 @@ subroutine vegetation_dynamics(new_month,new_year)
 
       cgrid => edgrid_g(ifm) 
 
+      do ipy = 1, cgrid%npolygons
+         cpoly => cgrid%polygon(ipy)
+         do isi = 1, cpoly%nsites
+            csite => cpoly%site(isi)
+            do ipa = 1, csite%npatches
+               csite%plant_input_C(:,ipa) = 0.
+               csite%plant_input_N(:,ipa) = 0.
+               csite%plant_input_P(:,ipa) = 0.
+            enddo
+         enddo
+      enddo
       !------------------------------------------------------------------------------------!
       !     The following block corresponds to the daily time-step.                        !
       !------------------------------------------------------------------------------------!

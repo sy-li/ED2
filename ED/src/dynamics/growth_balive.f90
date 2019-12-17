@@ -94,7 +94,7 @@ module growth_balive
       real                          :: tr_broot
       real                          :: tr_bsapwooda
       real                          :: tr_bsapwoodb
-      real                          :: tr_bstorage
+      real                          :: tr_bstorage,tr_nstorage,tr_pstorage
       real                          :: cb_decrement
       real                          :: carbon_debt
       real                          :: balive_aim
@@ -234,11 +234,13 @@ module growth_balive
                   else
                      call get_c_xfers(csite,ipa,ico,carbon_balance                         &
                                      ,cpoly%green_leaf_factor(ipft,isi),tr_bleaf,tr_broot  &
-                                     ,tr_bsapwooda,tr_bsapwoodb,tr_bstorage,carbon_debt    &
+                                     ,tr_bsapwooda,tr_bsapwoodb,tr_bstorage, &
+                                     tr_nstorage, tr_pstorage, carbon_debt    &
                                      ,flushing,balive_aim)
 
                      call apply_c_xfers(cpatch,ico,carbon_balance,tr_bleaf,tr_broot        &
-                                       ,tr_bsapwooda,tr_bsapwoodb,tr_bstorage)
+                                       ,tr_bsapwooda,tr_bsapwoodb,tr_bstorage,tr_nstorage, &
+                                       tr_pstorage)
 
                      call update_today_npp_vars(cpatch,ico,tr_bleaf,tr_broot,tr_bsapwooda  &
                                                 ,tr_bsapwoodb,carbon_balance)
@@ -929,13 +931,14 @@ module growth_balive
    !>          change it unless you really know what you are doing.
    !---------------------------------------------------------------------------------------!
    subroutine get_c_xfers(csite,ipa,ico,carbon_balance,green_leaf_factor,tr_bleaf,tr_broot &
-                         ,tr_bsapwooda,tr_bsapwoodb,tr_bstorage,carbon_debt,flushing       &
+                         ,tr_bsapwooda,tr_bsapwoodb,tr_bstorage,tr_nstorage,tr_pstorage, &
+                         carbon_debt,flushing       &
                          ,balive_aim)
       use ed_state_vars , only : sitetype     & ! structure
                                , patchtype    ! ! structure
       use pft_coms      , only : q            & ! intent(in)
                                , qsw          & ! intent(in)
-                               , agf_bs       ! ! intent(in)
+                               , agf_bs,c2n_leaf,c2p_leaf       ! ! intent(in)
       use allometry     , only : size2bl      ! ! function
       use consts_coms   , only : tiny_num     ! ! intent(in)
       implicit none
@@ -953,6 +956,7 @@ module growth_balive
       real           , intent(out)   :: carbon_debt         !< Net cohort carbon uptake
       logical        , intent(out)   :: flushing            !< Flag for leaf flush
       real           , intent(out)   :: balive_aim          !< Desired cohort balive value
+      real, intent(out) :: tr_nstorage, tr_pstorage
       !----- Local variables. -------------------------------------------------------------!
       type(patchtype), pointer       :: cpatch
       integer                        :: ipft
@@ -1004,6 +1008,8 @@ module growth_balive
       tr_bsapwooda = 0.0
       tr_bsapwoodb = 0.0
       tr_bstorage  = 0.0
+      tr_nstorage  = 0.0
+      tr_pstorage  = 0.0
 
       cpatch => csite%patch(ipa)
 
@@ -1221,6 +1227,15 @@ module growth_balive
          !---------------------------------------------------------------------------------!
       end if
 
+      if(tr_bleaf < 0.)then
+         tr_nstorage = -tr_bleaf / c2n_leaf(ipft)
+         tr_pstorage = -tr_bleaf / c2p_leaf(ipft)
+      endif
+      if(tr_broot < 0.)then
+         tr_nstorage = -tr_broot / c2n_leaf(ipft)
+         tr_pstorage = -tr_broot / c2p_leaf(ipft)
+      endif
+
       !------------------------------------------------------------------------------------!
 !      if (printout) then
 !         open (unit=66,file=fracfile,status='old',position='append',action='write')
@@ -1244,8 +1259,9 @@ module growth_balive
    !=======================================================================================!
    !=======================================================================================!
    subroutine apply_c_xfers(cpatch,ico,carbon_balance,tr_bleaf,tr_broot,tr_bsapwooda       &
-                           ,tr_bsapwoodb,tr_bstorage)
+                           ,tr_bsapwoodb,tr_bstorage,tr_nstorage,tr_pstorage)
       use ed_state_vars , only : patchtype  ! ! structure
+      use nutrient_constants, only: nstorage_max_factor, pstorage_max_factor
       implicit none
       !----- Arguments. -------------------------------------------------------------------!
       type(patchtype), target        :: cpatch
@@ -1255,7 +1271,8 @@ module growth_balive
       real           , intent(in)    :: tr_broot
       real           , intent(in)    :: tr_bsapwooda
       real           , intent(in)    :: tr_bsapwoodb
-      real           , intent(in)    :: tr_bstorage
+      real           , intent(in)    :: tr_bstorage,tr_nstorage,tr_pstorage
+      real :: extra_storage
       !------------------------------------------------------------------------------------!
 
       !------------------------------------------------------------------------------!
@@ -1286,6 +1303,19 @@ module growth_balive
       !------------------------------------------------------------------------------!
       cpatch%bstorage(ico) = max(0.0, cpatch%bstorage(ico) + tr_bstorage)
       !------------------------------------------------------------------------------!
+
+      cpatch%nstorage(ico) = cpatch%nstorage(ico) + tr_nstorage
+      extra_storage = max(0., cpatch%nstorage(ico) - cpatch%nstorage_min(ico) *   &
+           nstorage_max_factor)
+      cpatch%nstorage(ico) = cpatch%nstorage(ico) - extra_storage
+      csite%plant_soil_N(3,ipa) = csite%plant_soil_N(3,ipa) + extra_storage
+
+      cpatch%pstorage(ico) = cpatch%pstorage(ico) + tr_pstorage
+      extra_storage = max(0., cpatch%pstorage(ico) - cpatch%pstorage_min(ico) *   &
+           pstorage_max_factor)
+      cpatch%pstorage(ico) = cpatch%pstorage(ico) - extra_storage
+      csite%plant_soil_P(3,ipa) = csite%plant_soil_P(3,ipa) + extra_storage         
+
       return
    end subroutine apply_c_xfers
    !=======================================================================================!
@@ -2112,7 +2142,7 @@ module growth_balive
                               , sitetype  ! ! structure
       use pft_coms     , only : c2n_leaf  & ! intent(in)
                               , c2n_stem  & ! intent(in)
-                              , l2n_stem  ! ! intent(in)
+                              , l2n_stem,c2p_leaf  ! ! intent(in)
       use decomp_coms  , only : f_labile  ! ! intent(in)
       implicit none
       !----- Arguments. -------------------------------------------------------------------!
@@ -2125,6 +2155,7 @@ module growth_balive
       real                         :: plant_litter
       real                         :: plant_litter_f
       real                         :: plant_litter_s
+      real :: plant_C_leakage
       !------------------------------------------------------------------------------------!
 
       cpatch => csite%patch(ipa)
@@ -2145,6 +2176,31 @@ module growth_balive
 
          csite%ssc_in(ipa) = csite%ssc_in(ipa) + plant_litter_s
          csite%ssl_in(ipa) = csite%ssl_in(ipa) + plant_litter_s * l2n_stem / c2n_stem(ipft)
+
+         csite%plant_input_C(2,ipa) = csite%plant_input_C(2,ipa) + &
+              cpatch%leaf_maintenance(ico) * cpatch%nplant(ico)
+         csite%plant_input_C(3,ipa) = csite%plant_input_C(3,ipa) + &
+              cpatch%root_maintenance(ico) * cpatch%nplant(ico)
+
+         csite%plant_input_N(2,ipa) = csite%plant_input_N(2,ipa) + &
+              cpatch%leaf_maintenance(ico) * cpatch%nplant(ico) / &
+              c2n_leaf(ipft)
+         csite%plant_input_N(3,ipa) = csite%plant_input_N(3,ipa) + &
+              cpatch%root_maintenance(ico) * cpatch%nplant(ico) / &
+              c2n_leaf(ipft)
+
+         csite%plant_input_P(2,ipa) = csite%plant_input_P(2,ipa) + &
+              cpatch%leaf_maintenance(ico) * cpatch%nplant(ico) / &
+              c2p_leaf(ipft)
+         csite%plant_input_P(3,ipa) = csite%plant_input_P(3,ipa) + &
+              cpatch%root_maintenance(ico) * cpatch%nplant(ico) / &
+              c2p_leaf(ipft)
+
+         plant_C_leakage = max(0.,cpatch%bstorage(ico) - 2. * cpatch%bstorage_min(ico))
+         cpatch%bstorage(ico) = cpatch%bstorage(ico) - plant_C_leakage
+         csite%plant_input_C(1,ipa) = csite%plant_input_C(1,ipa) +   &
+              0. * plant_C_leakage * cpatch%nplant(ico)
+
       end do
       return
    end subroutine litter

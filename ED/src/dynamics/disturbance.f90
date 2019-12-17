@@ -1669,6 +1669,10 @@ module disturbance_utils
       csite%total_plant_nitrogen_uptake(np) = 0.0
       !------------------------------------------------------------------------------------!
 
+      csite%plant_input_C(:,np) = 0.
+      csite%plant_input_N(:,np) = 0.
+      csite%plant_input_P(:,np) = 0.
+
       call mend_zero_vars(csite%mend, np, np)
       call mend_zero_vars(csite%mend_mm, np, np)
 
@@ -1795,6 +1799,13 @@ module disturbance_utils
       csite%total_plant_nitrogen_uptake(np) = csite%total_plant_nitrogen_uptake(np)        &
                                             + csite%total_plant_nitrogen_uptake(cp)        &
                                             * area_fac
+
+      csite%plant_input_C(:,np) = csite%plant_input_C(:,np) +   &
+           csite%plant_input_C(:,cp) * area_fac
+      csite%plant_input_N(:,np) = csite%plant_input_N(:,np) +   &
+           csite%plant_input_N(:,cp) * area_fac
+      csite%plant_input_P(:,np) = csite%plant_input_P(:,np) +   &
+           csite%plant_input_P(:,cp) * area_fac
 
       !----- Do the same thing for the multiple-level variables. --------------------------!
       do k=1,n_pft
@@ -2850,7 +2861,7 @@ module disturbance_utils
       use pft_coms     , only : agf_bs       ! ! intent(in)
       use mortality    , only : survivorship ! ! function
       use mend_state_vars, only: npom
-      use mend_exchange, only: plant2som_exchange
+      use mend_exchange, only: mend_plant2som_exchange
       use mend_consts_coms, only: som_consts
 
       implicit none
@@ -2883,7 +2894,7 @@ module disturbance_utils
       real :: input_nh4
       real :: input_no3
       real :: input_psol
-      real :: gm2_mgg
+      real :: kgm2_mgg
       real, dimension(4) :: clm_input_c, clm_input_n, clm_input_p
       !------------------------------------------------------------------------------------!
 
@@ -2951,21 +2962,21 @@ module disturbance_utils
               cpatch%nplant(ico) * area_fac / c2p_wood(ipft)
 
          clm_input_c(3) = clm_input_c(3) + (1.-survival_fac) * &
-              cpatch%bleaf(ico) * cpatch%nplant(ico) * area_fac
-         clm_input_n(3) = clm_input_n(3) + (1.-survival_fac) * &
-              cpatch%bleaf(ico) * cpatch%nplant(ico) * area_fac / c2n_leaf(ipft)
-         clm_input_p(3) = clm_input_p(3) + (1.-survival_fac) * &
-              cpatch%bleaf(ico) * cpatch%nplant(ico) * area_fac / c2p_leaf(ipft)
-
-         clm_input_c(2) = clm_input_c(2) + (1.-survival_fac) * &
               (cpatch%balive(ico) - cpatch%bleaf(ico) * cpatch%nplant(ico) * area_fac
-         clm_input_n(2) = clm_input_n(2) + (1.-survival_fac) * &
+         clm_input_n(3) = clm_input_n(3) + (1.-survival_fac) * &
               (cpatch%balive(ico) - cpatch%bleaf(ico) * cpatch%nplant(ico) * area_fac / &
               c2n_leaf(ipft)
-         clm_input_p(2) = clm_input_p(2) + (1.-survival_fac) * &
+         clm_input_p(3) = clm_input_p(3) + (1.-survival_fac) * &
               (cpatch%balive(ico) - cpatch%bleaf(ico) * cpatch%nplant(ico) * area_fac / &
               c2p_leaf(ipft)
          
+         clm_input_c(2) = clm_input_c(2) + (1.-survival_fac) * &
+              cpatch%bleaf(ico) * cpatch%nplant(ico) * area_fac
+         clm_input_n(2) = clm_input_n(2) + (1.-survival_fac) * &
+              cpatch%bleaf(ico) * cpatch%nplant(ico) * area_fac / c2n_leaf(ipft)
+         clm_input_p(2) = clm_input_p(2) + (1.-survival_fac) * &
+              cpatch%bleaf(ico) * cpatch%nplant(ico) * area_fac / c2p_leaf(ipft)
+
          clm_input_c(1) = clm_input_c(1) + (1.-survival_fac) * cpatch%bstorage(ico) * &
               cpatch%nplant(ico) * area_fac
          clm_input_n(1) = clm_input_n(1) + (1.-survival_fac) * cpatch%nstorage(ico) * &
@@ -2986,14 +2997,14 @@ module disturbance_utils
       csite%fast_soil_N(np)       = csite%fast_soil_N(np)       + fast_litter_n * area_fac
       !------------------------------------------------------------------------------------!
 
-      call plant2som_exchange(npom, input_pom_c, input_pom_n, input_pom_p, &
+      call mend_plant2som_exchange(npom, input_pom_c, input_pom_n, input_pom_p, &
            input_dom_c, input_dom_n, input_dom_p, input_nh4, input_no3, &
            input_psol, clm_input_c, clm_input_n, clm_input_p)
 
-      gm2_mgg = 1. / (som_consts%eff_soil_depth * csite%mend%bulk_den(cp))
+      kgm2_mgg = 1000. / (som_consts%eff_soil_depth * csite%mend%bulk_den(cp))
 
       call mend_disturb_update(npom, input_pom_c, input_pom_n, input_pom_p, &
-           input_dom_c, input_dom_n, input_dom_p, csite%mend%som, np, gm2_mgg)
+           input_dom_c, input_dom_n, input_dom_p, csite%mend%som, np, kgm2_mgg)
 
       return
    end subroutine accum_dist_litt
@@ -3001,7 +3012,7 @@ module disturbance_utils
    !=======================================================================================!
 
    subroutine mend_disturb_update(npom, input_pom_c, input_pom_n, input_pom_p, &
-        input_dom_c, input_dom_n, input_dom_p, som, np, gm2_mgg)
+        input_dom_c, input_dom_n, input_dom_p, som, np, kgm2_mgg)
      use mend_state_vars, only: mend_vars
      implicit none
      integer, intent(in) :: npom
@@ -3014,16 +3025,16 @@ module disturbance_utils
      type(mend_vars) :: som
      integer, intent(in) :: np
      integer :: ipom
-     real, intent(in) :: gm2_mgg
+     real, intent(in) :: kgm2_mgg
 
      do ipom = 1, npom
-        som%cvars%pom(ipom,np) = som%cvars%pom(ipom,np) + input_pom_c(ipom) * gm2_mgg
-        som%nvars%pom(ipom,np) = som%nvars%pom(ipom,np) + input_pom_n(ipom) * gm2_mgg
-        som%pvars%pom(ipom,np) = som%pvars%pom(ipom,np) + input_pom_p(ipom) * gm2_mgg
+        som%cvars%pom(ipom,np) = som%cvars%pom(ipom,np) + input_pom_c(ipom) * kgm2_mgg
+        som%nvars%pom(ipom,np) = som%nvars%pom(ipom,np) + input_pom_n(ipom) * kgm2_mgg
+        som%pvars%pom(ipom,np) = som%pvars%pom(ipom,np) + input_pom_p(ipom) * kgm2_mgg
      enddo
-     som%cvars%dom(np) = som%cvars%dom(np) + input_dom_c * gm2_mgg
-     som%nvars%dom(np) = som%nvars%dom(np) + input_dom_n * gm2_mgg
-     som%pvars%dom(np) = som%pvars%dom(np) + input_dom_p * gm2_mgg
+     som%cvars%dom(np) = som%cvars%dom(np) + input_dom_c * kgm2_mgg
+     som%nvars%dom(np) = som%nvars%dom(np) + input_dom_n * kgm2_mgg
+     som%pvars%dom(np) = som%pvars%dom(np) + input_dom_p * kgm2_mgg
      
      return
    end subroutine mend_disturb_update

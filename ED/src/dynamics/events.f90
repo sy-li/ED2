@@ -304,6 +304,7 @@ subroutine event_harvest(agb_frac8,bgb_frac8,fol_frac8,stor_frac8)
   real(kind=8),intent(in) :: fol_frac8
   real(kind=8),intent(in) :: stor_frac8
   real :: ialloc,bdead_new,bswa_new,bswb_new,bleaf_new,bfr_new,bstore_new
+  real :: nstore_new, pstore_new
   real :: agb_frac,bgb_frac,fol_frac,stor_frac
   real :: old_leaf_hcap
   real :: old_wood_hcap
@@ -364,6 +365,8 @@ subroutine event_harvest(agb_frac8,bgb_frac8,fol_frac8,stor_frac8)
                               * (1.0-agb_frac*agf_bs(pft) - bgb_frac*(1.0-agf_bs(pft)))
 
                  bstore_new = cpatch%bstorage(ico) * (1.0-stor_frac)
+                 nstore_new = cpatch%nstorage(ico) * (1.0-stor_frac)
+                 pstore_new = cpatch%pstorage(ico) * (1.0-stor_frac)
                  bleaf_new  = cpatch%balive(ico)   * ialloc *(1.0-fol_frac)
                  bfr_new    = cpatch%balive(ico)   * q(pft) * ialloc * (1.0-bgb_frac)
 
@@ -380,6 +383,8 @@ subroutine event_harvest(agb_frac8,bgb_frac8,fol_frac8,stor_frac8)
                  cpatch%bsapwoodb(ico) = max(0.0,bswb_new)
                  cpatch%bdead(ico)     = max(0.0,bdead_new)
                  cpatch%bstorage(ico)  = max(0.0,bstore_new)
+                 cpatch%nstorage(ico)  = max(0.0,nstore_new)
+                 cpatch%pstorage(ico)  = max(0.0,pstore_new)
 
                  if(bleaf_new .le. tiny(1.0)) then
                     cpatch%phenology_status(ico) = -2
@@ -775,6 +780,8 @@ subroutine event_till(rval8)
                  cpatch%bsapwoodb(ico)        = 0.0
                  cpatch%bdead(ico)            = 0.0
                  cpatch%bstorage(ico)         = 0.0
+                 cpatch%nstorage(ico)         = 0.0
+                 cpatch%pstorage(ico)         = 0.0
                  cpatch%nplant(ico)           = 0.0
                  cpatch%lai(ico)              = 0.0
                  cpatch%wai(ico)              = 0.0

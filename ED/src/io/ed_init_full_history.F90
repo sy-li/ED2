@@ -3120,7 +3120,7 @@ subroutine fill_history_site(csite,sipa_index,npatches_global,is_burnt)
    use ed_max_dims        , only : n_pft         & ! intent(in)
                                  , n_dbh         & ! intent(in)
                                  , max_site      & ! intent(in)
-                                 , n_dist_types  ! ! intent(in)
+                                 , n_dist_types,nlitter  ! ! intent(in)
    use hdf5
    use hdf5_coms          , only : globdims      & ! intent(inout)
                                  , chnkdims      & ! intent(inout)
@@ -4048,6 +4048,18 @@ subroutine fill_history_site(csite,sipa_index,npatches_global,is_burnt)
       call hdf_getslab_r(csite%mmean_sensible_gg                                           &
                         ,'MMEAN_SENSIBLE_GG_PA ',dsetrank,iparallel,.false.,foundvar)
    end if
+
+   globdims(1) = int(nlitter+1,8)
+   chnkdims(1) = int(nlitter+1,8)
+   memdims(1) = int(nlitter+1,8)
+   memsize(1) = int(nlitter+1,8)
+   call hdf5_getslab_r(csite%plant_input_C,'PLANT_INPUT_C ',dsetrank,  &
+        iparallel,.true.,foundvar)
+   call hdf5_getslab_r(csite%plant_input_N,'PLANT_INPUT_N ',dsetrank,  &
+        iparallel,.true.,foundvar)
+   call hdf5_getslab_r(csite%plant_input_P,'PLANT_INPUT_P ',dsetrank,  &
+        iparallel,.true.,foundvar)
+
    !---------------------------------------------------------------------------------------!
    !---------------------------------------------------------------------------------------!
    !---------------------------------------------------------------------------------------!

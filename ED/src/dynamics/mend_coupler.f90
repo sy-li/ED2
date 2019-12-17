@@ -368,7 +368,7 @@ Contains
        csite, ipa, som_water_drainage, soil_water, d_can_co2, &
        d_co2budget_storage,ccapcani, ntext_soil)
     use mend_exchange, only: litt2som_exchange, plant2litt_exchange, &
-         plant2som_exchange, plant2wood_exchange, wood2litt_exchange, &
+         mend_plant2som_exchange, plant2wood_exchange, wood2litt_exchange, &
          wood2som_exchange, zero_exchange_vars, inc_exchange_vars, &
          wood2wood_exchange, som2canopy_exchange
     use ed_state_vars, only: sitetype
@@ -435,67 +435,6 @@ Contains
     enddo
     ! No negative drainage.
     som_water_drainage_ps = max(0., som_water_drainage) / (total_water * wdns)
-    litt_water_drainage = 0.
-    wood_water_drainage = 0.
-
-    call zero_exchange_vars(wood2litt_sum)
-    call zero_exchange_vars(wood2som_sum)
-    do iwood = 1, nwood
-       call plant2wood_exchange(iwood, npom, &
-            plant2wood(iwood)%pom_c, plant2wood(iwood)%pom_n,   &
-            plant2wood(iwood)%pom_p, plant2wood(iwood)%dom_c,   &
-            plant2wood(iwood)%dom_n, plant2wood(iwood)%dom_p, &
-            plant2wood(iwood)%nh4, plant2wood(iwood)%no3,   &
-            plant2wood(iwood)%psol)
-       
-       call wood2litt_exchange(iwood, npom, &
-            wood(iwood)%cvars%pom(:,1), wood(iwood)%nvars%pom(:,1), wood(iwood)%pvars%pom(:,1), &
-            wood(iwood)%cvars%dom(1), wood(iwood)%nvars%dom(1), wood(iwood)%pvars%dom(1), &
-            wood(iwood)%invars%nh4(1), wood(iwood)%invars%no3(1), wood(iwood)%invars%psol(1), &
-            wood2litt(iwood)%pom_c, wood2litt(iwood)%pom_n,   &
-            wood2litt(iwood)%pom_p, wood2litt(iwood)%dom_c,  &
-            wood2litt(iwood)%dom_n, wood2litt(iwood)%dom_p,   &
-            wood2litt(iwood)%nh4, wood2litt(iwood)%no3,   &
-            wood2litt(iwood)%psol, wood_consts(iwood))
-       call inc_exchange_vars(wood2litt_sum, wood2litt(iwood))
-
-       call wood2som_exchange(iwood, npom, &
-            wood(iwood)%cvars%pom(:,1), wood(iwood)%nvars%pom(:,1), wood(iwood)%pvars%pom(:,1), &
-            wood(iwood)%cvars%dom(1), wood(iwood)%nvars%dom(1), wood(iwood)%pvars%dom(1), &
-            wood(iwood)%invars%nh4(1), wood(iwood)%invars%no3(1), wood(iwood)%invars%psol(1), &
-            wood2som(iwood)%pom_c, wood2som(iwood)%pom_n,   &
-            wood2som(iwood)%pom_p, wood2som(iwood)%dom_c,  &
-            wood2som(iwood)%dom_n, wood2som(iwood)%dom_p,   &
-            wood2som(iwood)%nh4, wood2som(iwood)%no3,   &
-            wood2som(iwood)%psol, wood_consts(iwood))
-       call inc_exchange_vars(wood2som_sum, wood2som(iwood))
-
-       do jwood = 1, nwood
-          call wood2wood_exchange(iwood, jwood, npom, &
-               wood(iwood)%cvars%pom(:,1), wood(iwood)%nvars%pom(:,1), wood(iwood)%pvars%pom(:,1), &
-               wood(iwood)%cvars%dom(1), wood(iwood)%nvars%dom(1), wood(iwood)%pvars%dom(1), &
-               wood(iwood)%invars%nh4(1), wood(iwood)%invars%no3(1), wood(iwood)%invars%psol(1), &
-               wood2wood(iwood,jwood)%pom_c, wood2wood(iwood,jwood)%pom_n,   &
-               wood2wood(iwood,jwood)%pom_p, wood2wood(iwood,jwood)%dom_c,  &
-               wood2wood(iwood,jwood)%dom_n, wood2wood(iwood,jwood)%dom_p,   &
-               wood2wood(iwood,jwood)%nh4, wood2wood(iwood,jwood)%no3, &
-               wood2wood(iwood,jwood)%psol, wood_consts(iwood))
-       enddo
-
-    enddo
-
-    call plant2litt_exchange(npom, &
-         plant2litt%pom_c, plant2litt%pom_n, plant2litt%pom_p, &
-         plant2litt%dom_c, plant2litt%dom_n, plant2litt%dom_p, &
-         plant2litt%nh4, plant2litt%no3, plant2litt%psol)
-
-    call litt2som_exchange(npom, &
-         litt%cvars%pom(:,1), litt%nvars%pom(:,1), litt%pvars%pom(:,1), &
-         litt%cvars%dom(1), litt%nvars%dom(1), litt%pvars%dom(1), &
-         litt%invars%nh4(1), litt%invars%no3(1), litt%invars%psol(1), &
-         litt2som%pom_c, litt2som%pom_n, litt2som%pom_p, &
-         litt2som%dom_c, litt2som%dom_n, litt2som%dom_p, &
-         litt2som%nh4, litt2som%no3, litt2som%psol)
 
     call plant2som_exchange(npom, &
          plant2som%pom_c, plant2som%pom_n, plant2som%pom_p, &
@@ -504,31 +443,31 @@ Contains
          csite%plant_input_C(:,ipa), csite%plant_input_N(:,ipa),  &
          csite%plant_input_P(:,ipa))
 
-    d_som%plvars%plant_input_C_pom(:,1) = plant2som%pom_c * gm2_mgg
-    d_som%plvars%plant_input_N_pom(:,1) = plant2som%pom_n * gm2_mgg
-    d_som%plvars%plant_input_P_pom(:,1) = plant2som%pom_p * gm2_mgg
-    d_som%plvars%plant_input_C_dom = plant2som%dom_c * gm2_mgg
-    d_som%plvars%plant_input_N_dom = plant2som%dom_n * gm2_mgg
-    d_som%plvars%plant_input_P_dom = plant2som%dom_p * gm2_mgg
+    d_som%plvars%plant_input_C_pom(:,1) = plant2som%pom_c * gm2_mgg * 1000./86400.
+    d_som%plvars%plant_input_N_pom(:,1) = plant2som%pom_n * gm2_mgg * 1000./86400.
+    d_som%plvars%plant_input_P_pom(:,1) = plant2som%pom_p * gm2_mgg * 1000./86400.
+    d_som%plvars%plant_input_C_dom = plant2som%dom_c * gm2_mgg * 1000./86400.
+    d_som%plvars%plant_input_N_dom = plant2som%dom_n * gm2_mgg * 1000./86400.
+    d_som%plvars%plant_input_P_dom = plant2som%dom_p * gm2_mgg * 1000./86400.
 
     input_pom_c_net = (plant2som%pom_c+litt2som%pom_c+wood2som_sum%pom_c) * &
-         gm2_mgg
+         gm2_mgg * 1000./86400.
     input_dom_c_net = (plant2som%dom_c+litt2som%dom_c+wood2som_sum%dom_c) * &
-         gm2_mgg
+         gm2_mgg * 1000./86400.
     input_pom_n_net = (plant2som%pom_n+litt2som%pom_n+wood2som_sum%pom_n) * &
-         gm2_mgg
+         gm2_mgg * 1000./86400.
     input_dom_n_net = (plant2som%dom_n+litt2som%dom_n+wood2som_sum%dom_n) * &
-         gm2_mgg
+         gm2_mgg * 1000./86400.
     input_pom_p_net = (plant2som%pom_p+litt2som%pom_p+wood2som_sum%pom_p) * &
-         gm2_mgg
+         gm2_mgg * 1000./86400.
     input_dom_p_net = (plant2som%dom_p+litt2som%dom_p+wood2som_sum%dom_p) * &
-         gm2_mgg
+         gm2_mgg * 1000./86400.
     input_nh4_net = (plant2som%nh4 + litt2som%nh4 + wood2som_sum%nh4) * &
-         gm2_mgg + som%fluxes%nh4_dep(1)
+         gm2_mgg  * 1000./86400. + som%fluxes%nh4_dep(1)
     input_no3_net = (plant2som%no3 + litt2som%no3 + wood2som_sum%no3) * &
-         gm2_mgg + som%fluxes%no3_dep(1)
+         gm2_mgg  * 1000./86400. + som%fluxes%no3_dep(1)
     input_psol_net = (plant2som%psol + litt2som%psol + wood2som_sum%psol) * &
-         gm2_mgg + som%fluxes%ppar_dep(1)
+         gm2_mgg  * 1000./86400. + som%fluxes%ppar_dep(1)
     input_ppar_net = 0.
     call mend_derivs_layer(npom, som_consts,  &
          som%cvars%pom(:,1), input_pom_c_net, d_som%cvars%pom(:,1),  &
@@ -583,169 +522,6 @@ Contains
     call som2canopy_exchange(d_som%fluxes%co2_lost(1),  &
          csite%mend%bulk_den(ipa), som_consts, &
          d_can_co2, d_co2budget_storage, ccapcani)
-
-    input_pom_c_net = plant2litt%pom_c - litt2som%pom_c + wood2litt_sum%pom_c
-    input_dom_c_net = plant2litt%dom_c - litt2som%dom_c + wood2litt_sum%dom_c
-    input_pom_n_net = plant2litt%pom_n - litt2som%pom_n + wood2litt_sum%pom_n
-    input_dom_n_net = plant2litt%dom_n - litt2som%dom_n + wood2litt_sum%dom_n
-    input_pom_p_net = plant2litt%pom_p - litt2som%pom_p + wood2litt_sum%pom_p
-    input_dom_p_net = plant2litt%dom_p - litt2som%dom_p + wood2litt_sum%dom_p
-    input_nh4_net = plant2litt%nh4 - litt2som%nh4 + wood2litt_sum%nh4 +  &
-         litt%fluxes%nh4_dep(1)
-    input_no3_net = plant2litt%no3 - litt2som%no3 + wood2litt_sum%no3 +  &
-         litt%fluxes%no3_dep(1)
-    input_psol_net = plant2litt%psol - litt2som%psol + wood2litt_sum%psol
-    input_ppar_net = litt%fluxes%ppar_dep(1)
-    call mend_derivs_layer(npom, litt_consts,  &
-         litt%cvars%pom(:,1), input_pom_c_net, d_litt%cvars%pom(:,1),  &
-         litt%cvars%dom(1), input_dom_c_net, d_litt%cvars%dom(1),  &
-         litt%cvars%enz_pom(:,1), d_litt%cvars%enz_pom(:,1),  &
-         litt%cvars%mom(1), d_litt%cvars%mom(1),  &
-         litt%cvars%qom(1), d_litt%cvars%qom(1),  &
-         litt%cvars%enz_mom(1), d_litt%cvars%enz_mom(1),  &
-         litt%cvars%amb(1), d_litt%cvars%amb(1),   &
-         litt%cvars%dmb(1), d_litt%cvars%dmb(1),   &
-         litt%fluxes%co2_lost(1), d_litt%fluxes%co2_lost(1),  &
-         litt%fluxes%nmin(1), d_litt%fluxes%nmin(1),  &
-         litt%fluxes%nitr(1), d_litt%fluxes%nitr(1),  &
-         litt%nvars%pom(:,1), input_pom_n_net, d_litt%nvars%pom(:,1),  &
-         litt%nvars%dom(1), input_dom_n_net, d_litt%nvars%dom(1),  &
-         litt%nvars%enz_pom(:,1), d_litt%nvars%enz_pom(:,1),  &
-         litt%nvars%mom(1), d_litt%nvars%mom(1),   &
-         litt%nvars%qom(1), d_litt%nvars%qom(1),   &
-         litt%nvars%enz_mom(1), d_litt%nvars%enz_mom(1),   &
-         litt%nvars%amb(1), d_litt%nvars%amb(1),  &
-         litt%nvars%dmb(1), d_litt%nvars%dmb(1),  &
-         litt%invars%nh4(1), input_nh4_net, d_litt%invars%nh4(1), &
-         litt%invars%no3(1), input_no3_net, d_litt%invars%no3(1),  &
-         litt%pvars%pom(:,1), input_pom_p_net, d_litt%pvars%pom(:,1),  &
-         litt%pvars%dom(1), input_dom_p_net, d_litt%pvars%dom(1),  &
-         litt%pvars%enz_pom(:,1), d_litt%pvars%enz_pom(:,1),  &
-         litt%pvars%mom(1), d_litt%pvars%mom(1),   &
-         litt%pvars%qom(1), d_litt%pvars%qom(1),  &
-         litt%pvars%enz_mom(1), d_litt%pvars%enz_mom(1),   &
-         litt%pvars%amb(1), d_litt%pvars%amb(1),  &
-         litt%pvars%dmb(1), d_litt%pvars%dmb(1),   &
-         litt%invars%psol(1), input_psol_net, d_litt%invars%psol(1),  &
-         litt%invars%plab(1), d_litt%invars%plab(1), &
-         litt%fluxes%ngas_lost(1), d_litt%fluxes%ngas_lost(1), &
-         litt%cvars%enz_ptase(1), d_litt%cvars%enz_ptase(1), &
-         litt%nvars%enz_ptase(1), d_litt%nvars%enz_ptase(1), &
-         litt%pvars%enz_ptase(1), d_litt%pvars%enz_ptase(1), &
-         d_litt%fluxes%nh4_plant(:,1), &
-         litt%fluxes%nh4_bnf(1), d_litt%fluxes%nh4_bnf(1), &
-         d_litt%fluxes%no3_plant(:,1), &
-         litt%fluxes%c_leach(1), d_litt%fluxes%c_leach(1), &
-         litt%fluxes%n_leach(1), d_litt%fluxes%n_leach(1), &
-         litt%fluxes%p_leach(1), d_litt%fluxes%p_leach(1), &
-         d_litt%fluxes%p_plant(:,1), &
-         litt%invars%pocc(1), d_litt%invars%pocc(1), &
-         litt%invars%ppar(1), d_litt%invars%ppar(1), input_ppar_net, &
-         litt%plvars%enz_plant_n(:,1), litt%plvars%enz_plant_p(:,1), &
-         litt%plvars%vnh4up_plant(:,1),  &
-         litt%plvars%vno3up_plant(:,1), litt%plvars%vpup_plant(:,1), &
-         litt_water_drainage, &
-         csite%mend%bulk_den(ipa),pi1, wfp)
-
-    do iwood = 1,nwood
-       input_pom_c_net = plant2wood(iwood)%pom_c - wood2litt(iwood)%pom_c -  &
-            wood2som(iwood)%pom_c
-       input_dom_c_net = plant2wood(iwood)%dom_c - wood2litt(iwood)%dom_c -  &
-            wood2som(iwood)%dom_c
-       input_pom_n_net = plant2wood(iwood)%pom_n - wood2litt(iwood)%pom_n -  &
-            wood2som(iwood)%pom_n
-       input_dom_n_net = plant2wood(iwood)%dom_n - wood2litt(iwood)%dom_n -  &
-            wood2som(iwood)%dom_n
-       input_pom_p_net = plant2wood(iwood)%pom_p - wood2litt(iwood)%pom_p -  &
-            wood2som(iwood)%pom_p
-       input_dom_p_net = plant2wood(iwood)%dom_p - wood2litt(iwood)%dom_p -  &
-            wood2som(iwood)%dom_p
-       input_nh4_net = plant2wood(iwood)%nh4 - wood2litt(iwood)%nh4 -  &
-            wood2som(iwood)%nh4 + wood(iwood)%fluxes%nh4_dep(1)
-       input_no3_net = plant2wood(iwood)%no3 - wood2litt(iwood)%no3 -  &
-            wood2som(iwood)%no3 + wood(iwood)%fluxes%no3_dep(1)
-       input_psol_net = plant2wood(iwood)%psol - wood2litt(iwood)%psol -  &
-            wood2som(iwood)%psol
-       input_ppar_net = wood(iwood)%fluxes%ppar_dep(1)
-       do jwood = 1, nwood
-          input_pom_c_net = input_pom_c_net - wood2wood(iwood,jwood)%pom_c + &
-               wood2wood(jwood,iwood)%pom_c
-          input_pom_n_net = input_pom_n_net - wood2wood(iwood,jwood)%pom_n + &
-               wood2wood(jwood,iwood)%pom_n
-          input_pom_p_net = input_pom_p_net - wood2wood(iwood,jwood)%pom_p + &
-               wood2wood(jwood,iwood)%pom_p
-          input_dom_c_net = input_dom_c_net - wood2wood(iwood,jwood)%dom_c + &
-               wood2wood(jwood,iwood)%dom_c
-          input_dom_n_net = input_dom_n_net - wood2wood(iwood,jwood)%dom_n + &
-               wood2wood(jwood,iwood)%dom_n
-          input_dom_p_net = input_dom_p_net - wood2wood(iwood,jwood)%dom_p + &
-               wood2wood(jwood,iwood)%dom_p
-          input_nh4_net = input_nh4_net - wood2wood(iwood,jwood)%nh4 + &
-               wood2wood(jwood,iwood)%nh4
-          input_no3_net = input_no3_net - wood2wood(iwood,jwood)%no3 + &
-               wood2wood(jwood,iwood)%no3
-          input_psol_net = input_psol_net - wood2wood(iwood,jwood)%psol + &
-               wood2wood(jwood,iwood)%psol
-       enddo
-       call mend_derivs_layer(npom, wood_consts(iwood), &
-            wood(iwood)%cvars%pom(:,1), input_pom_c_net,  &
-            d_wood(iwood)%cvars%pom(:,1), wood(iwood)%cvars%dom(1),  &
-            input_dom_c_net, d_wood(iwood)%cvars%dom(1),  &
-            wood(iwood)%cvars%enz_pom(:,1), d_wood(iwood)%cvars%enz_pom(:,1), &
-            wood(iwood)%cvars%mom(1), d_wood(iwood)%cvars%mom(1),  &
-            wood(iwood)%cvars%qom(1), d_wood(iwood)%cvars%qom(1),  &
-            wood(iwood)%cvars%enz_mom(1), d_wood(iwood)%cvars%enz_mom(1),  &
-            wood(iwood)%cvars%amb(1), d_wood(iwood)%cvars%amb(1),  &
-            wood(iwood)%cvars%dmb(1), d_wood(iwood)%cvars%dmb(1),  &
-            wood(iwood)%fluxes%co2_lost(1), d_wood(iwood)%fluxes%co2_lost(1), &
-            wood(iwood)%fluxes%nmin(1), d_wood(iwood)%fluxes%nmin(1), &
-            wood(iwood)%fluxes%nitr(1), d_wood(iwood)%fluxes%nitr(1), &
-            wood(iwood)%nvars%pom(:,1), input_pom_n_net, &
-            d_wood(iwood)%nvars%pom(:,1), wood(iwood)%nvars%dom(1),   &
-            input_dom_n_net, d_wood(iwood)%nvars%dom(1),  &
-            wood(iwood)%nvars%enz_pom(:,1), d_wood(iwood)%nvars%enz_pom(:,1), &
-            wood(iwood)%nvars%mom(1), d_wood(iwood)%nvars%mom(1),  &
-            wood(iwood)%nvars%qom(1), d_wood(iwood)%nvars%qom(1),  &
-            wood(iwood)%nvars%enz_mom(1), d_wood(iwood)%nvars%enz_mom(1),   &
-            wood(iwood)%nvars%amb(1), d_wood(iwood)%nvars%amb(1),  &
-            wood(iwood)%nvars%dmb(1), d_wood(iwood)%nvars%dmb(1),  &
-            wood(iwood)%invars%nh4(1), input_nh4_net, &
-            d_wood(iwood)%invars%nh4(1), wood(iwood)%invars%no3(1),   &
-            input_no3_net, d_wood(iwood)%invars%no3(1), &
-            wood(iwood)%pvars%pom(:,1), input_pom_p_net, &
-            d_wood(iwood)%pvars%pom(:,1), wood(iwood)%pvars%dom(1),   &
-            input_dom_p_net, d_wood(iwood)%pvars%dom(1),  &
-            wood(iwood)%pvars%enz_pom(:,1), d_wood(iwood)%pvars%enz_pom(:,1), &
-            wood(iwood)%pvars%mom(1), d_wood(iwood)%pvars%mom(1), &
-            wood(iwood)%pvars%qom(1), d_wood(iwood)%pvars%qom(1),  &
-            wood(iwood)%pvars%enz_mom(1), d_wood(iwood)%pvars%enz_mom(1),   &
-            wood(iwood)%pvars%amb(1), d_wood(iwood)%pvars%amb(1), &
-            wood(iwood)%pvars%dmb(1), d_wood(iwood)%pvars%dmb(1),  &
-            wood(iwood)%invars%psol(1), input_psol_net,  &
-            d_wood(iwood)%invars%psol(1), wood(iwood)%invars%plab(1),  &
-            d_wood(iwood)%invars%plab(1), wood(iwood)%fluxes%ngas_lost(1),  &
-            d_wood(iwood)%fluxes%ngas_lost(1),  &
-            wood(iwood)%cvars%enz_ptase(1), d_wood(iwood)%cvars%enz_ptase(1), &
-            wood(iwood)%nvars%enz_ptase(1), d_wood(iwood)%nvars%enz_ptase(1), &
-            wood(iwood)%pvars%enz_ptase(1), d_wood(iwood)%pvars%enz_ptase(1), &
-            d_wood(iwood)%fluxes%nh4_plant(:,1),  &
-            wood(iwood)%fluxes%nh4_bnf(1),  d_wood(iwood)%fluxes%nh4_bnf(1), &
-            d_wood(iwood)%fluxes%no3_plant(:,1), &
-            wood(iwood)%fluxes%c_leach(1), d_wood(iwood)%fluxes%c_leach(1),  &
-            wood(iwood)%fluxes%n_leach(1), d_wood(iwood)%fluxes%n_leach(1),  &
-            wood(iwood)%fluxes%p_leach(1), d_wood(iwood)%fluxes%p_leach(1), &
-            d_wood(iwood)%fluxes%p_plant(:,1), &
-            wood(iwood)%invars%pocc(1), d_wood(iwood)%invars%pocc(1), &
-            wood(iwood)%invars%ppar(1), d_wood(iwood)%invars%ppar(1),  &
-            input_ppar_net, wood(iwood)%plvars%enz_plant_n(:,1),  &
-            wood(iwood)%plvars%enz_plant_p(:,1),   &
-            wood(iwood)%plvars%vnh4up_plant(:,1), &
-            wood(iwood)%plvars%vno3up_plant(:,1),   &
-            wood(iwood)%plvars%vpup_plant(:,1), &
-            wood_water_drainage, &
-            csite%mend%bulk_den(ipa),pi1,wfp)
-
-    enddo
 
     return
   end subroutine mend_derivs_coupler

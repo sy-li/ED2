@@ -481,6 +481,9 @@ subroutine read_ed10_ed20_history_file
                      csite%sum_dgd           (ip2) = 0.0
                      csite%sum_chd           (ip2) = 0.0
                      csite%cohort_count      (ip2) = 0
+                     csite%plant_input_C(:,ip2) = 0.
+                     csite%plant_input_N(:,ip2) = 0.
+                     csite%plant_input_P(:,ip2) = 0.
                   end if
                end do
                !---- Initialize the cohort counts per patch. ------------------------------!
@@ -558,6 +561,9 @@ subroutine read_ed10_ed20_history_file
                   csite%sum_dgd           (ip) = 0.0
                   csite%sum_chd           (ip) = 0.0
                   csite%cohort_count      (ip) = 0
+                  csite%plant_input_C(ip) = 0.
+                  csite%plant_input_N(ip) = 0.
+                  csite%plant_input_P(ip) = 0.
                end do
                !---------------------------------------------------------------------------!
 

@@ -497,6 +497,9 @@ module pft_coms
    real, dimension(n_pft) :: leaf_grow_rate
    !< Rate of leaf growing if high_psi_threshold is crossed  [unitless]
 
+   real, dimension(n_pft) :: N_resorption_factor
+   real, dimension(n_pft) :: P_resorption_factor
+
    !=======================================================================================!
    !=======================================================================================!
 

@@ -260,6 +260,8 @@ subroutine update_phenology(doy, cpoly, isi, lat)
          
          !----- Initially, we assume all leaves stay. -------------------------------------!
          cpatch%leaf_drop(ico) = 0.0
+         delta_bleaf = 0.
+         delta_broot = 0.
 
          !----- Find cohort-specific thresholds. ------------------------------------------!
          select case (iphen_scheme)
@@ -547,6 +549,7 @@ subroutine update_phenology(doy, cpoly, isi, lat)
                                             + cpatch%nplant(ico) * cpatch%leaf_drop(ico)   &    
                                             * (1.0 - f_labile(ipft)) * l2n_stem            &
                                             / c2n_stem(ipft)
+
                !---------------------------------------------------------------------------!
 
 
@@ -814,6 +817,65 @@ subroutine update_phenology(doy, cpoly, isi, lat)
          end select
          !---------------------------------------------------------------------------------!
 
+         if(delta_bleaf > 0.)then
+            csite%plant_input_C(2,ipa) = csite%plant_input_C(2,ipa) + &
+                 delta_bleaf * cpatch%nplant(ico) * &
+                 (1.-retained_carbon_fraction)
+            csite%plant_input_N(2,ipa) = csite%plant_input_N(2,ipa) + &
+                 delta_bleaf / c2n_leaf(ipft) * cpatch%nplant(ico) * &
+                 (1.-N_resorption_factor(ipft))
+            csite%plant_input_P(2,ipa) = csite%plant_input_P(2,ipa) + &
+                 delta_bleaf / c2p_leaf(ipft) * cpatch%nplant(ico) *  &
+                 (1.-P_resorption_factor(ipft))
+
+            cpatch%nstorage(ico) = cpatch%nstorage(ico) + N_resorption_factor(ipft) * &
+                 delta_bleaf / c2n_leaf(ipft)
+            if(cpatch%nstorage(ico) > cpatch%nstorage_min(ico) * nstorage_max_factor)then
+               csite%plant_input_N(2,ipa) = csite%plant_input_N(2,ipa) + &
+                    cpatch%nplant(ico) * (cpatch%nstorage(ico) -  &
+                    cpatch%nstorage_min(ico) * nstorage_max_factor)
+               cpatch%nstorage(ico) = cpatch%nstorage_min(ico) * nstorage_max_factor
+            endif
+            cpatch%pstorage(ico) = cpatch%pstorage(ico) + P_resorption_factor(ipft) * &
+                 delta_bleaf / c2p_leaf(ipft)
+            if(cpatch%pstorage(ico) > cpatch%pstorage_min(ico) * pstorage_max_factor)then
+               csite%plant_input_P(2,ipa) = csite%plant_input_P(2,ipa) + &
+                    cpatch%nplant(ico) * (cpatch%pstorage(ico) -  &
+                    cpatch%pstorage_min(ico) * pstorage_max_factor)
+               cpatch%pstorage(ico) = cpatch%pstorage_min(ico) * pstorage_max_factor
+            endif
+         endif
+
+         if(delta_broot > 0.)then
+            csite%plant_input_C(3,ipa) = csite%plant_input_C(3,ipa) + &
+                 delta_broot * cpatch%nplant(ico) * &
+                 (1.-retained_carbon_fraction)
+            csite%plant_input_N(3,ipa) = csite%plant_input_N(3,ipa) + &
+                 delta_broot / c2n_leaf(ipft) * cpatch%nplant(ico) * &
+                 (1.-N_resorption_factor(ipft))
+            csite%plant_input_P(3,ipa) = csite%plant_input_P(3,ipa) + &
+                 delta_broot / c2p_leaf(ipft) * cpatch%nplant(ico) * &
+                 (1.-P_resorption_factor(ipft))
+
+            cpatch%nstorage(ico) = cpatch%nstorage(ico) + N_resorption_factor(ipft) * &
+                 delta_broot / c2n_leaf(ipft)
+            if(cpatch%nstorage(ico) > cpatch%nstorage_min(ico) * nstorage_max_factor)then
+               csite%plant_input_N(3,ipa) = csite%plant_input_N(3,ipa) + &
+                    cpatch%nplant(ico) * (cpatch%nstorage(ico) -  &
+                    cpatch%nstorage_min(ico) * nstorage_max_factor)
+               cpatch%nstorage(ico) = cpatch%nstorage_min(ico) * nstorage_max_factor
+            endif
+            cpatch%pstorage(ico) = cpatch%pstorage(ico) + P_resorption_factor(ipft) * &
+                 delta_broot / c2p_leaf(ipft)
+            if(cpatch%pstorage(ico) > cpatch%pstorage_min(ico) * pstorage_max_factor)then
+               csite%plant_input_P(3,ipa) = csite%plant_input_P(3,ipa) + &
+                    cpatch%nplant(ico) * (cpatch%pstorage(ico) -  &
+                    cpatch%pstorage_min(ico) * pstorage_max_factor)
+               cpatch%pstorage(ico) = cpatch%pstorage_min(ico) * pstorage_max_factor
+            endif
+
+
+         endif
 
 
          !----- Update LAI, WAI, and CAI accordingly. -------------------------------------!

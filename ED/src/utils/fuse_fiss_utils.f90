@@ -185,6 +185,38 @@ module fuse_fiss_utils
                               * ( (1.0 - f_labile(ipft)) * cpatch%balive(ico)              &
                                 + cpatch%bdead(ico) ) * l2n_stem/c2n_stem(ipft)
 
+            csite%plant_input_C(1,ipa) = csite%plant_input_C(1,ipa) +  &
+                 cpatch%nplant(ico) * cpatch%bstorage(ico)
+            csite%plant_input_C(2,ipa) = csite%plant_input_C(2,ipa) +  &
+                 cpatch%nplant(ico) * cpatch%balive(ico) / (1.+cpatch%root2leaf(ico))
+            csite%plant_input_C(3,ipa) = csite%plant_input_C(3,ipa) +  &
+                 cpatch%nplant(ico) * cpatch%balive(ico) * cpatch%root2leaf(ico) /  &
+                 (1.+cpatch%root2leaf(ico))
+            csite%plant_input_C(4,ipa) = csite%plant_input_C(4,ipa) +  &
+                 cpatch%nplant(ico) * cpatch%bdead(ico)
+
+            csite%plant_input_N(1,ipa) = csite%plant_input_N(1,ipa) +  &
+                 cpatch%nplant(ico) * cpatch%nstorage(ico)
+            csite%plant_input_N(2,ipa) = csite%plant_input_N(2,ipa) +  &
+                 cpatch%nplant(ico) * cpatch%balive(ico) / (1.+cpatch%root2leaf(ico)) / &
+                 c2n_leaf(ipft)
+            csite%plant_input_N(3,ipa) = csite%plant_input_N(3,ipa) +  &
+                 cpatch%nplant(ico) * cpatch%balive(ico) * cpatch%root2leaf(ico) /  &
+                 (1.+cpatch%root2leaf(ico)) / c2n_leaf(ipft)
+            csite%plant_input_N(4,ipa) = csite%plant_input_N(4,ipa) +  &
+                 cpatch%nplant(ico) * cpatch%bdead(ico) / c2n_stem(ipft)
+
+            csite%plant_input_P(1,ipa) = csite%plant_input_P(1,ipa) +  &
+                 cpatch%nplant(ico) * cpatch%pstorage(ico)
+            csite%plant_input_P(2,ipa) = csite%plant_input_P(2,ipa) +  &
+                 cpatch%nplant(ico) * cpatch%balive(ico) / (1.+cpatch%root2leaf(ico)) / &
+                 c2p_leaf(ipft)
+            csite%plant_input_P(3,ipa) = csite%plant_input_P(3,ipa) +  &
+                 cpatch%nplant(ico) * cpatch%balive(ico) * cpatch%root2leaf(ico) /  &
+                 (1.+cpatch%root2leaf(ico)) / c2p_leaf(ipft)
+            csite%plant_input_P(4,ipa) = csite%plant_input_P(4,ipa) +  &
+                 cpatch%nplant(ico) * cpatch%bdead(ico) / c2p_wood(ipft)
+
          end if
       end do
 
@@ -4284,6 +4316,15 @@ module fuse_fiss_utils
       csite%fast_soil_N(recp)        = newareai *                                          &
                                      ( csite%fast_soil_N(donp)        * csite%area(donp)   &
                                      + csite%fast_soil_N(recp)        * csite%area(recp) )
+
+
+      csite%plant_input_C(:,recp) = newareai * (csite%plant_input_C(:,donp) * csite%area(donp) + &
+           csite%plant_input_C(:,recp) * csite%area(recp))
+      csite%plant_input_N(:,recp) = newareai * (csite%plant_input_N(:,donp) * csite%area(donp) + &
+           csite%plant_input_N(:,recp) * csite%area(recp))
+      csite%plant_input_P(:,recp) = newareai * (csite%plant_input_P(:,donp) * csite%area(donp) + &
+           csite%plant_input_P(:,recp) * csite%area(recp))
+
 
       csite%sum_dgd(recp)            = newareai *                                          &
                                      ( csite%sum_dgd(donp)            * csite%area(donp)   &
