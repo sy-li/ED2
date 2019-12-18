@@ -400,6 +400,8 @@ subroutine inc_rk4_patch(rkp, inc, fac, cpatch)
    rkp%tpwp = rkp%tpwp + fac * inc%tpwp
    rkp%qpwp = rkp%qpwp + fac * inc%qpwp
    rkp%cpwp = rkp%cpwp + fac * inc%cpwp
+   rkp%avg_nutrient_layer_drainage = rkp%avg_nutrient_layer_drainage +  &
+        fac * inc%avg_nutrient_layer_drainage
 
    do ico = 1,cpatch%ncohorts
       rkp%leaf_water (ico) = rkp%leaf_water (ico) + fac * inc%leaf_water (ico)

@@ -175,6 +175,8 @@ subroutine copy_rk4_patch(sourcep, targetp, cpatch)
       targetp%sapb_storage_resp(k) = sourcep%sapb_storage_resp(k)
    end do
 
+   targetp%avg_nutrient_layer_drainage = sourcep%avg_nutrient_layer_drainage
+
    if (checkbudget) then
       targetp%co2budget_storage      = sourcep%co2budget_storage
       targetp%co2budget_loss2atm     = sourcep%co2budget_loss2atm

@@ -5208,7 +5208,12 @@ module fuse_fiss_utils
                                                *   newareai
          !---------------------------------------------------------------------------------!
 
-
+         csite%avg_nutrient_layer_drainage(recp) =  &
+              (csite%avg_nutrient_layer_drainage(recp)*csite%area(recp) + &
+              csite%avg_nutrient_layer_drainage(donp) * csite%area(donp))*newareai
+         csite%dmean_nutrient_layer_drainage(recp) =  &
+              (csite%dmean_nutrient_layer_drainage(recp)*csite%area(recp) + &
+              csite%dmean_nutrient_layer_drainage(donp) * csite%area(donp))*newareai
 
          !---------------------------------------------------------------------------------!
          !      Now we find the derived properties for the canopy air space.               !

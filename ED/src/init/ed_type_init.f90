@@ -929,7 +929,8 @@ subroutine init_ed_patch_vars(csite,ipaa,ipaz,lsl)
 
 
 
-
+   csite%avg_nutrient_layer_drainage(ipaa:ipaz) = 0.
+   csite%dmean_nutrient_layer_drainage(ipaa:ipaz) = 0.
    !---------------------------------------------------------------------------------------!
    !    Daily means.                                                                       !
    !---------------------------------------------------------------------------------------!

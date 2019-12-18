@@ -3488,6 +3488,9 @@ subroutine fill_history_site(csite,sipa_index,npatches_global,is_burnt)
    call hdf_getslab_r(csite%hprev                                                          &
                      ,'HPREV                       ',dsetrank,iparallel,.true. ,foundvar)
    !----- Daily means. --------------------------------------------------------------------!
+   if(associated(csite%dmean_nutrient_layer_drainage))   &
+        call hdf_getslab_r(csite%dmean_nutrient_layer_drainage,'DMEAN_NUTRIENT_LAYER_DRAINAGE   ',&
+        dsetrank, iparallel, .false., foundvar)
    if (writing_long) then
       call hdf_getslab_r(csite%dmean_A_decomp                                              &
                         ,'DMEAN_A_DECOMP_PA         ',dsetrank,iparallel,.false.,foundvar)

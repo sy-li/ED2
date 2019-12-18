@@ -1795,6 +1795,9 @@ module ed_state_vars
       !====================================================================================!
       !====================================================================================!
 
+      real, pointer, dimension(:) :: dmean_nutrient_layer_drainage
+      real, pointer, dimension(:) :: avg_nutrient_layer_drainage
+
       type(mend_model) :: mend
       type(mend_model) :: mend_mm
 
@@ -4435,6 +4438,9 @@ module ed_state_vars
       allocate(csite%fmean_qrunoff                 (              npatches))
       allocate(csite%fmean_qdrainage               (              npatches))
 
+      allocate(csite%avg_nutrient_layer_drainage(npatches))
+      allocate(csite%dmean_nutrient_layer_drainage(npatches))
+
       if (writing_long) then
          allocate(csite%dmean_A_decomp             (              npatches))
          allocate(csite%dmean_Af_decomp            (              npatches))
@@ -6558,6 +6564,9 @@ module ed_state_vars
       nullify(csite%qmsqu_sensible_gc          )
       nullify(csite%qmsqu_sensible_ac          )
 
+      nullify(csite%avg_nutrient_layer_drainage)
+      nullify(csite%dmean_nutrient_layer_drainage)
+
       return
    end subroutine nullify_sitetype
    !=======================================================================================!
@@ -7546,6 +7555,10 @@ module ed_state_vars
       if(associated(csite%qmsqu_sensible_gc     )) deallocate(csite%qmsqu_sensible_gc     )
       if(associated(csite%qmsqu_sensible_ac     )) deallocate(csite%qmsqu_sensible_ac     )
 
+      if(associated(csite%avg_nutrient_layer_drainage     )) deallocate(csite%avg_nutrient_layer_drainage )
+      if(associated(csite%dmean_nutrient_layer_drainage  )) deallocate(csite%dmean_nutrient_layer_drainage )
+
+
       return
    end subroutine deallocate_sitetype
    !=======================================================================================!
@@ -8335,6 +8348,9 @@ module ed_state_vars
          osite%fmean_qrunoff              (opa) = isite%fmean_qrunoff              (ipa)
          osite%fmean_qdrainage            (opa) = isite%fmean_qdrainage            (ipa)
 
+         osite%avg_nutrient_layer_drainage(opa) = isite%avg_nutrient_layer_drainage(ipa)
+         osite%dmean_nutrient_layer_drainage(opa) = isite%dmean_nutrient_layer_drainage(ipa)
+
          !----- Temporary pounding/snow layer variables. ----------------------------------!
          do m=1,nzs
             osite%sfcwater_mass   (m,opa) = isite%sfcwater_mass   (m,ipa)
@@ -8928,6 +8944,9 @@ module ed_state_vars
       osite%qrunoff                   (1:z) = pack(isite%qrunoff                   ,lmask)
       !------------------------------------------------------------------------------------!
 
+      osite%avg_nutrient_layer_drainage(1:z) = pack(isite%avg_nutrient_layer_drainage,lmask)
+      osite%dmean_nutrient_layer_drainage(1:z) = pack(isite%dmean_nutrient_layer_drainage,lmask)
+
       !----- Temporary pounding/snow layer variables. -------------------------------------!
       do m=1,nzs
          osite%sfcwater_mass   (m,1:z) = pack(isite%sfcwater_mass   (m,:),lmask)
@@ -8981,6 +9000,8 @@ module ed_state_vars
       !------------------------------------------------------------------------------------!
 
 
+
+    
 
       return
    end subroutine copy_sitetype_mask_inst
@@ -14180,6 +14201,7 @@ module ed_state_vars
                            ,'Daily mean - Albedo'                                          &
                            ,'[       ----]','(ipoly)'            )
       end if
+
       if (associated(cgrid%dmean_albedo_par      )) then
          nvar = nvar+1
          call vtable_edio_r(npts,cgrid%dmean_albedo_par                                    &
@@ -21771,6 +21793,17 @@ module ed_state_vars
                            ,'Daily mean - Albedo'                                          &
                            ,'[       ----]','(ipatch)'            )
       end if
+
+      if (associated(csite%dmean_nutrient_layer_drainage)) then
+         nvar = nvar+1
+         call vtable_edio_r(npts,csite%dmean_nutrient_layer_drainage                      &
+                           ,nvar,igr,init,csite%paglob_id,var_len,var_len_global,max_ptrs  &
+                           ,'DMEAN_NUTRIENT_LAYER_DRAINAGE_PA            :31:'//trim(dail_keys)     )
+         call metadata_edio(nvar,igr                                                       &
+                           ,'Daily mean - Nutrient layer drainage'                                          &
+                           ,'[       ----]','(ipatch)'            )
+      end if
+
       if (associated(csite%dmean_albedo_par      )) then
          nvar = nvar+1
          call vtable_edio_r(npts,csite%dmean_albedo_par                                    &

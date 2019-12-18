@@ -357,6 +357,7 @@ module rk4_driver
       initp%qpwp = 0.d0
       initp%cpwp = 0.d0
       initp%wpwp = 0.d0
+      initp%avg_nutrient_layer_drainage = 0.d0
 
       !----- Go into the ODE integrator. --------------------------------------------------!
 
@@ -553,6 +554,11 @@ module rk4_driver
       csite%tpwp  (ipa)           = sngloff(initp%tpwp            ,tiny_offset)
       csite%qpwp  (ipa)           = sngloff(initp%qpwp            ,tiny_offset)
       csite%cpwp  (ipa)           = sngloff(initp%cpwp            ,tiny_offset)
+
+      csite%avg_nutrient_layer_drainage(ipa) = sngloff(initp%avg_nutrient_layer_drainage, &
+           tiny_offset)
+      csite%dmean_nutrient_layer_drainage(ipa) = csite%dmean_nutrient_layer_drainage(ipa) + &
+           csite%avg_nutrient_layer_drainage(ipa)
 
       !------------------------------------------------------------------------------------!
       !    These variables are fast scale fluxes, and they may not be allocated, so just   !

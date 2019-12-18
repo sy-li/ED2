@@ -281,6 +281,7 @@ module rk4_coms
       real(kind=8),pointer,dimension(:) :: avg_transloss     ! Transpired soil moisture sink
       real(kind=8),pointer,dimension(:) :: avg_sensible_gg   ! Soil heat flux between layers
       real(kind=8)                      :: avg_drainage      ! Drainage at the bottom.
+      real(kind=8)                      :: avg_nutrient_layer_drainage      ! Drainage at the bottom.
       real(kind=8)                      :: avg_qdrainage     ! Drainage at the bottom.
       !----- Cohort-level fluxes. ---------------------------------------------------------!
       real(kind=8),pointer,dimension(:) :: avg_sensible_lc    ! Sensible heat (Leaf-CAS)
@@ -1066,6 +1067,7 @@ module rk4_coms
       y%avg_heatstor_veg               = 0.d0
 
       y%avg_drainage                   = 0.d0
+      y%avg_nutrient_layer_drainage                   = 0.d0
       y%avg_qdrainage                  = 0.d0
 
       y%water_deficit                  = 0.d0
