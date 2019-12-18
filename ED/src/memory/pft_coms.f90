@@ -398,7 +398,7 @@ module pft_coms
    real :: plant_N_supply_scale
 
    real, dimension(n_pft) :: c2p_wood
-   real, dimension(n_pft) :: c2p_leaf
+   real, dimension(n_pft) :: c2p_leaf,c2p_recruit
    real, dimension(n_pft) :: C_resorption_fraction, N_resorption_fraction, P_resorption_fraction
 
    !---------------------------------------------------------------------------------------!

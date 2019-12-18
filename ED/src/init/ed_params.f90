@@ -3893,7 +3893,7 @@ subroutine init_pft_derived_params()
       , c2n_recruit          & ! intent(out)
       , veg_hcap_min         & ! intent(out)
       , seed_rain,b1Ht,b2Ht,b1CA,b2CA,bdead_crit,min_bdead,min_dbh,b2Bl_large,b1Bl_large &
-      , C2B, bleaf_adult, dbh_adult! ! intent(out)
+      , C2B, bleaf_adult, dbh_adult,c2p_recruit,c2p_leaf,c2p_wood! ! intent(out)
    use allometry            , only : h2dbh                & ! function
       , dbh2h                & ! function
       , size2bl          & ! function
@@ -4065,6 +4065,12 @@ subroutine init_pft_derived_params()
          / (balive_min * ( f_labile(ipft) / c2n_leaf(ipft)             &
          + (1.0 - f_labile(ipft)) / c2n_stem(ipft))                    &
          + bdead_min/c2n_stem(ipft))
+      !------------------------------------------------------------------------------------!
+
+      !----- Find the recruit carbon to phosphorus ratio. -----------------------------------!
+      c2p_recruit(ipft)      = (balive_min + bdead_min)                                    &
+         / (balive_min / c2p_leaf(ipft)                    &
+         + bdead_min/c2p_wood(ipft))
       !------------------------------------------------------------------------------------!
 
 
