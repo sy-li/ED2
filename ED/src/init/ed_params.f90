@@ -3310,7 +3310,8 @@ subroutine init_pft_nitro_params()
 
    use pft_coms, only: c2n_leaf, Vm0, SLA, &
       c2n_slow,c2n_structural,c2n_storage,c2n_stem,l2n_stem,plant_N_supply_scale,&
-      c2p_leaf, c2p_wood, N_resorption_factor, P_resorption_factor
+      c2p_leaf, c2p_wood,  &
+      N_resorption_fraction, P_resorption_fraction, C_resorption_fraction
 
    implicit none
 
@@ -3319,6 +3320,7 @@ subroutine init_pft_nitro_params()
    c2n_storage    = 150.0 ! Carbon to Nitrogen ratio, storage pool.
    c2n_stem       = 150.0 ! Carbon to Nitrogen ratio, structural stem.
    l2n_stem       = 150.0 ! Carbon to Nitrogen ratio, structural stem.
+   C_resorption_factor(:) = 0.48
    N_resorption_factor(:) = 0.48
 
 
@@ -5107,7 +5109,6 @@ subroutine init_phen_coms
    use phenology_coms, only : radint                   & ! intent(in)
       , radslp                   & ! intent(in)
       , thetacrit                & ! intent(in)
-      , retained_carbon_fraction & ! intent(out)
       , elongf_min               & ! intent(out)
       , elongf_flush             & ! intent(out)
       , spot_phen                & ! intent(out)
@@ -5137,15 +5138,6 @@ subroutine init_phen_coms
       , vm0_min                  ! ! intent(out)
 
    implicit none
-
-   !---------------------------------------------------------------------------------------!
-   !     Before plants drop their leaves, they retain this fraction of their leaf carbon   !
-   ! and nitrogen and put it into storage.                                                 !
-   !---------------------------------------------------------------------------------------!
-   retained_carbon_fraction = 0.5
-   !---------------------------------------------------------------------------------------!
-
-
 
    !---------------------------------------------------------------------------------------!
    !      Minimum elongation factor before plants give up completely and shed all remain-  !

@@ -399,6 +399,7 @@ module pft_coms
 
    real, dimension(n_pft) :: c2p_wood
    real, dimension(n_pft) :: c2p_leaf
+   real, dimension(n_pft) :: C_resorption_fraction, N_resorption_fraction, P_resorption_fraction
 
    !---------------------------------------------------------------------------------------!
    !    Supply coefficient for plant water uptake [m2_ground/kgC_root/sec].                !

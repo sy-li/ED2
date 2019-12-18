@@ -139,14 +139,6 @@ module phenology_coms
 
 
 
-   !---------------------------------------------------------------------------------------!
-   !     Before plants drop their leaves, they retain this fraction of their leaf carbon   !
-   ! and nitrogen and put it into storage.                                                 !
-   !---------------------------------------------------------------------------------------!
-   real    :: retained_carbon_fraction
-   !---------------------------------------------------------------------------------------!
-
-
 
    !---------------------------------------------------------------------------------------!
    !     Flag that checks whether to Use soil potential rather than soil moisture to drive !

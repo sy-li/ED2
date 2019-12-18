@@ -178,10 +178,10 @@ subroutine update_phenology(doy, cpoly, isi, lat)
                              , leaf_grow_rate           & ! intent(in)
                              , l2n_stem                 & ! intent(in)
                              , c2n_stem                 & ! intent(in)
-                             , c2n_storage              ! ! intent(in)
+                             , c2n_storage,C_resorption_fraction,&
+                             N_resorption_fraction, P_resorption_fraction! ! intent(in)
    use decomp_coms    , only : f_labile                 ! ! intent(in)
-   use phenology_coms , only : retained_carbon_fraction & ! intent(in)
-                             , iphen_scheme             & ! intent(in)
+   use phenology_coms , only : iphen_scheme             & ! intent(in)
                              , elongf_min               & ! intent(in)
                              , elongf_flush             ! ! intent(in)
    use consts_coms    , only : t3ple                    & ! intent(in)
@@ -319,7 +319,7 @@ subroutine update_phenology(doy, cpoly, isi, lat)
 
             if (elongf_try < 1.0 .and. cpatch%phenology_status(ico) /= -2) then
                !----- It is time to drop leaves.  Drop all leaves. ------------------------!
-               cpatch%leaf_drop(ico) = (1.0 - retained_carbon_fraction) * cpatch%bleaf(ico)
+               cpatch%leaf_drop(ico) = (1.0 - C_resorption_fraction(ipft)) * cpatch%bleaf(ico)
                !---------------------------------------------------------------------------!
 
 
@@ -327,7 +327,7 @@ subroutine update_phenology(doy, cpoly, isi, lat)
                !----- Update plant carbon pools. ------------------------------------------!
                cpatch%balive  (ico) = cpatch%balive(ico) - cpatch%bleaf(ico)
                cpatch%bstorage(ico) = cpatch%bstorage(ico)                                 &
-                                    + cpatch%bleaf(ico) * retained_carbon_fraction
+                                    + cpatch%bleaf(ico) * C_resorption_fraction(ipft)
                cpatch%bleaf   (ico) = 0.0
                cpatch%elongf  (ico) = 0.0
                cpatch%phenology_status(ico) = -2
@@ -412,7 +412,7 @@ subroutine update_phenology(doy, cpoly, isi, lat)
                   ! not growing (not necessarily because the leaves are fully flushed).    !
                   !------------------------------------------------------------------------!
                   cpatch%phenology_status(ico) = -1
-                  cpatch%leaf_drop(ico) = (1.0 - retained_carbon_fraction) * delta_bleaf
+                  cpatch%leaf_drop(ico) = (1.0 - C_resorption_fraction(ipft)) * delta_bleaf
                   csite%fsc_in(ipa) = csite%fsc_in(ipa)                                    &
                                     + cpatch%nplant(ico) * cpatch%leaf_drop(ico)           &
                                     * f_labile(ipft)
@@ -429,7 +429,7 @@ subroutine update_phenology(doy, cpoly, isi, lat)
                   !----- Adjust plant carbon pools. ---------------------------------------!
                   cpatch%balive(ico)   = cpatch%balive(ico) - delta_bleaf
                   cpatch%bstorage(ico) = cpatch%bstorage(ico)                              &
-                                       + retained_carbon_fraction * delta_bleaf
+                                       + C_resorption_fraction(ipft) * delta_bleaf
 
                   !------------------------------------------------------------------------!
                   !     Contribution due to the fact that c2n_leaf and c2n_storage may be  !
@@ -437,7 +437,7 @@ subroutine update_phenology(doy, cpoly, isi, lat)
                   !------------------------------------------------------------------------!
                   csite%fsn_in(ipa)     = csite%fsn_in(ipa)                                &
                                         + delta_bleaf * cpatch%nplant(ico)                 &
-                                        * retained_carbon_fraction                         &
+                                        * C_resorption_fraction(ipft)                         &
                                         * (1.0 / c2n_leaf(ipft) - 1.0/c2n_storage)
                   cpatch%bleaf(ico)     = bl_max
 
@@ -522,13 +522,13 @@ subroutine update_phenology(doy, cpoly, isi, lat)
                else
                   cpatch%phenology_status(ico) = -2
                end if
-               cpatch%leaf_drop (ico) = (1.0 - retained_carbon_fraction) * delta_bleaf
+               cpatch%leaf_drop (ico) = (1.0 - C_resorption_fraction(ipft)) * delta_bleaf
                cpatch%elongf    (ico) = elongf_try
                !----- Adjust plant carbon pools. ------------------------------------------!
                cpatch%bleaf     (ico) = bl_max
                cpatch%balive    (ico) = cpatch%balive(ico)   - delta_bleaf
                cpatch%bstorage  (ico) = cpatch%bstorage(ico)                               &
-                                      + retained_carbon_fraction * delta_bleaf
+                                      + C_resorption_fraction(ipft) * delta_bleaf
                !---------------------------------------------------------------------------!
 
 
@@ -558,7 +558,7 @@ subroutine update_phenology(doy, cpoly, isi, lat)
                ! different.                                                                !
                !---------------------------------------------------------------------------!
                csite%fsn_in(ipa)     = csite%fsn_in(ipa) + delta_bleaf*cpatch%nplant(ico)  &
-                                     * retained_carbon_fraction                            &
+                                     * C_resorption_fraction(ipft)                            &
                                      * (1.0 / c2n_leaf(ipft) - 1.0/c2n_storage)
                !---------------------------------------------------------------------------!
 
@@ -688,13 +688,13 @@ subroutine update_phenology(doy, cpoly, isi, lat)
                else
                   cpatch%phenology_status(ico) = -2
                end if
-               cpatch%leaf_drop (ico) = (1.0 - retained_carbon_fraction) * delta_bleaf
+               cpatch%leaf_drop (ico) = (1.0 - C_resorption_fraction(ipft)) * delta_bleaf
                cpatch%elongf    (ico) = elongf_try
                !----- Adjust plant carbon pools. ------------------------------------------!
                cpatch%bleaf     (ico) = bl_max
                cpatch%balive    (ico) = cpatch%balive(ico)   - delta_bleaf
                cpatch%bstorage  (ico) = cpatch%bstorage(ico)                               &
-                                      + retained_carbon_fraction * delta_bleaf
+                                      + C_resorption_fraction(ipft) * delta_bleaf
                !---------------------------------------------------------------------------!
 
 
@@ -723,7 +723,7 @@ subroutine update_phenology(doy, cpoly, isi, lat)
                ! different.                                                                !
                !---------------------------------------------------------------------------!
                csite%fsn_in(ipa)     = csite%fsn_in(ipa) + delta_bleaf*cpatch%nplant(ico)  &
-                                     * retained_carbon_fraction                            &
+                                     * C_resorption_fraction(ipft)                            &
                                      * (1.0 / c2n_leaf(ipft) - 1.0/c2n_storage)
                !---------------------------------------------------------------------------!
 
@@ -762,7 +762,7 @@ subroutine update_phenology(doy, cpoly, isi, lat)
                cpatch%broot     (ico) = br_max
                cpatch%balive    (ico) = cpatch%balive(ico)   - delta_broot
                cpatch%bstorage  (ico) = cpatch%bstorage(ico)                               &
-                                      + retained_carbon_fraction * delta_broot
+                                      + C_resorption_fraction(ipft) * delta_broot
                !---------------------------------------------------------------------------!
 
 
@@ -772,19 +772,19 @@ subroutine update_phenology(doy, cpoly, isi, lat)
                !---------------------------------------------------------------------------!
                csite%fsc_in           (ipa) = csite%fsc_in(ipa)                            &    
                                             + cpatch%nplant(ico)                           &    
-                                            * delta_broot * (1. - retained_carbon_fraction)&    
+                                            * delta_broot * (1. - C_resorption_fraction(ipft))&    
                                             * f_labile(ipft)                                
                csite%fsn_in           (ipa) = csite%fsn_in(ipa)                            &    
                                             + cpatch%nplant(ico)                           &    
-                                            * delta_broot * (1. - retained_carbon_fraction)&    
+                                            * delta_broot * (1. - C_resorption_fraction(ipft))&    
                                             * f_labile(ipft) / c2n_leaf(ipft)               
                csite%ssc_in           (ipa) = csite%ssc_in(ipa)                            &    
                                             + cpatch%nplant(ico)                           &    
-                                            * delta_broot * (1. - retained_carbon_fraction)&    
+                                            * delta_broot * (1. - C_resorption_fraction(ipft))&    
                                             * (1.0-f_labile(ipft))                          
                csite%ssl_in           (ipa) = csite%ssl_in(ipa)                            &    
                                             + cpatch%nplant(ico)                           &    
-                                            * delta_broot * (1. - retained_carbon_fraction)&    
+                                            * delta_broot * (1. - C_resorption_fraction(ipft))&    
                                             * (1.0 - f_labile(ipft)) * l2n_stem            &
                                             / c2n_stem(ipft)
                !---------------------------------------------------------------------------!
@@ -795,7 +795,7 @@ subroutine update_phenology(doy, cpoly, isi, lat)
                ! different.                                                                !
                !---------------------------------------------------------------------------!
                csite%fsn_in(ipa)     = csite%fsn_in(ipa) + delta_broot*cpatch%nplant(ico)  &
-                                     * retained_carbon_fraction                            &
+                                     * C_resorption_fraction(ipft)                            &
                                      * (1.0 / c2n_leaf(ipft) - 1.0/c2n_storage)
                !---------------------------------------------------------------------------!
 
@@ -803,13 +803,13 @@ subroutine update_phenology(doy, cpoly, isi, lat)
                !      Deduct the leaf drop from the carbon balance.                        !
                !---------------------------------------------------------------------------!
                cpatch%cb          (13,ico) = cpatch%cb          (13,ico)                   &
-                                           - delta_broot * (1. - retained_carbon_fraction)
+                                           - delta_broot * (1. - C_resorption_fraction(ipft))
                cpatch%cb_lightmax (13,ico) = cpatch%cb_lightmax (13,ico)                   &
-                                           - delta_broot * (1. - retained_carbon_fraction)
+                                           - delta_broot * (1. - C_resorption_fraction(ipft))
                cpatch%cb_moistmax (13,ico) = cpatch%cb_moistmax (13,ico)                   &
-                                           - delta_broot * (1. - retained_carbon_fraction)
+                                           - delta_broot * (1. - C_resorption_fraction(ipft))
                cpatch%cb_mlmax (13,ico)    = cpatch%cb_mlmax    (13,ico)                   &
-                                           - delta_broot * (1. - retained_carbon_fraction)
+                                           - delta_broot * (1. - C_resorption_fraction(ipft))
 
             end if
             !------------------------------------------------------------------------------!
@@ -820,15 +820,15 @@ subroutine update_phenology(doy, cpoly, isi, lat)
          if(delta_bleaf > 0.)then
             csite%plant_input_C(2,ipa) = csite%plant_input_C(2,ipa) + &
                  delta_bleaf * cpatch%nplant(ico) * &
-                 (1.-retained_carbon_fraction)
+                 (1.-C_resorption_fraction(ipft))
             csite%plant_input_N(2,ipa) = csite%plant_input_N(2,ipa) + &
                  delta_bleaf / c2n_leaf(ipft) * cpatch%nplant(ico) * &
-                 (1.-N_resorption_factor(ipft))
+                 (1.-N_resorption_fraction(ipft))
             csite%plant_input_P(2,ipa) = csite%plant_input_P(2,ipa) + &
                  delta_bleaf / c2p_leaf(ipft) * cpatch%nplant(ico) *  &
-                 (1.-P_resorption_factor(ipft))
+                 (1.-P_resorption_fraction(ipft))
 
-            cpatch%nstorage(ico) = cpatch%nstorage(ico) + N_resorption_factor(ipft) * &
+            cpatch%nstorage(ico) = cpatch%nstorage(ico) + N_resorption_fraction(ipft) * &
                  delta_bleaf / c2n_leaf(ipft)
             if(cpatch%nstorage(ico) > cpatch%nstorage_max(ico))then
                csite%plant_input_N(2,ipa) = csite%plant_input_N(2,ipa) + &
@@ -836,7 +836,7 @@ subroutine update_phenology(doy, cpoly, isi, lat)
                     cpatch%nstorage_max(ico))
                cpatch%nstorage(ico) = cpatch%nstorage_max(ico)
             endif
-            cpatch%pstorage(ico) = cpatch%pstorage(ico) + P_resorption_factor(ipft) * &
+            cpatch%pstorage(ico) = cpatch%pstorage(ico) + P_resorption_fraction(ipft) * &
                  delta_bleaf / c2p_leaf(ipft)
             if(cpatch%pstorage(ico) > cpatch%pstorage_max(ico))then
                csite%plant_input_P(2,ipa) = csite%plant_input_P(2,ipa) + &
@@ -849,15 +849,15 @@ subroutine update_phenology(doy, cpoly, isi, lat)
          if(delta_broot > 0.)then
             csite%plant_input_C(3,ipa) = csite%plant_input_C(3,ipa) + &
                  delta_broot * cpatch%nplant(ico) * &
-                 (1.-retained_carbon_fraction)
+                 (1.-C_resorption_fraction(ipft))
             csite%plant_input_N(3,ipa) = csite%plant_input_N(3,ipa) + &
                  delta_broot / c2n_leaf(ipft) * cpatch%nplant(ico) * &
-                 (1.-N_resorption_factor(ipft))
+                 (1.-N_resorption_fraction(ipft))
             csite%plant_input_P(3,ipa) = csite%plant_input_P(3,ipa) + &
                  delta_broot / c2p_leaf(ipft) * cpatch%nplant(ico) * &
-                 (1.-P_resorption_factor(ipft))
+                 (1.-P_resorption_fraction(ipft))
 
-            cpatch%nstorage(ico) = cpatch%nstorage(ico) + N_resorption_factor(ipft) * &
+            cpatch%nstorage(ico) = cpatch%nstorage(ico) + N_resorption_fraction(ipft) * &
                  delta_broot / c2n_leaf(ipft)
             if(cpatch%nstorage(ico) > cpatch%nstorage_max(ico))then
                csite%plant_input_N(3,ipa) = csite%plant_input_N(3,ipa) + &
@@ -865,7 +865,7 @@ subroutine update_phenology(doy, cpoly, isi, lat)
                     cpatch%nstorage_max(ico))
                cpatch%nstorage(ico) = cpatch%nstorage_max(ico)
             endif
-            cpatch%pstorage(ico) = cpatch%pstorage(ico) + P_resorption_factor(ipft) * &
+            cpatch%pstorage(ico) = cpatch%pstorage(ico) + P_resorption_fraction(ipft) * &
                  delta_broot / c2p_leaf(ipft)
             if(cpatch%pstorage(ico) > cpatch%pstorage_max(ico))then
                csite%plant_input_P(3,ipa) = csite%plant_input_P(3,ipa) + &
@@ -956,8 +956,7 @@ subroutine update_phenology_eq_0(doy, cpoly, isi, lat)
                              , leaf_grow_rate           & ! intent(in)
                              , q                        & ! intent(in)
                              , qsw                      ! ! intent(in)
-   use phenology_coms , only : retained_carbon_fraction & ! intent(in)
-                             , iphen_scheme             & ! intent(in)
+   use phenology_coms , only : iphen_scheme             & ! intent(in)
                              , elongf_min               & ! intent(in)
                              , elongf_flush             ! ! intent(in)
    use ed_therm_lib   , only : calc_veg_hcap            & ! function
@@ -1076,7 +1075,7 @@ subroutine update_phenology_eq_0(doy, cpoly, isi, lat)
                !----- It is time to drop leaves. ------------------------------------------!
                if (cpatch%phenology_status(ico) /= -2) then
                   !----- Find the leaf drop. ----------------------------------------------!
-                  cpatch%leaf_drop(ico) = (1.0 - retained_carbon_fraction)                 &
+                  cpatch%leaf_drop(ico) = (1.0 - C_resorption_fraction(ipft))                 &
                                         * cpatch%lai(ico) / cpatch%sla(ico)                &
                                         / cpatch%nplant(ico)
                   !------------------------------------------------------------------------!
@@ -1137,7 +1136,7 @@ subroutine update_phenology_eq_0(doy, cpoly, isi, lat)
                   ! not growing (not necessarily because the leaves are fully flushed).    !
                   !------------------------------------------------------------------------!
                   cpatch%phenology_status(ico) = -1
-                  cpatch%leaf_drop(ico) = (1.0 - retained_carbon_fraction) * delta_bleaf
+                  cpatch%leaf_drop(ico) = (1.0 - C_resorption_fraction(ipft)) * delta_bleaf
                   !------------------------------------------------------------------------!
 
 
@@ -1227,13 +1226,13 @@ subroutine update_phenology_eq_0(doy, cpoly, isi, lat)
                else
                   cpatch%phenology_status(ico) = -2
                end if
-               cpatch%leaf_drop(ico) = (1.0 - retained_carbon_fraction) * delta_bleaf
+               cpatch%leaf_drop(ico) = (1.0 - C_resorption_fraction(ipft)) * delta_bleaf
                cpatch%elongf   (ico) = elongf_try
                !----- Adjust plant carbon pools. ------------------------------------------!
                cpatch%balive   (ico) = cpatch%balive(ico) - delta_bleaf
                cpatch%bleaf    (ico) = bleaf_new
                cpatch%bstorage (ico) = cpatch%bstorage(ico)                                &
-                                     + retained_carbon_fraction * delta_bleaf
+                                     + C_resorption_fraction(ipft) * delta_bleaf
                !---------------------------------------------------------------------------!
 
                !---------------------------------------------------------------------------!
@@ -1365,13 +1364,13 @@ subroutine update_phenology_eq_0(doy, cpoly, isi, lat)
                else
                   cpatch%phenology_status(ico) = -2
                end if
-               cpatch%leaf_drop (ico) = (1.0 - retained_carbon_fraction) * delta_bleaf
+               cpatch%leaf_drop (ico) = (1.0 - C_resorption_fraction(ipft)) * delta_bleaf
                cpatch%elongf    (ico) = elongf_try
                !----- Adjust plant carbon pools. ------------------------------------------!
                cpatch%bleaf     (ico) = bleaf_new
                cpatch%balive    (ico) = cpatch%balive(ico)   - delta_bleaf
                cpatch%bstorage  (ico) = cpatch%bstorage(ico)                               &
-                                      + retained_carbon_fraction * delta_bleaf
+                                      + C_resorption_fraction(ipft) * delta_bleaf
                !---------------------------------------------------------------------------!
 
                !---------------------------------------------------------------------------!
@@ -1406,20 +1405,20 @@ subroutine update_phenology_eq_0(doy, cpoly, isi, lat)
                cpatch%broot     (ico) = broot_new
                cpatch%balive    (ico) = cpatch%balive(ico)   - delta_broot
                cpatch%bstorage  (ico) = cpatch%bstorage(ico)                               &
-                                      + retained_carbon_fraction * delta_broot
+                                      + C_resorption_fraction(ipft) * delta_broot
                !---------------------------------------------------------------------------!
 
                !---------------------------------------------------------------------------!
                !      Deduct the leaf drop from the carbon balance.                        !
                !---------------------------------------------------------------------------!
                cpatch%cb          (13,ico) = cpatch%cb          (13,ico)                   &
-                                           - delta_broot * (1. - retained_carbon_fraction)
+                                           - delta_broot * (1. - C_resorption_fraction(ipft))
                cpatch%cb_lightmax (13,ico) = cpatch%cb_lightmax (13,ico)                   &
-                                           - delta_broot * (1. - retained_carbon_fraction)
+                                           - delta_broot * (1. - C_resorption_fraction(ipft))
                cpatch%cb_moistmax (13,ico) = cpatch%cb_moistmax (13,ico)                   &
-                                           - delta_broot * (1. - retained_carbon_fraction)
+                                           - delta_broot * (1. - C_resorption_fraction(ipft))
                cpatch%cb_mlmax (13,ico)    = cpatch%cb_mlmax    (13,ico)                   &
-                                           - delta_broot * (1. - retained_carbon_fraction)
+                                           - delta_broot * (1. - C_resorption_fraction(ipft))
 
                !---------------------------------------------------------------------------!
             elseif (cpatch%phenology_status(ico) /= 0) then
