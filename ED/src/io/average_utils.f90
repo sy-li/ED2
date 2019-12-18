@@ -2521,6 +2521,9 @@ module average_utils
                csite%today_A_decomp (ipa) = csite%today_A_decomp(ipa)  * dtlsm_o_daysec
                csite%today_Af_decomp(ipa) = csite%today_Af_decomp(ipa) * dtlsm_o_daysec
 
+               csite%dmean_nutrient_layer_drainage(ipa) = &
+                    csite%dmean_nutrient_layer_drainage(ipa)/day_sec
+
                !----- Copy the decomposition terms to the daily mean if they are sought. --!
                if (writing_long) then
                   csite%dmean_A_decomp(ipa)  = csite%today_A_decomp(ipa)
@@ -3535,7 +3538,7 @@ module average_utils
                csite%dmean_qrunoff          (ipa) = 0.0
                csite%dmean_qdrainage        (ipa) = 0.0
 
-
+               csite%dmean_nutrient_layer_drainage(ipa) = 0.
 
                !---------------------------------------------------------------------------!
                !       Loop over cohorts.                                                  !
