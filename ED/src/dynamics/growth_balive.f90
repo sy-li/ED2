@@ -1111,6 +1111,16 @@ module growth_balive
                tr_bsapwooda = min(delta_bsapwooda, f_bsapwooda / f_total * available_carbon)
                tr_bsapwoodb = min(delta_bsapwoodb, f_bsapwoodb / f_total * available_carbon)
             end if
+
+            n_demand = tr_bleaf / c2n_leaf(ico) + tr_broot / c2n_leaf(ico)
+            Nlimit = min(1., cpatch%nstorage(ico) / n_demand)
+
+            p_demand = tr_bleaf / c2p_leaf(ico) + tr_broot / c2p_leaf(ico)
+            Plimit = min(1., cpatch%pstorage(ico) / p_demand)
+
+            nutr_limit = min(Nlimit,Plimit)
+            tr_bleaf = nutr_limit * tr_bleaf
+
             !------------------------------------------------------------------------------!
 
             tr_bstorage = carbon_balance - tr_bleaf - tr_broot - tr_bsapwooda - tr_bsapwoodb
