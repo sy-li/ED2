@@ -94,7 +94,7 @@ subroutine leaftw_derivs(mzg,initp,dinitp,csite,ipa,dt,is_hybrid)
                                    , isoilbc               & ! intent(in)
                                    , sin_sldrain8          & ! intent(in)
                                    , matric_potential8     & ! function
-                                   , hydr_conduct8         ! ! function
+                                   , hydr_conduct8,nlsl         ! ! function
    use rk4_coms             , only : checkbudget           & ! intent(in)
                                    , rk4site               & ! intent(in)
                                    , rk4patchtype          & ! structure
@@ -695,6 +695,7 @@ subroutine leaftw_derivs(mzg,initp,dinitp,csite,ipa,dt,is_hybrid)
    ! to the system).                                                                       !
    !---------------------------------------------------------------------------------------!
    dinitp%avg_drainage  = - rk4aux(ibuff)%w_flux_g (klsl) * wdns8
+   dinitp%avg_nutrient_layer_drainage = -rk4aux(ibuff)%w_flux_g(nlsl) * wdns8
    dinitp%avg_qdrainage = - rk4aux(ibuff)%qw_flux_g(klsl)
    !----- Copy the variables to the budget arrays. ----------------------------------------!
    if (checkbudget) then
