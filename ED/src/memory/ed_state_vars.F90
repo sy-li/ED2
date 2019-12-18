@@ -203,8 +203,11 @@ module ed_state_vars
       real, pointer, dimension(:) :: bsapwoodb
       !<Biomass of sapwood below ground (kgC/plant)
 
-      real ,pointer,dimension(:) :: bstorage
-      !<Plant storage pool of carbon [kgC/plant]
+      real ,pointer,dimension(:) :: bstorage,nstorage,pstorage
+      !<Plant storage pool of carbon [kgC/plant], kgN/plant, kgP/plant
+
+      real ,pointer,dimension(:) :: bstorage_max,nstorage_max,pstorage_max
+      !<Max Plant storage pool of carbon [kgC/plant], kgN/plant, kgP/plant
 
       real ,pointer,dimension(:) :: bseeds
       !<Amount of seeds produced for dispersal [kgC/plant]
@@ -4729,6 +4732,11 @@ module ed_state_vars
       allocate(cpatch%bsapwooda                    (                    ncohorts))
       allocate(cpatch%bsapwoodb                    (                    ncohorts))
       allocate(cpatch%bstorage                     (                    ncohorts))
+      allocate(cpatch%bstorage_max(ncohorts))
+      allocate(cpatch%nstorage(ncohorts))
+      allocate(cpatch%nstorage_max(ncohorts))
+      allocate(cpatch%pstorage(ncohorts))
+      allocate(cpatch%pstorage_max(ncohorts))
       allocate(cpatch%bseeds                       (                    ncohorts))
       allocate(cpatch%lai                          (                    ncohorts))
       allocate(cpatch%wai                          (                    ncohorts))
@@ -6595,6 +6603,11 @@ module ed_state_vars
       nullify(cpatch%bsapwooda             )
       nullify(cpatch%bsapwoodb             )
       nullify(cpatch%bstorage              )
+      nullify(cpatch%nstorage)
+      nullify(cpatch%pstorage)
+      nullify(cpatch%bstorage_max)
+      nullify(cpatch%nstorage_max)
+      nullify(cpatch%pstorage_max)
       nullify(cpatch%bseeds                )
       nullify(cpatch%lai                   )
       nullify(cpatch%wai                   )
@@ -7582,6 +7595,11 @@ module ed_state_vars
       if(associated(cpatch%bsapwooda           )) deallocate(cpatch%bsapwooda           )
       if(associated(cpatch%bsapwoodb           )) deallocate(cpatch%bsapwoodb           )
       if(associated(cpatch%bstorage            )) deallocate(cpatch%bstorage            )
+      if(associated(cpatch%bstorage_max        )) deallocate(cpatch%bstorage_max        )
+      if(associated(cpatch%nstorage            )) deallocate(cpatch%nstorage            )
+      if(associated(cpatch%nstorage_max        )) deallocate(cpatch%nstorage_max        )
+      if(associated(cpatch%pstorage            )) deallocate(cpatch%pstorage            )
+      if(associated(cpatch%pstorage_max        )) deallocate(cpatch%pstorage_max        )
       if(associated(cpatch%bseeds              )) deallocate(cpatch%bseeds              )
       if(associated(cpatch%lai                 )) deallocate(cpatch%lai                 )
       if(associated(cpatch%wai                 )) deallocate(cpatch%wai                 )
@@ -9497,6 +9515,11 @@ module ed_state_vars
          opatch%bsapwooda             (oco) = ipatch%bsapwooda             (ico)
          opatch%bsapwoodb             (oco) = ipatch%bsapwoodb             (ico)
          opatch%bstorage              (oco) = ipatch%bstorage              (ico)
+         opatch%bstorage_max          (oco) = ipatch%bstorage_max          (ico)
+         opatch%nstorage              (oco) = ipatch%nstorage              (ico)
+         opatch%nstorage_max          (oco) = ipatch%nstorage_max          (ico)
+         opatch%pstorage              (oco) = ipatch%pstorage              (ico)
+         opatch%pstorage_max          (oco) = ipatch%pstorage_max          (ico)
          opatch%bseeds                (oco) = ipatch%bseeds                (ico)
          opatch%lai                   (oco) = ipatch%lai                   (ico)
          opatch%wai                   (oco) = ipatch%wai                   (ico)
@@ -10172,6 +10195,11 @@ module ed_state_vars
       opatch%bsapwooda             (1:z) = pack(ipatch%bsapwooda                 ,lmask)
       opatch%bsapwoodb             (1:z) = pack(ipatch%bsapwoodb                 ,lmask)
       opatch%bstorage              (1:z) = pack(ipatch%bstorage                  ,lmask)
+      opatch%bstorage_max          (1:z) = pack(ipatch%bstorage_max              ,lmask)
+      opatch%nstorage              (1:z) = pack(ipatch%nstorage                  ,lmask)
+      opatch%nstorage_max          (1:z) = pack(ipatch%nstorage_max              ,lmask)
+      opatch%pstorage              (1:z) = pack(ipatch%pstorage                  ,lmask)
+      opatch%pstorage_max          (1:z) = pack(ipatch%pstorage_max              ,lmask)
       opatch%bseeds                (1:z) = pack(ipatch%bseeds                    ,lmask)
       opatch%lai                   (1:z) = pack(ipatch%lai                       ,lmask)
       opatch%wai                   (1:z) = pack(ipatch%wai                       ,lmask)
@@ -24362,6 +24390,41 @@ module ed_state_vars
          nvar=nvar+1
            call vtable_edio_r(npts,cpatch%bstorage,nvar,igr,init,cpatch%coglob_id, &
            var_len,var_len_global,max_ptrs,'BSTORAGE :41:hist:anal:year:dail:mont:dcyc') 
+         call metadata_edio(nvar,igr,'No metadata available','[NA]','NA') 
+      end if
+
+      if (associated(cpatch%bstorage_max)) then
+         nvar=nvar+1
+           call vtable_edio_r(npts,cpatch%bstorage_max,nvar,igr,init,cpatch%coglob_id, &
+           var_len,var_len_global,max_ptrs,'BSTORAGE_MAX :41:hist:anal:year:dail:mont:dcyc') 
+         call metadata_edio(nvar,igr,'No metadata available','[NA]','NA') 
+      end if
+
+      if (associated(cpatch%nstorage)) then
+         nvar=nvar+1
+           call vtable_edio_r(npts,cpatch%nstorage,nvar,igr,init,cpatch%coglob_id, &
+           var_len,var_len_global,max_ptrs,'NSTORAGE :41:hist:anal:year:dail:mont:dcyc') 
+         call metadata_edio(nvar,igr,'No metadata available','[NA]','NA') 
+      end if
+
+      if (associated(cpatch%nstorage_max)) then
+         nvar=nvar+1
+           call vtable_edio_r(npts,cpatch%nstorage_max,nvar,igr,init,cpatch%coglob_id, &
+           var_len,var_len_global,max_ptrs,'NSTORAGE_MAX :41:hist:anal:year:dail:mont:dcyc') 
+         call metadata_edio(nvar,igr,'No metadata available','[NA]','NA') 
+      end if
+
+      if (associated(cpatch%pstorage)) then
+         nvar=nvar+1
+           call vtable_edio_r(npts,cpatch%pstorage,nvar,igr,init,cpatch%coglob_id, &
+           var_len,var_len_global,max_ptrs,'PSTORAGE :41:hist:anal:year:dail:mont:dcyc') 
+         call metadata_edio(nvar,igr,'No metadata available','[NA]','NA') 
+      end if
+
+      if (associated(cpatch%pstorage_max)) then
+         nvar=nvar+1
+           call vtable_edio_r(npts,cpatch%pstorage_max,nvar,igr,init,cpatch%coglob_id, &
+           var_len,var_len_global,max_ptrs,'PSTORAGE_MAX :41:hist:anal:year:dail:mont:dcyc') 
          call metadata_edio(nvar,igr,'No metadata available','[NA]','NA') 
       end if
 

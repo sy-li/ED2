@@ -4407,6 +4407,16 @@ subroutine fill_history_patch(cpatch,paco_index,ncohorts_global)
                      ,'BSAPWOODB                 ',dsetrank,iparallel,.true. ,foundvar)
    call hdf_getslab_r(cpatch%bstorage                                                      &
                      ,'BSTORAGE                  ',dsetrank,iparallel,.true. ,foundvar)
+   call hdf_getslab_r(cpatch%bstorage_max,'BSTORAGE_MAX              ',dsetrank, &
+        iparallel,.true., foundvar)
+   call hdf_getslab_r(cpatch%nstorage,'NSTORAGE                  ',dsetrank, &
+        iparallel,.true., foundvar)
+   call hdf_getslab_r(cpatch%nstorage_max,'NSTORAGE_MAX              ',dsetrank, &
+        iparallel,.true., foundvar)
+   call hdf_getslab_r(cpatch%pstorage,'PSTORAGE                  ',dsetrank, &
+        iparallel,.true., foundvar)
+   call hdf_getslab_r(cpatch%pstorage_max,'PSTORAGE_MAX              ',dsetrank, &
+        iparallel,.true., foundvar)
    call hdf_getslab_r(cpatch%bseeds                                                        &
                      ,'BSEEDS_CO                 ',dsetrank,iparallel,.true. ,foundvar)
    call hdf_getslab_r(cpatch%lai                                                           &

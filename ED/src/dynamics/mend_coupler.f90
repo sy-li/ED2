@@ -292,7 +292,7 @@ Contains
 
   subroutine mend_extern_forcing(mend, ipa, ncohorts, broot, nplant, &
        pft,  &
-       krdepth, slden, nstorage, pstorage, nstorage_min, pstorage_min, &
+       krdepth, slden, nstorage, pstorage, nstorage_max, pstorage_max, &
        water_supply_layer_frac, lai)
     use mend_state_vars, only: mend_model, nwood
 !    use mend_wood, only: wood_extern_forcing
@@ -314,8 +314,8 @@ Contains
     real, intent(in), dimension(ncohorts) :: nplant
     real, intent(in), dimension(ncohorts) :: nstorage
     real, intent(in), dimension(ncohorts) :: pstorage
-    real, intent(in), dimension(ncohorts) :: nstorage_min
-    real, intent(in), dimension(ncohorts) :: pstorage_min
+    real, intent(in), dimension(ncohorts) :: nstorage_max
+    real, intent(in), dimension(ncohorts) :: pstorage_max
     real, intent(in), dimension(ncohorts) :: lai
     real, intent(in), dimension(nzg,ncohorts) :: water_supply_layer_frac
     real :: broot_total
@@ -338,7 +338,7 @@ Contains
          mend%som%plvars%vnh4up_plant(:,ipa),  &
          mend%som%plvars%vno3up_plant(:,ipa), &
          mend%som%plvars%vpup_plant(:,ipa), som_consts, nstorage, pstorage, &
-         nstorage_min, pstorage_min, water_supply, lai)
+         nstorage_max, pstorage_max, water_supply, lai)
 
 !    call litt_extern_forcing(mend%litt%fluxes%nh4_dep(ipa), &
 !         mend%litt%fluxes%no3_dep(ipa), mend%litt%fluxes%ppar_dep(ipa))

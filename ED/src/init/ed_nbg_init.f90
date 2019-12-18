@@ -239,6 +239,10 @@ subroutine init_nbg_cohorts(csite,lsl,ipa_a,ipa_z)
                                               + cpatch%bsapwooda(ico)                      &
                                               + cpatch%bsapwoodb(ico))
 
+         cpatch%bstorage_max(ico) = (cpatch%bleaf(ico) + cpatch%broot(ico)) * bstorage_max_factor
+         cpatch%nstorage_max(ico) = cpatch%bstorage(ico) / c2n_leaf(cpatch%pft(ico))
+         cpatch%pstorage_max(ico) = cpatch%bstorage(ico) / c2p_leaf(cpatch%pft(ico))
+
          !----- Find the above-ground biomass and basal area. -----------------------------!
          cpatch%agb(ico) = ed_biomass(cpatch, ico)
          cpatch%basarea(ico) = pio4 * cpatch%dbh(ico)*cpatch%dbh(ico)

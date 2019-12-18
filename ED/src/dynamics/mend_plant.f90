@@ -8,11 +8,11 @@ Contains
   subroutine som_plant_enzymes(ncohorts, broot, nplant, pft, &
        krdepth, slden, enz_plant_n, &
        enz_plant_p, vnh4up_plant, vno3up_plant, vpup_plant, consts, &
-       nstorage, pstorage, nstorage_min, pstorage_min, water_supply, lai)
+       nstorage, pstorage, nstorage_max, pstorage_max, water_supply, lai)
     use mend_consts_coms, only: decomp_consts
     use pft_coms, only: root_beta
     use soil_coms, only: slz
-    use nutrient_constants, only: nstorage_max_factor, pstorage_max_factor, nlsl
+    use nutrient_constants, only: nlsl
     use ed_max_dims, only: n_pft
     implicit none
 
@@ -31,17 +31,17 @@ Contains
     real, intent(out), dimension(n_pft) :: vpup_plant
     real, intent(in), dimension(ncohorts) :: nstorage
     real, intent(in), dimension(ncohorts) :: pstorage
-    real, intent(in), dimension(ncohorts) :: nstorage_min
-    real, intent(in), dimension(ncohorts) :: pstorage_min
+    real, intent(in), dimension(ncohorts) :: nstorage_max
+    real, intent(in), dimension(ncohorts) :: pstorage_max
     type(decomp_consts) :: consts
     integer :: ico
     real :: broot_nl
     real :: n_limit_factor
     real :: p_limit_factor
     real :: nstorage_total
-    real :: nstorage_min_total
+    real :: nstorage_max_total
     real :: pstorage_total
-    real :: pstorage_min_total
+    real :: pstorage_max_total
     real :: nplant_total
     integer, parameter :: nutr_limit_scheme = 1
     real :: transp_fact
@@ -120,140 +120,48 @@ Contains
     ! enzC:Nratio                           ! mgNenz / gsoil
 
     ! Ecosystem-level nutrient limitation
-    if(nutr_limit_scheme == 2)then
-       nstorage_total = 0.
-       nstorage_min_total = 0.
-       pstorage_total = 0.
-       pstorage_min_total = 0.
-       nplant_total = 0.
-       do ico = 1, ncohorts
-          nstorage_total = nstorage_total + nstorage(ico) * nplant(ico) 
-          nstorage_min_total = nstorage_min_total + nstorage_min(ico) *  &
-               nplant(ico) 
-          pstorage_total = pstorage_total + pstorage(ico) * nplant(ico) 
-          pstorage_min_total = pstorage_min_total + pstorage_min(ico) *  &
-               nplant(ico) 
-          nplant_total = nplant_total + nplant(ico)
-       enddo
-       nstorage_total = nstorage_total / nplant_total
-       nstorage_min_total = nstorage_min_total / nplant_total
-       pstorage_total = pstorage_total / nplant_total
-       pstorage_min_total = pstorage_min_total / nplant_total
-       n_limit_factor = 1.0 - ((nstorage_total - nstorage_min_total) / &
-            (nstorage_min_total * (nstorage_max_factor - 1.)))**consts%wexp
-       p_limit_factor = 1.0 - ((pstorage_total - pstorage_min_total) / &
-            (pstorage_min_total * (pstorage_max_factor - 1.)))**consts%wexp
+    do ico = 1, ncohorts
+       broot_nl = broot(ico) * (1. - root_beta(pft(ico))**  &
+            (-slz(nlsl)/(-slz(krdepth(ico)))))
+
+       n_limit_factor = 1.0 - (nstorage(ico) / &
+            nstorage_max(ico))**consts%wexp
        n_limit_factor = max(min(1., n_limit_factor), 0.)
+       p_limit_factor = 1.0 - (pstorage(ico) / &
+            pstorage_max(ico))**consts%wexp
        p_limit_factor = max(min(1., p_limit_factor), 0.)
-
-       do ico = 1, ncohorts
-          broot_nl = broot(ico) * (1. - root_beta(pft(ico))**  &
-               (-slz(nlsl)/(-slz(krdepth(ico)))))
-          enz_plant_n(pft(ico)) = enz_plant_n(pft(ico)) + &
-               consts%enz2biomass_plant * nplant(ico) * broot_nl * 1000. /   &
-               consts%eff_soil_depth / slden / consts%enz_plant_c2n * &
-               n_limit_factor
-          enz_plant_p(pft(ico)) = enz_plant_p(pft(ico)) + &
-               consts%enz2biomass_plant * nplant(ico) * broot_nl * 1000. /   & 
-               consts%eff_soil_depth / slden / consts%enz_plant_c2p * &
-               p_limit_factor
-       enddo
-    elseif(nutr_limit_scheme == 1)then
-       do ico = 1, ncohorts
-             broot_nl = broot(ico) * (1. - root_beta(pft(ico))**  &
-                  (-slz(nlsl)/(-slz(krdepth(ico)))))
-
-!          if(lai(ico) > 0.)then
-!             broot_nl = broot(ico) * (1. - root_beta(pft(ico))**  &
-!                  (-slz(nlsl)/(-slz(krdepth(ico))))) * min(1., sum(water_supply) / (0.004 * lai(ico)))
-!             print*,1,lai(ico),sum(water_supply),sum(water_supply)/(0.004*lai(ico))
-!          else
-!             broot_nl = 0.
-!          endif
-          n_limit_factor = 1.0 - ((nstorage(ico) - nstorage_min(ico)) / &
-               (nstorage_min(ico)*(nstorage_max_factor - 1.)))**consts%wexp
-          n_limit_factor = max(min(1., n_limit_factor), 0.)
-          p_limit_factor = 1.0 - ((pstorage(ico) - pstorage_min(ico)) / &
-               (pstorage_min(ico)*(pstorage_max_factor - 1.)))**consts%wexp
-          p_limit_factor = max(min(1., p_limit_factor), 0.)
           
-!          enz_plant_n(pft(ico)) = enz_plant_n(pft(ico)) + &
-!               consts%enz2biomass_plant * nplant(ico) * broot_nl * 1000. /   &
-!               consts%eff_soil_depth / slden / consts%enz_plant_c2n !* &
-!!!!!               n_limit_factor
-!          enz_plant_p(pft(ico)) = enz_plant_p(pft(ico)) + &
-!               consts%enz2biomass_plant * nplant(ico) * broot_nl * 1000. /   & 
-!               consts%eff_soil_depth / slden / consts%enz_plant_c2p !* &
-!!!!!               p_limit_factor
-
-          enz_plant_n(pft(ico)) = enz_plant_n(pft(ico)) + &
-               consts%enz2biomass_plant * nplant(ico) * broot_nl /   &
-               consts%eff_soil_depth / slden * 14.
-          enz_plant_p(pft(ico)) = enz_plant_p(pft(ico)) + &
-               consts%enz2biomass_plant * nplant(ico) * broot_nl /   & 
-               consts%eff_soil_depth / slden * 31.
-
-
-!          if(lai(ico) > 0.)then
-!             print*,1,ico,water_supply(ico),lai(ico),water_supply(ico)/(water_supply_scale*lai(ico))
-!             transp_fact = water_supply(ico)/(water_supply_scale*lai(ico))
-!             if(transp_fact_max < transp_fact)print*,'new max transp_fact',transp_fact
-!             transp_fact_max = max(transp_fact_max,transp_fact)
-!             transp_fact = min(1., transp_fact)
-             transp_fact = 1.
-             vnh4up_plant(pft(ico)) = vnh4up_plant(pft(ico)) + consts%vnh4up_plant_base *  &
-                  consts%enz2biomass_plant * nplant(ico) * broot_nl /   & 
-                  consts%eff_soil_depth / slden * 14. * &
-                  n_limit_factor * transp_fact
-             vno3up_plant(pft(ico)) = vno3up_plant(pft(ico)) + consts%vno3up_plant_base *  &
-                  consts%enz2biomass_plant * nplant(ico) * broot_nl /   & 
-                  consts%eff_soil_depth / slden * 14. * &
-                  n_limit_factor * transp_fact
-             vpup_plant(pft(ico)) = vpup_plant(pft(ico)) + consts%vpup_plant_base *  &
-                  consts%enz2biomass_plant * nplant(ico) * broot_nl /   & 
-                  consts%eff_soil_depth / slden * 31. * &
-                  p_limit_factor * transp_fact
-!          endif
-
-!          vnh4up_plant(pft(ico)) = vnh4up_plant(pft(ico)) + consts%vnh4up_plant_base *  &
-!               consts%enz2biomass_plant * nplant(ico) * broot_nl * 1000. /   & 
-!               consts%eff_soil_depth / slden / consts%enz_plant_c2n * &
-!               n_limit_factor
-!          vno3up_plant(pft(ico)) = vno3up_plant(pft(ico)) + consts%vno3up_plant_base *  &
-!               consts%enz2biomass_plant * nplant(ico) * broot_nl * 1000. /   & 
-!               consts%eff_soil_depth / slden / consts%enz_plant_c2n * &
-!               n_limit_factor
-!          vpup_plant(pft(ico)) = vpup_plant(pft(ico)) + consts%vpup_plant_base *  &
-!               consts%enz2biomass_plant * nplant(ico) * broot_nl * 1000. /   & 
-!               consts%eff_soil_depth / slden / consts%enz_plant_c2p * &
-!               p_limit_factor
-          
-       enddo
-    endif
-
-    ! These rates from Zhu et al. (2016) Biogeosciences, Table 2 footnotes.
-    ! Units: 1/s
-!    vnh4up_plant = consts%vnh4up_plant_base
-!    vno3up_plant = consts%vno3up_plant_base
-!    vpup_plant = consts%vpup_plant_base
-
-!    vnh4up_plant(24) = vnh4up_plant(24) * 1000. / 120.
-!    vno3up_plant(24) = vno3up_plant(24) * 1000. / 2.
-!    vpup_plant(24) = vpup_plant(24) * 400. / 12.
-
-!    vnh4up_plant(36) = vnh4up_plant(36) * 1000. / 120.
-!    vno3up_plant(36) = vno3up_plant(36) * 1000. / 2.
-!    vpup_plant(36) = vpup_plant(36) * 400. / 12.
+       enz_plant_n(pft(ico)) = enz_plant_n(pft(ico)) + &
+            consts%enz2biomass_plant * nplant(ico) * broot_nl /   &
+            consts%eff_soil_depth / slden * 14.
+       enz_plant_p(pft(ico)) = enz_plant_p(pft(ico)) + &
+            consts%enz2biomass_plant * nplant(ico) * broot_nl /   & 
+            consts%eff_soil_depth / slden * 31.
+       
+       transp_fact = 1.
+       vnh4up_plant(pft(ico)) = vnh4up_plant(pft(ico)) + consts%vnh4up_plant_base *  &
+            consts%enz2biomass_plant * nplant(ico) * broot_nl /   & 
+            consts%eff_soil_depth / slden * 14. * &
+            n_limit_factor * transp_fact
+       vno3up_plant(pft(ico)) = vno3up_plant(pft(ico)) + consts%vno3up_plant_base *  &
+            consts%enz2biomass_plant * nplant(ico) * broot_nl /   & 
+            consts%eff_soil_depth / slden * 14. * &
+            n_limit_factor * transp_fact
+       vpup_plant(pft(ico)) = vpup_plant(pft(ico)) + consts%vpup_plant_base *  &
+            consts%enz2biomass_plant * nplant(ico) * broot_nl /   & 
+            consts%eff_soil_depth / slden * 31. * &
+            p_limit_factor * transp_fact
+    enddo
 
     return
   end subroutine som_plant_enzymes
 
   subroutine som_plant_feedback(nh4_plant, no3_plant, p_plant, slden,  &
-       consts, ncohorts, nstorage, pstorage, nstorage_min, pstorage_min, &
+       consts, ncohorts, nstorage, pstorage, nstorage_max, pstorage_max, &
        nplant, broot, rh, co2_lost, pft, krdepth, water_supply_layer_frac, lai)
     use ed_misc_coms, only: dtlsm
     use mend_consts_coms, only: decomp_consts
-    use nutrient_constants, only: nstorage_max_factor, pstorage_max_factor, nlsl
+    use nutrient_constants, only: nlsl
     use ed_max_dims, only: n_pft
     use pft_coms, only: root_beta
     use soil_coms, only: slz, nzg
@@ -282,19 +190,18 @@ Contains
     real, intent(in), dimension(ncohorts) :: lai
     real, intent(in), dimension(nzg,ncohorts) :: water_supply_layer_frac
     real, dimension(ncohorts) :: water_supply
-    real, intent(in), dimension(ncohorts) :: nstorage_min
-    real, intent(in), dimension(ncohorts) :: pstorage_min
+    real, intent(in), dimension(ncohorts) :: nstorage_max
+    real, intent(in), dimension(ncohorts) :: pstorage_max
     real, intent(in), dimension(ncohorts) :: nplant
     real, intent(in), dimension(ncohorts) :: broot
     real, intent(inout) :: rh
     real :: co2_lost_units
     real, intent(in) :: co2_lost
     real :: nstorage_total
-    real :: nstorage_min_total
+    real :: nstorage_max_total
     real :: pstorage_total
-    real :: pstorage_min_total
+    real :: pstorage_max_total
     real :: nplant_total
-    integer, parameter :: nutr_limit_scheme = 1
     real :: total_nlim
     real :: total_plim
     real :: transp_fact
@@ -310,96 +217,49 @@ Contains
     plant_p_uptake = p_plant * 1.0e-6  * &
          1000. * slden * consts%eff_soil_depth  
 
-!print*
-!print*,plant_p_uptake(24:29)
-
-    if(nutr_limit_scheme == 1)then
-       total_n_activity = 0.
-       total_p_activity = 0.
-       total_n_activity_nolimit = 0.
-       total_p_activity_nolimit = 0.
-       do ico = 1, ncohorts
-          broot_nl = broot(ico) * (1. - root_beta(pft(ico))**  &
-               (-slz(nlsl)/(-slz(krdepth(ico)))))
-
-          n_limit_factor(ico) = 1.0 - ((nstorage(ico) - nstorage_min(ico)) / &
-               (nstorage_min(ico)*(nstorage_max_factor - 1.)))**consts%wexp
-          n_limit_factor(ico) = max(min(1., n_limit_factor(ico)), 0.)
-!BUG          n_limit_factor = max(min(1., n_limit_factor), 0.)
-          p_limit_factor(ico) = 1.0 - ((pstorage(ico) - pstorage_min(ico)) / &
-               (pstorage_min(ico)*(pstorage_max_factor - 1.)))**consts%wexp
-          p_limit_factor(ico) = max(min(1., p_limit_factor(ico)), 0.)
-!BUG          p_limit_factor = max(min(1., p_limit_factor), 0.)
-
-!          if(lai(ico) > 0.)then
-!             transp_fact = min(1.,water_supply(ico) / (water_supply_scale * lai(ico)))
-!          else
-!             transp_fact = 0.
-!          endif
-          transp_fact = 1.
-
-!          print*,2,ico,water_supply(ico),lai(ico),water_supply(ico)/(water_supply_scale*lai(ico))
-
-          total_n_activity(pft(ico)) = total_n_activity(pft(ico)) + nplant(ico) *   &
-               broot_nl * n_limit_factor(ico) * transp_fact
-          total_p_activity(pft(ico)) = total_p_activity(pft(ico)) + nplant(ico) *   &
-               broot_nl * p_limit_factor(ico) * transp_fact
-          total_n_activity_nolimit(pft(ico)) = total_n_activity_nolimit(pft(ico)) + nplant(ico) *   &
-               broot_nl
-          total_p_activity_nolimit(pft(ico)) = total_p_activity_nolimit(pft(ico)) + nplant(ico) *   &
-               broot_nl
-       enddo
-!print*,total_p_activity(24:29)       
-       do ico = 1, ncohorts
-          broot_nl = broot(ico) * (1. - root_beta(pft(ico))**  &
-               (-slz(nlsl)/(-slz(krdepth(ico)))))
-
-!          if(lai(ico) > 0.)then
-!             transp_fact = min(1.,water_supply(ico) / (water_supply_scale * lai(ico)))
-!          else
-!             transp_fact = 0.
-!          endif
-          transp_fact = 1.
-
-          if(total_n_activity(pft(ico)) > 1.e-30)then
-             nstorage(ico) = nstorage(ico) + plant_n_uptake(pft(ico)) * broot_nl /  &
-                  total_n_activity(pft(ico)) * n_limit_factor(ico) * transp_fact
-!          else
-!             nstorage(ico) = nstorage(ico) + plant_n_uptake(pft(ico)) * broot_nl /  &
-!                  total_n_activity_nolimit(pft(ico))
-          endif
-
-          if(total_p_activity(pft(ico)) > 1.e-30)then
-             pstorage(ico) = pstorage(ico) + plant_p_uptake(pft(ico)) * broot_nl /  &
-                  total_p_activity(pft(ico)) * p_limit_factor(ico) * transp_fact
-!          else
-!             pstorage(ico) = pstorage(ico) + plant_p_uptake(pft(ico)) * broot_nl /  &
-!                  total_p_activity_nolimit(pft(ico))
-          endif
-       enddo
-    elseif(nutr_limit_scheme == 2)then
-       total_n_activity = 0.
-       total_p_activity = 0.
-       do ico = 1, ncohorts
-          broot_nl = broot(ico) * (1. - root_beta(pft(ico))**  &
-               (-slz(nlsl)/(-slz(krdepth(ico)))))
-          total_n_activity(pft(ico)) = total_n_activity(pft(ico)) + nplant(ico) *   &
-               broot_nl
-          total_p_activity(pft(ico)) = total_p_activity(pft(ico)) + nplant(ico) *   &
-               broot_nl
-       enddo
+    total_n_activity = 0.
+    total_p_activity = 0.
+    total_n_activity_nolimit = 0.
+    total_p_activity_nolimit = 0.
+    do ico = 1, ncohorts
+       broot_nl = broot(ico) * (1. - root_beta(pft(ico))**  &
+            (-slz(nlsl)/(-slz(krdepth(ico)))))
        
-       do ico = 1, ncohorts
-          broot_nl = broot(ico) * (1. - root_beta(pft(ico))**  &
-               (-slz(nlsl)/(-slz(krdepth(ico)))))
-          if(total_n_activity(pft(ico)) > 1.e-30)  &
-               nstorage(ico) = nstorage(ico) + plant_n_uptake(pft(ico)) * broot_nl /  &
-               total_n_activity(pft(ico))
-          if(total_p_activity(pft(ico)) > 1.e-30)  &
-               pstorage(ico) = pstorage(ico) + plant_p_uptake(pft(ico)) * broot_nl /  &
-               total_p_activity(pft(ico))
-       enddo
-    endif
+       n_limit_factor(ico) = 1.0 - (nstorage(ico) / &
+            nstorage_max(ico))**consts%wexp
+       n_limit_factor(ico) = max(min(1., n_limit_factor(ico)), 0.)
+       p_limit_factor(ico) = 1.0 - (pstorage(ico) / &
+            pstorage_max(ico))**consts%wexp
+       p_limit_factor(ico) = max(min(1., p_limit_factor(ico)), 0.)
+
+       transp_fact = 1.
+       total_n_activity(pft(ico)) = total_n_activity(pft(ico)) + nplant(ico) *   &
+            broot_nl * n_limit_factor(ico) * transp_fact
+       total_p_activity(pft(ico)) = total_p_activity(pft(ico)) + nplant(ico) *   &
+            broot_nl * p_limit_factor(ico) * transp_fact
+       total_n_activity_nolimit(pft(ico)) = total_n_activity_nolimit(pft(ico)) + nplant(ico) *   &
+            broot_nl
+       total_p_activity_nolimit(pft(ico)) = total_p_activity_nolimit(pft(ico)) + nplant(ico) *   &
+            broot_nl
+    enddo
+
+    do ico = 1, ncohorts
+       broot_nl = broot(ico) * (1. - root_beta(pft(ico))**  &
+            (-slz(nlsl)/(-slz(krdepth(ico)))))
+
+       transp_fact = 1.
+
+       if(total_n_activity(pft(ico)) > 1.e-30)then
+          nstorage(ico) = nstorage(ico) + plant_n_uptake(pft(ico)) * broot_nl /  &
+               total_n_activity(pft(ico)) * n_limit_factor(ico) * transp_fact
+       endif
+
+       if(total_p_activity(pft(ico)) > 1.e-30)then
+          pstorage(ico) = pstorage(ico) + plant_p_uptake(pft(ico)) * broot_nl /  &
+               total_p_activity(pft(ico)) * p_limit_factor(ico) * transp_fact
+       endif
+    enddo
+
 
     ! gC/kgSoil
     co2_lost_units = co2_lost

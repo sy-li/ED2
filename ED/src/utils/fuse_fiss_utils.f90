@@ -1214,6 +1214,16 @@ module fuse_fiss_utils
                                      + cpatch%bsapwoodb       (donc) * dnplant
       cpatch%bstorage         (recc) = cpatch%bstorage        (recc) * rnplant             &
                                      + cpatch%bstorage        (donc) * dnplant
+      cpatch%bstorage_max     (recc) = cpatch%bstorage_max    (recc) * rnplant             &
+                                     + cpatch%bstorage_max    (donc) * dnplant
+      cpatch%nstorage         (recc) = cpatch%nstorage        (recc) * rnplant             &
+                                     + cpatch%nstorage        (donc) * dnplant
+      cpatch%nstorage_max     (recc) = cpatch%nstorage_max    (recc) * rnplant             &
+                                     + cpatch%nstorage_max    (donc) * dnplant
+      cpatch%pstorage         (recc) = cpatch%pstorage        (recc) * rnplant             &
+                                     + cpatch%pstorage        (donc) * dnplant
+      cpatch%pstorage_max     (recc) = cpatch%pstorage_max    (recc) * rnplant             &
+                                     + cpatch%pstorage_max    (donc) * dnplant
       cpatch%bseeds           (recc) = cpatch%bseeds          (recc) * rnplant             &
                                      + cpatch%bseeds          (donc) * dnplant
       cpatch%leaf_maintenance (recc) = cpatch%leaf_maintenance(recc) * rnplant             &

@@ -833,7 +833,15 @@ subroutine read_ed10_ed20_history_file
                         ! phenology after this sub-routine.                                !
                         !------------------------------------------------------------------!
                         cpatch%phenology_status(ic2) = 0
-                        cpatch%bstorage        (ic2) = 0.0
+                        cpatch%bstorage_max(ic2) = bstorage_max_factor *  &
+                             (cpatch%bleaf(ic2) + cpatch%broot(ic2))
+                        cpatch%nstorage_max(ic2) = cpatch%bstorage_max(ic2) /  &
+                             c2n_leaf(cpatch%pft(ic2))
+                        cpatch%pstorage_max(ic2) = cpatch%bstorage_max(ic2) /  &
+                             c2p_leaf(cpatch%pft(ic2))
+                        cpatch%bstorage(ic2) = cpatch%bstorage_max(ic2)
+                        cpatch%nstorage(ic2) = cpatch%nstorage_max(ic2)
+                        cpatch%pstorage(ic2) = cpatch%pstorage_max(ic2)
                         !------------------------------------------------------------------!
 
 

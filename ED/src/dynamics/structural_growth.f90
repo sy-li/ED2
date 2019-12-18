@@ -223,13 +223,29 @@ subroutine structural_growth(cgrid, month)
                select case (istruct_growth_scheme)
                case (0)
                    ! use all bstorage
-                   bstorage_available = cpatch%bstorage(ico)
+                  bstorage_min = 0.
+                  nstorage_min = 0.
+                  pstorage_min = 0.
+                  bstorage_available = cpatch%bstorage(ico)
+                  N_avail = cpatch%nstorage(ico)
+                  P_avail = cpatch%pstorage(ico)
                case (1)
                    ! reserve enough carbon for reflushing canopy and fine roots
-                   bstorage_min = size2bl(cpatch%dbh(ico),cpatch%hite(ico),ipft)    &
-                                * (1. + q(ipft))
-                   bstorage_available = max(0., cpatch%bstorage(ico) - bstorage_min)
+                  bstorage_min = size2bl(cpatch%dbh(ico),cpatch%hite(ico),ipft)    &
+                       * (1. + q(ipft))
+                  nstorage_min = bstorage_min / c2n_leaf(ipft)
+                  pstorage_min = bstorage_min / c2p_leaf(ipft)
+                  bstorage_available = max(0., cpatch%bstorage(ico) - bstorage_min)
+                  N_avail = max(0., cpatch%nstorage(ico) - nstorage_min)
+                  P_avail = max(0., cpatch%pstorage(ico) - pstorage_min)
                end select
+
+               N_demand = bstorage_available * (f_bdead / c2n_stem(ipft) + &
+                    f_bseeds / c2n_recruit(ipft))
+               bstorage_available = bstorage_available * min(1., N_avail/max(1.e-8,N_demand))
+               P_demand = bstorage_available * (f_bdead / c2p_wood(ipft) + &
+                    f_bseeds / c2p_recruit(ipft))
+               bstorage_available = bstorage_available * min(1., P_avail/max(1.e-8,P_demand))
 
                !----- Grow plants; bdead gets fraction f_bdead of bstorage. ---------------!
                cpatch%bdead(ico) = cpatch%bdead(ico) + f_bdead * bstorage_available
@@ -287,6 +303,10 @@ subroutine structural_growth(cgrid, month)
                !----- Decrement the storage pool. -----------------------------------------!
                cpatch%bstorage(ico) = cpatch%bstorage(ico)                                 &
                                     - bstorage_available * (f_bdead + f_bseeds)
+               cpatch%nstorage(ico) = max(0., cpatch%nstorage(ico) - bstorage_available * &
+                    (f_bdead / c2n_stem(ipft) + f_bseeds / c2n_recruit(ipft)))
+               cpatch%pstorage(ico) = max(0., cpatch%pstorage(ico) - bstorage_available * &
+                    (f_bdead / c2p_wood(ipft) + f_bseeds / c2p_recruit(ipft)))
                !---------------------------------------------------------------------------!
 
                !----- Finalize litter inputs. ---------------------------------------------!
@@ -1326,6 +1346,11 @@ subroutine update_derived_cohort_props(cpatch,ico,lsl,month)
    end select
    !---------------------------------------------------------------------------------------!
        
+   cpatch%bstorage_max(ico) = dbh2bl(cpatch%dbh(ico),cpatch%pft(ico)) * &
+        (1. + cpatch%root2leaf(ico)) * bstorage_max_factor
+   cpatch%nstorage_max(ico) = cpatch%bstorage_max(ico) / c2n_leaf(cpatch%pft(ico))
+   cpatch%pstorage_max(ico) = cpatch%bstorage_max(ico) / c2p_leaf(cpatch%pft(ico))
+
 
    !----- Update LAI, WAI, and CAI. -------------------------------------------------------!
    call area_indices(cpatch, ico)

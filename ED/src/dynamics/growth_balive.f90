@@ -1305,14 +1305,12 @@ module growth_balive
       !------------------------------------------------------------------------------!
 
       cpatch%nstorage(ico) = cpatch%nstorage(ico) + tr_nstorage
-      extra_storage = max(0., cpatch%nstorage(ico) - cpatch%nstorage_min(ico) *   &
-           nstorage_max_factor)
+      extra_storage = max(0., cpatch%nstorage(ico) - cpatch%nstorage_max(ico))
       cpatch%nstorage(ico) = cpatch%nstorage(ico) - extra_storage
       csite%plant_soil_N(3,ipa) = csite%plant_soil_N(3,ipa) + extra_storage
 
       cpatch%pstorage(ico) = cpatch%pstorage(ico) + tr_pstorage
-      extra_storage = max(0., cpatch%pstorage(ico) - cpatch%pstorage_min(ico) *   &
-           pstorage_max_factor)
+      extra_storage = max(0., cpatch%pstorage(ico) - cpatch%pstorage_max(ico))
       cpatch%pstorage(ico) = cpatch%pstorage(ico) - extra_storage
       csite%plant_soil_P(3,ipa) = csite%plant_soil_P(3,ipa) + extra_storage         
 
@@ -2196,7 +2194,7 @@ module growth_balive
               cpatch%root_maintenance(ico) * cpatch%nplant(ico) / &
               c2p_leaf(ipft)
 
-         plant_C_leakage = max(0.,cpatch%bstorage(ico) - 2. * cpatch%bstorage_min(ico))
+         plant_C_leakage = max(0.,cpatch%bstorage(ico) - cpatch%bstorage_max(ico))
          cpatch%bstorage(ico) = cpatch%bstorage(ico) - plant_C_leakage
          csite%plant_input_C(1,ipa) = csite%plant_input_C(1,ipa) +   &
               0. * plant_C_leakage * cpatch%nplant(ico)
