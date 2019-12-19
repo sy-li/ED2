@@ -177,8 +177,8 @@ subroutine update_phenology(doy, cpoly, isi, lat)
                              , leaf_shed_rate           & ! intent(in)
                              , leaf_grow_rate           & ! intent(in)
                              , l2n_stem                 & ! intent(in)
-                             , c2n_stem                 & ! intent(in)
-                             , c2n_storage,C_resorption_fraction,&
+                             , c2n_stem,c2n_storage                 & ! intent(in)
+                             , C_resorption_fraction,&
                              N_resorption_fraction, P_resorption_fraction! ! intent(in)
    use decomp_coms    , only : f_labile                 ! ! intent(in)
    use phenology_coms , only : iphen_scheme             & ! intent(in)
@@ -318,17 +318,14 @@ subroutine update_phenology(doy, cpoly, isi, lat)
 
 
             if (elongf_try < 1.0 .and. cpatch%phenology_status(ico) /= -2) then
+
+               delta_bleaf = -cpatch%bleaf(ico)
+
                !----- It is time to drop leaves.  Drop all leaves. ------------------------!
-               cpatch%leaf_drop(ico) = (1.0 - C_resorption_fraction(ipft)) * cpatch%bleaf(ico)
+               cpatch%leaf_drop(ico) = - delta_bleaf * (1.0 - C_resorption_fraction(ipft))
                !---------------------------------------------------------------------------!
 
-
-
                !----- Update plant carbon pools. ------------------------------------------!
-               cpatch%balive  (ico) = cpatch%balive(ico) - cpatch%bleaf(ico)
-               cpatch%bstorage(ico) = cpatch%bstorage(ico)                                 &
-                                    + cpatch%bleaf(ico) * C_resorption_fraction(ipft)
-               cpatch%bleaf   (ico) = 0.0
                cpatch%elongf  (ico) = 0.0
                cpatch%phenology_status(ico) = -2
                !---------------------------------------------------------------------------!
@@ -404,15 +401,15 @@ subroutine update_phenology(doy, cpoly, isi, lat)
                if (cpoly%green_leaf_factor(ipft,isi) < elongf_min) then
                    bl_max = 0.0
                end if
-               delta_bleaf = cpatch%bleaf(ico) - bl_max
+               delta_bleaf = bl_max - cpatch%bleaf(ico)
 
-               if (delta_bleaf > 0.0) then
+               if (delta_bleaf < 0.0) then
                   !------------------------------------------------------------------------!
                   !    Phenology_status = 0 means that the plant has leaves, but they are  !
                   ! not growing (not necessarily because the leaves are fully flushed).    !
                   !------------------------------------------------------------------------!
                   cpatch%phenology_status(ico) = -1
-                  cpatch%leaf_drop(ico) = (1.0 - C_resorption_fraction(ipft)) * delta_bleaf
+                  cpatch%leaf_drop(ico) = -(1.0 - C_resorption_fraction(ipft)) * delta_bleaf
                   csite%fsc_in(ipa) = csite%fsc_in(ipa)                                    &
                                     + cpatch%nplant(ico) * cpatch%leaf_drop(ico)           &
                                     * f_labile(ipft)
@@ -426,20 +423,14 @@ subroutine update_phenology(doy, cpoly, isi, lat)
                                     + cpatch%nplant(ico) * cpatch%leaf_drop(ico)           &
                                     * (1.0 - f_labile(ipft)) * l2n_stem / c2n_stem(ipft)
                   
-                  !----- Adjust plant carbon pools. ---------------------------------------!
-                  cpatch%balive(ico)   = cpatch%balive(ico) - delta_bleaf
-                  cpatch%bstorage(ico) = cpatch%bstorage(ico)                              &
-                                       + C_resorption_fraction(ipft) * delta_bleaf
-
                   !------------------------------------------------------------------------!
                   !     Contribution due to the fact that c2n_leaf and c2n_storage may be  !
                   ! different.                                                             !
                   !------------------------------------------------------------------------!
                   csite%fsn_in(ipa)     = csite%fsn_in(ipa)                                &
-                                        + delta_bleaf * cpatch%nplant(ico)                 &
+                                        - delta_bleaf * cpatch%nplant(ico)                 &
                                         * C_resorption_fraction(ipft)                         &
                                         * (1.0 / c2n_leaf(ipft) - 1.0/c2n_storage)
-                  cpatch%bleaf(ico)     = bl_max
 
                   !------------------------------------------------------------------------!
                   !      Deduct the leaf drop from the carbon balance.                     !
@@ -505,7 +496,7 @@ subroutine update_phenology(doy, cpoly, isi, lat)
             ! maximum permitted given the soil moisture conditions.  If delta_bleaf is     !
             ! positive, it means that the plant has more leaves than it should.            !
             !------------------------------------------------------------------------------!
-            delta_bleaf = cpatch%bleaf(ico) - bl_max
+            delta_bleaf = bl_max - cpatch%bleaf(ico)
             !------------------------------------------------------------------------------!
 
 
@@ -513,7 +504,7 @@ subroutine update_phenology(doy, cpoly, isi, lat)
             !------------------------------------------------------------------------------!
             !     Check whether drought is becoming more or less severe.                   !
             !------------------------------------------------------------------------------!
-            if (delta_bleaf > 0.0) then
+            if (delta_bleaf < 0.0) then
                !---------------------------------------------------------------------------!
                !    Drought conditions are becoming more severe, drop leaves.              !
                !---------------------------------------------------------------------------!
@@ -522,14 +513,8 @@ subroutine update_phenology(doy, cpoly, isi, lat)
                else
                   cpatch%phenology_status(ico) = -2
                end if
-               cpatch%leaf_drop (ico) = (1.0 - C_resorption_fraction(ipft)) * delta_bleaf
+               cpatch%leaf_drop (ico) = -(1.0 - C_resorption_fraction(ipft)) * delta_bleaf
                cpatch%elongf    (ico) = elongf_try
-               !----- Adjust plant carbon pools. ------------------------------------------!
-               cpatch%bleaf     (ico) = bl_max
-               cpatch%balive    (ico) = cpatch%balive(ico)   - delta_bleaf
-               cpatch%bstorage  (ico) = cpatch%bstorage(ico)                               &
-                                      + C_resorption_fraction(ipft) * delta_bleaf
-               !---------------------------------------------------------------------------!
 
 
 
@@ -557,7 +542,7 @@ subroutine update_phenology(doy, cpoly, isi, lat)
                !     Contribution due to the fact that c2n_leaf and c2n_storage may be     !
                ! different.                                                                !
                !---------------------------------------------------------------------------!
-               csite%fsn_in(ipa)     = csite%fsn_in(ipa) + delta_bleaf*cpatch%nplant(ico)  &
+               csite%fsn_in(ipa)     = csite%fsn_in(ipa) - delta_bleaf*cpatch%nplant(ico)  &
                                      * C_resorption_fraction(ipft)                            &
                                      * (1.0 / c2n_leaf(ipft) - 1.0/c2n_storage)
                !---------------------------------------------------------------------------!
@@ -670,8 +655,8 @@ subroutine update_phenology(doy, cpoly, isi, lat)
             ! maximum permitted given the soil moisture conditions.  If delta_bleaf is     !
             ! positive, it means that the plant has more leaves than it should.            !
             !------------------------------------------------------------------------------!
-            delta_bleaf = cpatch%bleaf(ico) - bl_max
-            delta_broot = cpatch%broot(ico) - br_max
+            delta_bleaf = bl_max - cpatch%bleaf(ico)
+            delta_broot = br_max - cpatch%broot(ico)
             !------------------------------------------------------------------------------!
 
 
@@ -679,7 +664,7 @@ subroutine update_phenology(doy, cpoly, isi, lat)
             !------------------------------------------------------------------------------!
             !     Check whether drought is becoming more or less severe.                   !
             !------------------------------------------------------------------------------!
-            if (delta_bleaf > 0.0) then
+            if (delta_bleaf < 0.0) then
                !---------------------------------------------------------------------------!
                !    Drought conditions are becoming more severe, drop leaves.              !
                !---------------------------------------------------------------------------!
@@ -688,15 +673,8 @@ subroutine update_phenology(doy, cpoly, isi, lat)
                else
                   cpatch%phenology_status(ico) = -2
                end if
-               cpatch%leaf_drop (ico) = (1.0 - C_resorption_fraction(ipft)) * delta_bleaf
+               cpatch%leaf_drop (ico) = -(1.0 - C_resorption_fraction(ipft)) * delta_bleaf
                cpatch%elongf    (ico) = elongf_try
-               !----- Adjust plant carbon pools. ------------------------------------------!
-               cpatch%bleaf     (ico) = bl_max
-               cpatch%balive    (ico) = cpatch%balive(ico)   - delta_bleaf
-               cpatch%bstorage  (ico) = cpatch%bstorage(ico)                               &
-                                      + C_resorption_fraction(ipft) * delta_bleaf
-               !---------------------------------------------------------------------------!
-
 
 
                !---------------------------------------------------------------------------!
@@ -722,7 +700,7 @@ subroutine update_phenology(doy, cpoly, isi, lat)
                !     Contribution due to the fact that c2n_leaf and c2n_storage may be     !
                ! different.                                                                !
                !---------------------------------------------------------------------------!
-               csite%fsn_in(ipa)     = csite%fsn_in(ipa) + delta_bleaf*cpatch%nplant(ico)  &
+               csite%fsn_in(ipa)     = csite%fsn_in(ipa) - delta_bleaf*cpatch%nplant(ico)  &
                                      * C_resorption_fraction(ipft)                            &
                                      * (1.0 / c2n_leaf(ipft) - 1.0/c2n_storage)
                !---------------------------------------------------------------------------!
@@ -748,42 +726,34 @@ subroutine update_phenology(doy, cpoly, isi, lat)
                !       However, we now need to check whether we need to                    !
                !---------------------------------------------------------------------------!
                cpatch%elongf          (ico) = elongf_try
-               ! only modify phenology_status when delta_bleaf < 0. This avoids
+               ! only modify phenology_status when delta_bleaf > 0. This avoids
                ! changing phenology_status = 1 while elongf = 0.
-               if (delta_bleaf < 0.) cpatch%phenology_status(ico) = 1
+               if (delta_bleaf > 0.) cpatch%phenology_status(ico) = 1
                !---------------------------------------------------------------------------!
             end if
             !------------------------------------------------------------------------------!
 
             ! deal with root, dump biomass to soil when necessary
             ! for now we do not record the root_drop
-            if (delta_broot > 0.0) then
-               !----- Adjust plant carbon pools. ------------------------------------------!
-               cpatch%broot     (ico) = br_max
-               cpatch%balive    (ico) = cpatch%balive(ico)   - delta_broot
-               cpatch%bstorage  (ico) = cpatch%bstorage(ico)                               &
-                                      + C_resorption_fraction(ipft) * delta_broot
-               !---------------------------------------------------------------------------!
-
-
+            if (delta_broot < 0.0) then
 
                !---------------------------------------------------------------------------!
                !     Send the lost roots  to soil carbon and nitrogen pools.               !
                !---------------------------------------------------------------------------!
                csite%fsc_in           (ipa) = csite%fsc_in(ipa)                            &    
-                                            + cpatch%nplant(ico)                           &    
+                                            - cpatch%nplant(ico)                           &    
                                             * delta_broot * (1. - C_resorption_fraction(ipft))&    
                                             * f_labile(ipft)                                
                csite%fsn_in           (ipa) = csite%fsn_in(ipa)                            &    
-                                            + cpatch%nplant(ico)                           &    
+                                            - cpatch%nplant(ico)                           &    
                                             * delta_broot * (1. - C_resorption_fraction(ipft))&    
                                             * f_labile(ipft) / c2n_leaf(ipft)               
                csite%ssc_in           (ipa) = csite%ssc_in(ipa)                            &    
-                                            + cpatch%nplant(ico)                           &    
+                                            - cpatch%nplant(ico)                           &    
                                             * delta_broot * (1. - C_resorption_fraction(ipft))&    
                                             * (1.0-f_labile(ipft))                          
                csite%ssl_in           (ipa) = csite%ssl_in(ipa)                            &    
-                                            + cpatch%nplant(ico)                           &    
+                                            - cpatch%nplant(ico)                           &    
                                             * delta_broot * (1. - C_resorption_fraction(ipft))&    
                                             * (1.0 - f_labile(ipft)) * l2n_stem            &
                                             / c2n_stem(ipft)
@@ -794,7 +764,7 @@ subroutine update_phenology(doy, cpoly, isi, lat)
                !     Contribution due to the fact that c2n_leaf and c2n_storage may be     !
                ! different.                                                                !
                !---------------------------------------------------------------------------!
-               csite%fsn_in(ipa)     = csite%fsn_in(ipa) + delta_broot*cpatch%nplant(ico)  &
+               csite%fsn_in(ipa)     = csite%fsn_in(ipa) - delta_broot*cpatch%nplant(ico)  &
                                      * C_resorption_fraction(ipft)                            &
                                      * (1.0 / c2n_leaf(ipft) - 1.0/c2n_storage)
                !---------------------------------------------------------------------------!
@@ -803,13 +773,13 @@ subroutine update_phenology(doy, cpoly, isi, lat)
                !      Deduct the leaf drop from the carbon balance.                        !
                !---------------------------------------------------------------------------!
                cpatch%cb          (13,ico) = cpatch%cb          (13,ico)                   &
-                                           - delta_broot * (1. - C_resorption_fraction(ipft))
+                                           + delta_broot * (1. - C_resorption_fraction(ipft))
                cpatch%cb_lightmax (13,ico) = cpatch%cb_lightmax (13,ico)                   &
-                                           - delta_broot * (1. - C_resorption_fraction(ipft))
+                                           + delta_broot * (1. - C_resorption_fraction(ipft))
                cpatch%cb_moistmax (13,ico) = cpatch%cb_moistmax (13,ico)                   &
-                                           - delta_broot * (1. - C_resorption_fraction(ipft))
+                                           + delta_broot * (1. - C_resorption_fraction(ipft))
                cpatch%cb_mlmax (13,ico)    = cpatch%cb_mlmax    (13,ico)                   &
-                                           - delta_broot * (1. - C_resorption_fraction(ipft))
+                                           + delta_broot * (1. - C_resorption_fraction(ipft))
 
             end if
             !------------------------------------------------------------------------------!
@@ -817,67 +787,56 @@ subroutine update_phenology(doy, cpoly, isi, lat)
          end select
          !---------------------------------------------------------------------------------!
 
-         if(delta_bleaf > 0.)then
-            csite%plant_input_C(2,ipa) = csite%plant_input_C(2,ipa) + &
-                 delta_bleaf * cpatch%nplant(ico) * &
-                 (1.-C_resorption_fraction(ipft))
+         ! Update structural tissue. Note that the delta variables are always negative or zero.
+         cpatch%balive(ico) = cpatch%balive(ico) + delta_bleaf + delta_broot
+         cpatch%bleaf(ico) = cpatch%bleaf(ico) + delta_bleaf
+         cpatch%broot(ico) = cpatch%broot(ico) + delta_broot
+
+         ! Update storage for retranslocation.
+         cpatch%bstorage(ico) = cpatch%bstorage(ico) - (delta_bleaf +   &
+              delta_broot) * C_resorption_fraction(ipft)
+         cpatch%nstorage(ico) = cpatch%nstorage(ico) - (delta_bleaf +   &
+              delta_broot) * N_resorption_fraction(ipft) / c2n_leaf(ipft)
+         cpatch%pstorage(ico) = cpatch%pstorage(ico) - (delta_bleaf +   &
+              delta_broot) * P_resorption_fraction(ipft) / c2p_leaf(ipft)
+
+         ! Check to see if storage pools are exceeded. Set the excess
+         ! to "leaf litter".
+         if(cpatch%nstorage(ico) > cpatch%nstorage_max(ico))then
             csite%plant_input_N(2,ipa) = csite%plant_input_N(2,ipa) + &
-                 delta_bleaf / c2n_leaf(ipft) * cpatch%nplant(ico) * &
-                 (1.-N_resorption_fraction(ipft))
+                 cpatch%nplant(ico) * (cpatch%nstorage(ico) -  &
+                 cpatch%nstorage_max(ico))
+            cpatch%nstorage(ico) = cpatch%nstorage_max(ico)
+         endif
+         if(cpatch%pstorage(ico) > cpatch%pstorage_max(ico))then
             csite%plant_input_P(2,ipa) = csite%plant_input_P(2,ipa) + &
-                 delta_bleaf / c2p_leaf(ipft) * cpatch%nplant(ico) *  &
-                 (1.-P_resorption_fraction(ipft))
-
-            cpatch%nstorage(ico) = cpatch%nstorage(ico) + N_resorption_fraction(ipft) * &
-                 delta_bleaf / c2n_leaf(ipft)
-            if(cpatch%nstorage(ico) > cpatch%nstorage_max(ico))then
-               csite%plant_input_N(2,ipa) = csite%plant_input_N(2,ipa) + &
-                    cpatch%nplant(ico) * (cpatch%nstorage(ico) -  &
-                    cpatch%nstorage_max(ico))
-               cpatch%nstorage(ico) = cpatch%nstorage_max(ico)
-            endif
-            cpatch%pstorage(ico) = cpatch%pstorage(ico) + P_resorption_fraction(ipft) * &
-                 delta_bleaf / c2p_leaf(ipft)
-            if(cpatch%pstorage(ico) > cpatch%pstorage_max(ico))then
-               csite%plant_input_P(2,ipa) = csite%plant_input_P(2,ipa) + &
-                    cpatch%nplant(ico) * (cpatch%pstorage(ico) -  &
-                    cpatch%pstorage_max(ico))
-               cpatch%pstorage(ico) = cpatch%pstorage_max(ico)
-            endif
+                 cpatch%nplant(ico) * (cpatch%pstorage(ico) -  &
+                 cpatch%pstorage_max(ico))
+            cpatch%pstorage(ico) = cpatch%pstorage_max(ico)
          endif
+         
+         ! Update leaf and root litter.
+         csite%plant_input_C(2,ipa) = csite%plant_input_C(2,ipa) + &
+              delta_bleaf * cpatch%nplant(ico) * &
+              (1.-C_resorption_fraction(ipft))
+         csite%plant_input_N(2,ipa) = csite%plant_input_N(2,ipa) + &
+              delta_bleaf / c2n_leaf(ipft) * cpatch%nplant(ico) * &
+              (1.-N_resorption_fraction(ipft))
+         csite%plant_input_P(2,ipa) = csite%plant_input_P(2,ipa) + &
+              delta_bleaf / c2p_leaf(ipft) * cpatch%nplant(ico) *  &
+              (1.-P_resorption_fraction(ipft))
 
-         if(delta_broot > 0.)then
-            csite%plant_input_C(3,ipa) = csite%plant_input_C(3,ipa) + &
-                 delta_broot * cpatch%nplant(ico) * &
-                 (1.-C_resorption_fraction(ipft))
-            csite%plant_input_N(3,ipa) = csite%plant_input_N(3,ipa) + &
-                 delta_broot / c2n_leaf(ipft) * cpatch%nplant(ico) * &
-                 (1.-N_resorption_fraction(ipft))
-            csite%plant_input_P(3,ipa) = csite%plant_input_P(3,ipa) + &
-                 delta_broot / c2p_leaf(ipft) * cpatch%nplant(ico) * &
-                 (1.-P_resorption_fraction(ipft))
-
-            cpatch%nstorage(ico) = cpatch%nstorage(ico) + N_resorption_fraction(ipft) * &
-                 delta_broot / c2n_leaf(ipft)
-            if(cpatch%nstorage(ico) > cpatch%nstorage_max(ico))then
-               csite%plant_input_N(3,ipa) = csite%plant_input_N(3,ipa) + &
-                    cpatch%nplant(ico) * (cpatch%nstorage(ico) -  &
-                    cpatch%nstorage_max(ico))
-               cpatch%nstorage(ico) = cpatch%nstorage_max(ico)
-            endif
-            cpatch%pstorage(ico) = cpatch%pstorage(ico) + P_resorption_fraction(ipft) * &
-                 delta_broot / c2p_leaf(ipft)
-            if(cpatch%pstorage(ico) > cpatch%pstorage_max(ico))then
-               csite%plant_input_P(3,ipa) = csite%plant_input_P(3,ipa) + &
-                    cpatch%nplant(ico) * (cpatch%pstorage(ico) -  &
-                    cpatch%pstorage_max(ico))
-               cpatch%pstorage(ico) = cpatch%pstorage_max(ico)
-            endif
-
-
-         endif
-
-
+         csite%plant_input_C(3,ipa) = csite%plant_input_C(3,ipa) + &
+              delta_broot * cpatch%nplant(ico) * &
+              (1.-C_resorption_fraction(ipft))
+         csite%plant_input_N(3,ipa) = csite%plant_input_N(3,ipa) + &
+              delta_broot / c2n_leaf(ipft) * cpatch%nplant(ico) * &
+              (1.-N_resorption_fraction(ipft))
+         csite%plant_input_P(3,ipa) = csite%plant_input_P(3,ipa) + &
+              delta_broot / c2p_leaf(ipft) * cpatch%nplant(ico) * &
+              (1.-P_resorption_fraction(ipft))
+         
+         
          !----- Update LAI, WAI, and CAI accordingly. -------------------------------------!
          call area_indices(cpatch, ico)
          !---------------------------------------------------------------------------------!

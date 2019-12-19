@@ -978,6 +978,7 @@ module growth_balive
       real                           :: f_bsapwoodb
       logical                        :: time_to_flush
       integer                        :: phen_stat_in
+      real :: n_demand, p_demand, Nlimit, Plimit, nutr_limit
       !logical          , parameter   :: printout = .false.
       !character(len=11), parameter   :: fracfile = 'cballoc.txt'
       !----- Locally saved variables. -----------------------------------------------------!
@@ -1112,18 +1113,24 @@ module growth_balive
                tr_bsapwoodb = min(delta_bsapwoodb, f_bsapwoodb / f_total * available_carbon)
             end if
 
-            n_demand = tr_bleaf / c2n_leaf(ico) + tr_broot / c2n_leaf(ico)
+            n_demand = tr_bleaf / c2n_leaf(ipft) + tr_broot / c2n_leaf(ipft) + &
+                 (tr_bsapwooda + tr_bsapwoodb) / c2n_stem(ipft)
             Nlimit = min(1., cpatch%nstorage(ico) / n_demand)
 
-            p_demand = tr_bleaf / c2p_leaf(ico) + tr_broot / c2p_leaf(ico)
+            p_demand = tr_bleaf / c2p_leaf(ipft) + tr_broot / c2p_leaf(ipft) + &
+                 (tr_bsapwooda + tr_bsapwoodb) / c2p_wood(ipft)
             Plimit = min(1., cpatch%pstorage(ico) / p_demand)
 
             nutr_limit = min(Nlimit,Plimit)
             tr_bleaf = nutr_limit * tr_bleaf
+            tr_broot = nutr_limit * tr_broot
+            tr_bsapwooda = nutr_limit * tr_bsapwooda
+            tr_bsapwoodb = nutr_limit * tr_bsapwoodb
 
             !------------------------------------------------------------------------------!
 
             tr_bstorage = carbon_balance - tr_bleaf - tr_broot - tr_bsapwooda - tr_bsapwoodb
+
          case default
             !------------------------------------------------------------------------------!
             !     Put carbon gain into storage.  If we're not actively dropping leaves or  !
@@ -1237,15 +1244,15 @@ module growth_balive
          !---------------------------------------------------------------------------------!
       end if
 
-      if(tr_bleaf < 0.)then
-         tr_nstorage = -tr_bleaf / c2n_leaf(ipft)
-         tr_pstorage = -tr_bleaf / c2p_leaf(ipft)
-      endif
-      if(tr_broot < 0.)then
-         tr_nstorage = -tr_broot / c2n_leaf(ipft)
-         tr_pstorage = -tr_broot / c2p_leaf(ipft)
-      endif
-
+      ! If plants are building tissue, tr_b* is positive. Withdraw from nutrient
+      ! storage to build the tissue.
+      ! If plants are burning up C reserves by eliminating structural tissue,
+      ! tr_b* is negative. Assume perfect efficiency for respiration and retranslocation.
+      tr_nstorage = -tr_bleaf/c2n_leaf(ipft) - tr_broot/c2n_leaf(ipft) -  &
+           (tr_bsapwooda + tr_bsapwoodb) / c2n_stem(ipft)
+      tr_pstorage = -tr_bleaf/c2p_leaf(ipft) - tr_broot/c2p_leaf(ipft) -  &
+           (tr_bsapwooda + tr_bsapwoodb) / c2p_wood(ipft)
+      
       !------------------------------------------------------------------------------------!
 !      if (printout) then
 !         open (unit=66,file=fracfile,status='old',position='append',action='write')
