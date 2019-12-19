@@ -234,14 +234,13 @@ subroutine init_nbg_cohorts(csite,lsl,ipa_a,ipa_z)
                                       * salloci * agf_bs(ipft)
          cpatch%bsapwoodb(ico)        = qsw(ipft) * cpatch%hite(ico) * cpatch%balive(ico)  &
                                       * salloci * (1.-agf_bs(ipft))
-         cpatch%bstorage(ico)         = 0.5 * ( cpatch%bleaf(ico)                          &
-                                              + cpatch%broot(ico)                          &
-                                              + cpatch%bsapwooda(ico)                      &
-                                              + cpatch%bsapwoodb(ico))
 
          cpatch%bstorage_max(ico) = (cpatch%bleaf(ico) + cpatch%broot(ico)) * bstorage_max_factor
          cpatch%nstorage_max(ico) = cpatch%bstorage(ico) / c2n_leaf(cpatch%pft(ico))
          cpatch%pstorage_max(ico) = cpatch%bstorage(ico) / c2p_leaf(cpatch%pft(ico))
+         cpatch%bstorage(ico) = 0.5 * cpatch%bstorage_max(ico)
+         cpatch%nstorage(ico) = 0.5 * cpatch%nstorage_max(ico)
+         cpatch%pstorage(ico) = 0.5 * cpatch%pstorage_max(ico)
 
          !----- Find the above-ground biomass and basal area. -----------------------------!
          cpatch%agb(ico) = ed_biomass(cpatch, ico)
@@ -356,7 +355,6 @@ subroutine init_cohorts_by_layers(csite,lsl,ipa_a,ipa_z)
          !---------------------------------------------------------------------------------!
          cpatch%hite(ico)             = height
          cpatch%phenology_status(ico) = 0
-         cpatch%bstorage(ico)         = 0.0
          cpatch%dbh(ico)              = h2dbh(cpatch%hite(ico),ipft)
          cpatch%bdead(ico)            = dbh2bd(cpatch%dbh(ico),ipft)
          cpatch%bleaf(ico)            = size2bl(cpatch%dbh(ico),cpatch%hite(ico),ipft)
@@ -372,6 +370,13 @@ subroutine init_cohorts_by_layers(csite,lsl,ipa_a,ipa_z)
                                       * salloci * agf_bs(ipft)
          cpatch%bsapwoodb(ico)        = qsw(ipft) * cpatch%hite(ico) * cpatch%balive(ico)  &
                                       * salloci * (1.-agf_bs(ipft))
+
+         cpatch%bstorage_max(ico)         = bstorage_max_factor * (cpatch%bleaf(ico) + cpatch%broot(ico))
+         cpatch%nstorage_max(ico) = cpatch%bstorage_max(ico) / c2n_leaf(ipft)
+         cpatch%pstorage_max(ico) = cpatch%bstorage_max(ico) / c2p_leaf(ipft)
+         cpatch%bstorage(ico) = 0.5 * cpatch%bstorage_max(ico)
+         cpatch%nstorage(ico) = 0.5 * cpatch%nstorage_max(ico)
+         cpatch%pstorage(ico) = 0.5 * cpatch%pstorage_max(ico)
 
          !----- NPlant is defined such that the cohort LAI is equal to LAI0
          cpatch%nplant(ico)           = lai0 / (cpatch%bleaf(ico) * cpatch%sla(ico))
@@ -531,7 +536,6 @@ subroutine near_bare_ground_big_leaf_init(cgrid)
                cpatch%dbh(ico)              = dbh_bigleaf(ipft)
                cpatch%hite(ico)             = hgt_max(ipft)
                cpatch%phenology_status(ico) = 0
-               cpatch%bstorage(ico)         = 0.0
                cpatch%bdead(ico)            = dbh2bd(cpatch%dbh(ico),ipft)
                cpatch%bleaf(ico)            = size2bl(cpatch%dbh(ico),cpatch%hite(ico),ipft)
                cpatch%sla(ico)              = sla(ipft)
@@ -545,6 +549,14 @@ subroutine near_bare_ground_big_leaf_init(cgrid)
                                             * cpatch%balive(ico) * salloci *agf_bs(ipft)
                cpatch%bsapwoodb(ico)        = qsw(ipft) * cpatch%hite(ico)                 &
                                             * cpatch%balive(ico) * salloci *(1.-agf_bs(ipft))
+
+               cpatch%bstorage_max(ico)         = bstorage_max_factor * (cpatch%bleaf(ico) + cpatch%broot(ico))
+               cpatch%nstorage_max(ico) = cpatch%bstorage_max(ico) / c2n_leaf(ipft)
+               cpatch%pstorage_max(ico) = cpatch%bstorage_max(ico) / c2p_leaf(ipft)
+               cpatch%bstorage(ico) = 0.5 * cpatch%bstorage_max(ico)
+               cpatch%nstorage(ico) = 0.5 * cpatch%nstorage_max(ico)
+               cpatch%pstorage(ico) = 0.5 * cpatch%pstorage_max(ico)
+               
 
                !----- Find the initial area indices (LAI, WAI, CAI). ----------------------!
                call area_indices(cpatch, ico)

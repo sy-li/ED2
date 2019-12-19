@@ -80,7 +80,7 @@ subroutine structural_growth(cgrid, month)
    real                          :: cbr_ml
    real                          :: f_bseeds
    real                          :: f_bdead
-   real                          :: balive_mort_litter
+   real                          :: balive_mort_litter, bleaf_mort_litter, broot_mort_litter
    real                          :: bstorage_mort_litter,nstorage_mort_litter,pstorage_mort_litter
    real                          :: struct_litter
    real                          :: maxh !< maximum patch height
@@ -196,6 +196,8 @@ subroutine structural_growth(cgrid, month)
 
                !----- Calculate litter owing to mortality. --------------------------------!
                balive_mort_litter   = - cpatch%balive(ico)   * cpatch%monthly_dndt(ico)
+               bleaf_mort_litter   = - cpatch%bleaf(ico)   * cpatch%monthly_dndt(ico)
+               broot_mort_litter   = - cpatch%broot(ico)   * cpatch%monthly_dndt(ico)
                bstorage_mort_litter = - cpatch%bstorage(ico) * cpatch%monthly_dndt(ico)
                nstorage_mort_litter = - cpatch%nstorage(ico) * cpatch%monthly_dndt(ico)
                pstorage_mort_litter = - cpatch%pstorage(ico) * cpatch%monthly_dndt(ico)
@@ -328,29 +330,27 @@ subroutine structural_growth(cgrid, month)
                csite%plant_input_C(1,ipa) = csite%plant_input_C(1,ipa) +  &
                     bstorage_mort_litter
                csite%plant_input_C(2,ipa) = csite%plant_input_C(2,ipa) +  &
-                    balive_mort_litter / (1.+cpatch%root2leaf(ico))
+                    bleaf_mort_litter
                csite%plant_input_C(3,ipa) = csite%plant_input_C(3,ipa) +  &
-                    balive_mort_litter * cpatch%root2leaf(ico) / (1.+cpatch%root2leaf(ico))
+                    broot_mort_litter
                csite%plant_input_C(4,ipa) = csite%plant_input_C(4,ipa) +   &
                     seed_litter + struct_litter
 
                csite%plant_input_N(1,ipa) = csite%plant_input_N(1,ipa) +  &
                     nstorage_mort_litter
                csite%plant_input_N(2,ipa) = csite%plant_input_N(2,ipa) +  &
-                    balive_mort_litter / (1.+cpatch%root2leaf(ico)) / c2n_leaf(ipft)
+                    bleaf_mort_litter / c2n_leaf(ipft)
                csite%plant_input_N(3,ipa) = csite%plant_input_N(3,ipa) +  &
-                    balive_mort_litter * cpatch%root2leaf(ico) / (1.+cpatch%root2leaf(ico)) / &
-                    c2n_leaf(ipft)
+                    broot_mort_litter / c2n_leaf(ipft)
                csite%plant_input_N(4,ipa) = csite%plant_input_N(4,ipa) +   &
                     seed_litter / c2n_recruit(ipft) + struct_litter / c2n_stem(ipft)
 
                csite%plant_input_P(1,ipa) = csite%plant_input_P(1,ipa) +  &
                     pstorage_mort_litter
                csite%plant_input_P(2,ipa) = csite%plant_input_P(2,ipa) +  &
-                    balive_mort_litter / (1.+cpatch%root2leaf(ico)) / c2p_leaf(ipft)
+                    bleaf_mort_litter / c2p_leaf(ipft)
                csite%plant_input_P(3,ipa) = csite%plant_input_P(3,ipa) +  &
-                    balive_mort_litter * cpatch%root2leaf(ico) / (1.+cpatch%root2leaf(ico)) / &
-                    c2p_leaf(ipft)
+                    broot_mort_litter / c2p_leaf(ipft)
                csite%plant_input_P(4,ipa) = csite%plant_input_P(4,ipa) +   &
                     seed_litter / c2p_recruit(ipft) + struct_litter / c2p_wood(ipft)
 

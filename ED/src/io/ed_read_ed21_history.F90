@@ -576,6 +576,18 @@ subroutine read_ed21_history_file
                                           ,dsetrank,iparallel,.true.,foundvar)
                         call hdf_getslab_r(cpatch%nplant,'NPLANT '                         &
                                           ,dsetrank,iparallel,.true.,foundvar)
+                        call hdf_getslab_r(cpatch%bstorage,'BSTORAGE '                         &
+                                          ,dsetrank,iparallel,.true.,foundvar)
+                        call hdf_getslab_r(cpatch%bstorage,'NSTORAGE '                         &
+                                          ,dsetrank,iparallel,.true.,foundvar)
+                        call hdf_getslab_r(cpatch%bstorage,'PSTORAGE '                         &
+                                          ,dsetrank,iparallel,.true.,foundvar)
+                        call hdf_getslab_r(cpatch%bstorage,'BSTORAGE_MAX '                         &
+                                          ,dsetrank,iparallel,.true.,foundvar)
+                        call hdf_getslab_r(cpatch%bstorage,'NSTORAGE_MAX '                         &
+                                          ,dsetrank,iparallel,.true.,foundvar)
+                        call hdf_getslab_r(cpatch%bstorage,'PSTORAGE_MAX '                         &
+                                          ,dsetrank,iparallel,.true.,foundvar)
 
                         !------------------------------------------------------------------!
                         !    Find derived properties from Bdead.  In the unlikely case     !
@@ -621,7 +633,6 @@ subroutine read_ed21_history_file
                            cpatch%bsapwoodb(ico) = cpatch%balive(ico) * qsw(ipft)          &
                                                  * cpatch%hite(ico) * salloci              &
                                                  * (1.-agf_bs(ipft))
-                           cpatch%bstorage(ico) = 0.0
                            cpatch%phenology_status(ico) = 0
 
 
@@ -750,6 +761,26 @@ subroutine read_ed21_history_file
                            if (cpatch%bstorage(ico) > 0.             .and.                 &
                                cpatch%bstorage(ico) < tiny_biomass)  then
                               cpatch%bstorage(ico) = tiny_biomass
+                           end if
+                           if (cpatch%nstorage(ico) > 0.             .and.                 &
+                               cpatch%nstorage(ico) < tiny_biomass)  then
+                              cpatch%nstorage(ico) = tiny_biomass
+                           end if
+                           if (cpatch%pstorage(ico) > 0.             .and.                 &
+                               cpatch%pstorage(ico) < tiny_biomass)  then
+                              cpatch%pstorage(ico) = tiny_biomass
+                           end if
+                           if (cpatch%bstorage_max(ico) > 0.             .and.                 &
+                               cpatch%bstorage_max(ico) < tiny_biomass)  then
+                              cpatch%bstorage_max(ico) = tiny_biomass
+                           end if
+                           if (cpatch%nstorage_max(ico) > 0.             .and.                 &
+                               cpatch%nstorage_max(ico) < tiny_biomass)  then
+                              cpatch%nstorage_max(ico) = tiny_biomass
+                           end if
+                           if (cpatch%pstorage_max(ico) > 0.             .and.                 &
+                               cpatch%pstorage_max(ico) < tiny_biomass)  then
+                              cpatch%pstorage_max(ico) = tiny_biomass
                            end if
                            !---------------------------------------------------------------!
 
@@ -1779,6 +1810,18 @@ subroutine read_ed21_history_unstruct
                                           ,dsetrank,iparallel,.true.,foundvar)
                         call hdf_getslab_r(cpatch%nplant          ,'NPLANT '               &
                                           ,dsetrank,iparallel,.true.,foundvar)
+                        call hdf_getslab_r(cpatch%bstorage          ,'BSTORAGE '               &
+                                          ,dsetrank,iparallel,.true.,foundvar)
+                        call hdf_getslab_r(cpatch%nstorage          ,'NSTORAGE '               &
+                                          ,dsetrank,iparallel,.true.,foundvar)
+                        call hdf_getslab_r(cpatch%pstorage          ,'PSTORAGE '               &
+                                          ,dsetrank,iparallel,.true.,foundvar)
+                        call hdf_getslab_r(cpatch%bstorage_max          ,'BSTORAGE_MAX '               &
+                                          ,dsetrank,iparallel,.true.,foundvar)
+                        call hdf_getslab_r(cpatch%nstorage_max          ,'NSTORAGE_MAX '               &
+                                          ,dsetrank,iparallel,.true.,foundvar)
+                        call hdf_getslab_r(cpatch%pstorage_max          ,'PSTORAGE_MAX '               &
+                                          ,dsetrank,iparallel,.true.,foundvar)
 
                         !------------------------------------------------------------------!
                         !    Find derived properties from Bdead.  In the unlikely case     !
@@ -1824,7 +1867,6 @@ subroutine read_ed21_history_unstruct
                            cpatch%bsapwoodb(ico) = cpatch%balive(ico) * qsw(ipft)          &
                                                  * cpatch%hite(ico) * salloci              &
                                                  * (1.-agf_bs(ipft))
-                           cpatch%bstorage(ico)  = 0.0
                            cpatch%phenology_status(ico) = 0
 
                         end do
@@ -1949,6 +1991,26 @@ subroutine read_ed21_history_unstruct
                            if (cpatch%bstorage(ico) > 0.            .and.                  &
                                cpatch%bstorage(ico) < tiny_biomass) then
                               cpatch%bstorage(ico) = tiny_biomass
+                           end if
+                           if (cpatch%nstorage(ico) > 0.            .and.                  &
+                               cpatch%nstorage(ico) < tiny_biomass) then
+                              cpatch%nstorage(ico) = tiny_biomass
+                           end if
+                           if (cpatch%pstorage(ico) > 0.            .and.                  &
+                               cpatch%pstorage(ico) < tiny_biomass) then
+                              cpatch%pstorage(ico) = tiny_biomass
+                           end if
+                           if (cpatch%bstorage_max(ico) > 0.            .and.                  &
+                               cpatch%bstorage_max(ico) < tiny_biomass) then
+                              cpatch%bstorage_max(ico) = tiny_biomass
+                           end if
+                           if (cpatch%nstorage_max(ico) > 0.            .and.                  &
+                               cpatch%nstorage_max(ico) < tiny_biomass) then
+                              cpatch%nstorage_max(ico) = tiny_biomass
+                           end if
+                           if (cpatch%pstorage_max(ico) > 0.            .and.                  &
+                               cpatch%pstorage_max(ico) < tiny_biomass) then
+                              cpatch%pstorage_max(ico) = tiny_biomass
                            end if
                            !---------------------------------------------------------------!
 
@@ -2956,6 +3018,18 @@ subroutine read_ed21_polyclone
                                           ,dsetrank,iparallel,.true.,foundvar)
                         call hdf_getslab_r(cpatch%nplant          ,'NPLANT '               &
                                           ,dsetrank,iparallel,.true.,foundvar)
+                        call hdf_getslab_r(cpatch%bstorage          ,'BSTORAGE '               &
+                                          ,dsetrank,iparallel,.true.,foundvar)
+                        call hdf_getslab_r(cpatch%nstorage          ,'NSTORAGE '               &
+                                          ,dsetrank,iparallel,.true.,foundvar)
+                        call hdf_getslab_r(cpatch%pstorage          ,'PSTORAGE '               &
+                                          ,dsetrank,iparallel,.true.,foundvar)
+                        call hdf_getslab_r(cpatch%bstorage_max          ,'BSTORAGE_MAX '               &
+                                          ,dsetrank,iparallel,.true.,foundvar)
+                        call hdf_getslab_r(cpatch%nstorage_max          ,'NSTORAGE_MAX '               &
+                                          ,dsetrank,iparallel,.true.,foundvar)
+                        call hdf_getslab_r(cpatch%pstorage_max          ,'PSTORAGE_MAX '               &
+                                          ,dsetrank,iparallel,.true.,foundvar)
 
                         !------------------------------------------------------------------!
                         !    Find derived properties from Bdead.  In the unlikely case     !
@@ -3001,7 +3075,6 @@ subroutine read_ed21_polyclone
                            cpatch%bsapwoodb(ico) = cpatch%balive(ico) * qsw(ipft)          &
                                                  * cpatch%hite(ico) * salloci              &
                                                  * (1.-agf_bs(ipft))
-                           cpatch%bstorage(ico)  = 0.0
                            cpatch%phenology_status(ico) = 0
                         end do
 
@@ -3126,6 +3199,26 @@ subroutine read_ed21_polyclone
                            if (cpatch%bstorage(ico) > 0.            .and.                  &
                                cpatch%bstorage(ico) < tiny_biomass) then
                               cpatch%bstorage(ico) = tiny_biomass
+                           end if
+                           if (cpatch%nstorage(ico) > 0.            .and.                  &
+                               cpatch%nstorage(ico) < tiny_biomass) then
+                              cpatch%nstorage(ico) = tiny_biomass
+                           end if
+                           if (cpatch%pstorage(ico) > 0.            .and.                  &
+                               cpatch%pstorage(ico) < tiny_biomass) then
+                              cpatch%pstorage(ico) = tiny_biomass
+                           end if
+                           if (cpatch%bstorage_max(ico) > 0.            .and.                  &
+                               cpatch%bstorage_max(ico) < tiny_biomass) then
+                              cpatch%bstorage_max(ico) = tiny_biomass
+                           end if
+                           if (cpatch%nstorage_max(ico) > 0.            .and.                  &
+                               cpatch%nstorage_max(ico) < tiny_biomass) then
+                              cpatch%nstorage_max(ico) = tiny_biomass
+                           end if
+                           if (cpatch%pstorage_max(ico) > 0.            .and.                  &
+                               cpatch%pstorage_max(ico) < tiny_biomass) then
+                              cpatch%pstorage_max(ico) = tiny_biomass
                            end if
                            !---------------------------------------------------------------!
 
