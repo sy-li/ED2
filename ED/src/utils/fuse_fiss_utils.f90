@@ -122,7 +122,7 @@ module fuse_fiss_utils
                                     , l2n_stem         & ! intent(in)
                                     , c2n_stem         & ! intent(in)
                                     , c2n_storage      & ! intent(in), lookup table
-                                    , c2n_leaf         ! ! intent(in), lookup table
+                                    , c2n_leaf,c2p_leaf,c2p_wood         ! ! intent(in), lookup table
 
       use decomp_coms        , only : f_labile         ! ! intent(in), lookup table
 
@@ -881,8 +881,7 @@ module fuse_fiss_utils
       use update_derived_props_module
       use ed_state_vars        , only : patchtype              & ! structure
                                       , copy_patchtype         ! ! sub-routine
-      use pft_coms             , only : q                      & ! intent(in), lookup table
-                                      , qsw                    & ! intent(in), lookup table
+      use pft_coms             , only : qsw                    & ! intent(in), lookup table
                                       , is_grass               ! ! intent(in)
       use fusion_fission_coms  , only : lai_tol                ! ! intent(in)
       use ed_max_dims          , only : n_pft                  ! ! intent(in)

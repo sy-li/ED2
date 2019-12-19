@@ -112,15 +112,14 @@ subroutine init_nbg_cohorts(csite,lsl,ipa_a,ipa_z)
                                  , allocate_patchtype ! ! subroutine
    use ed_max_dims        , only : n_pft              ! ! intent(in)
    use ed_misc_coms       , only : ied_init_mode      ! ! intent(in)
-   use pft_coms           , only : q                  & ! intent(in)
-                                 , qsw                & ! intent(in)
+   use pft_coms           , only : qsw                & ! intent(in)
                                  , sla                & ! intent(in)
                                  , hgt_min            & ! intent(in)
                                  , include_pft        & ! intent(in)
                                  , include_pft_ag     & ! intent(in)
                                  , include_pft_fp     & ! intent(in)
                                  , init_density       & ! intent(in)
-                                 , agf_bs,root2leaf_max,root2leaf_min             ! ! intent(in)
+                                 , agf_bs,root2leaf_max,root2leaf_min,c2n_leaf,c2p_leaf             ! ! intent(in)
    use consts_coms        , only : t3ple              & ! intent(in)
                                  , pio4               & ! intent(in)
                                  , kgom2_2_tonoha     & ! intent(in)
@@ -131,6 +130,7 @@ subroutine init_nbg_cohorts(csite,lsl,ipa_a,ipa_z)
                                  , ed_biomass         & ! function
                                  , area_indices       ! ! subroutine
    use fuse_fiss_utils    , only : sort_cohorts    ! ! subroutine
+   use nutrient_constants, only: nstorage_max_factor
 
    implicit none
    !----- Arguments -----------------------------------------------------------------------!
@@ -235,7 +235,7 @@ subroutine init_nbg_cohorts(csite,lsl,ipa_a,ipa_z)
          cpatch%bsapwoodb(ico)        = qsw(ipft) * cpatch%hite(ico) * cpatch%balive(ico)  &
                                       * salloci * (1.-agf_bs(ipft))
 
-         cpatch%bstorage_max(ico) = (cpatch%bleaf(ico) + cpatch%broot(ico)) * bstorage_max_factor
+         cpatch%bstorage_max(ico) = (cpatch%bleaf(ico) + cpatch%broot(ico)) * nstorage_max_factor
          cpatch%nstorage_max(ico) = cpatch%bstorage(ico) / c2n_leaf(cpatch%pft(ico))
          cpatch%pstorage_max(ico) = cpatch%bstorage(ico) / c2p_leaf(cpatch%pft(ico))
          cpatch%bstorage(ico) = 0.5 * cpatch%bstorage_max(ico)
@@ -285,12 +285,11 @@ subroutine init_cohorts_by_layers(csite,lsl,ipa_a,ipa_z)
                                  , allocate_sitetype  & ! subroutine
                                  , allocate_patchtype ! ! subroutine
    use ed_max_dims        , only : n_pft              ! ! intent(in)
-   use pft_coms           , only : q                  & ! intent(in)
-                                 , qsw                & ! intent(in)
+   use pft_coms           , only : qsw                & ! intent(in)
                                  , sla                & ! intent(in)
                                  , include_pft        & ! intent(in)
                                  , include_these_pft  & ! intent(in)
-                                 , agf_bs,root2leaf_min,root2leaf_max             ! ! intent(in)
+                                 , agf_bs,root2leaf_min,root2leaf_max,c2n_leaf,c2p_leaf             ! ! intent(in)
    use consts_coms        , only : t3ple              & ! intent(in)
                                  , pio4               & ! intent(in)
                                  , kgom2_2_tonoha     & ! intent(in)
@@ -301,6 +300,7 @@ subroutine init_cohorts_by_layers(csite,lsl,ipa_a,ipa_z)
                                  , ed_biomass         & ! function
                                  , area_indices       ! ! subroutine
    use fuse_fiss_utils    , only : sort_cohorts       ! ! subroutine
+   use nutrient_constants, only: nstorage_max_factor
 
    implicit none
    !----- Arguments -----------------------------------------------------------------------!
@@ -372,7 +372,7 @@ subroutine init_cohorts_by_layers(csite,lsl,ipa_a,ipa_z)
          cpatch%bsapwoodb(ico)        = qsw(ipft) * cpatch%hite(ico) * cpatch%balive(ico)  &
                                       * salloci * (1.-agf_bs(ipft))
 
-         cpatch%bstorage_max(ico)         = bstorage_max_factor * (cpatch%bleaf(ico) + cpatch%broot(ico))
+         cpatch%bstorage_max(ico)         = nstorage_max_factor * (cpatch%bleaf(ico) + cpatch%broot(ico))
          cpatch%nstorage_max(ico) = cpatch%bstorage_max(ico) / c2n_leaf(ipft)
          cpatch%pstorage_max(ico) = cpatch%bstorage_max(ico) / c2p_leaf(ipft)
          cpatch%bstorage(ico) = 0.5 * cpatch%bstorage_max(ico)
@@ -426,15 +426,14 @@ subroutine near_bare_ground_big_leaf_init(cgrid)
                                  , allocate_patchtype ! ! subroutine
    use ed_misc_coms       , only : ied_init_mode      ! ! intent(in)
    use physiology_coms    , only : n_plant_lim        ! ! intent(in)
-   use pft_coms           , only : q                  & ! intent(in)
-                                 , qsw                & ! intent(in)
+   use pft_coms           , only : qsw                & ! intent(in)
                                  , sla                & ! intent(in)
                                  , agf_bs             & ! intent(in)
                                  , dbh_bigleaf        & ! intent(in)
                                  , hgt_max            & ! intent(in)
                                  , include_pft        & ! intent(in)
                                  , include_these_pft  & ! intent(in)
-                                 , init_density       ! ! intent(in)
+                                 , init_density,c2n_leaf,c2p_leaf       ! ! intent(in)
    use consts_coms        , only : t3ple              & ! intent(in)
                                  , pio4               & ! intent(in)
                                  , kgom2_2_tonoha     & ! intent(in)
@@ -443,6 +442,7 @@ subroutine near_bare_ground_big_leaf_init(cgrid)
                                  , size2bl            & ! function
                                  , ed_biomass         & ! function
                                  , area_indices       ! ! subroutine
+   use nutrient_constants, only: nstorage_max_factor
    implicit none
 
    !----- Arguments. ----------------------------------------------------------------------!
@@ -551,7 +551,7 @@ subroutine near_bare_ground_big_leaf_init(cgrid)
                cpatch%bsapwoodb(ico)        = qsw(ipft) * cpatch%hite(ico)                 &
                                             * cpatch%balive(ico) * salloci *(1.-agf_bs(ipft))
 
-               cpatch%bstorage_max(ico)         = bstorage_max_factor * (cpatch%bleaf(ico) + cpatch%broot(ico))
+               cpatch%bstorage_max(ico)         = nstorage_max_factor * (cpatch%bleaf(ico) + cpatch%broot(ico))
                cpatch%nstorage_max(ico) = cpatch%bstorage_max(ico) / c2n_leaf(ipft)
                cpatch%pstorage_max(ico) = cpatch%bstorage_max(ico) / c2p_leaf(ipft)
                cpatch%bstorage(ico) = 0.5 * cpatch%bstorage_max(ico)

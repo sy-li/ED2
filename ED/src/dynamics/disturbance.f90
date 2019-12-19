@@ -2858,7 +2858,7 @@ module disturbance_utils
                               , c2n_leaf     & ! intent(in)
                               , c2n_stem     & ! intent(in)
                               , l2n_stem     ! ! intent(in)
-      use pft_coms     , only : agf_bs       ! ! intent(in)
+      use pft_coms     , only : agf_bs,c2p_wood,c2p_leaf       ! ! intent(in)
       use mortality    , only : survivorship ! ! function
       use mend_state_vars, only: npom
       use mend_exchange, only: mend_plant2som_exchange
@@ -2962,12 +2962,12 @@ module disturbance_utils
               cpatch%nplant(ico) * area_fac / c2p_wood(ipft)
 
          clm_input_c(3) = clm_input_c(3) + (1.-survival_fac) * &
-              (cpatch%balive(ico) - cpatch%bleaf(ico) * cpatch%nplant(ico) * area_fac
+              (cpatch%balive(ico) - cpatch%bleaf(ico)) * cpatch%nplant(ico) * area_fac
          clm_input_n(3) = clm_input_n(3) + (1.-survival_fac) * &
-              (cpatch%balive(ico) - cpatch%bleaf(ico) * cpatch%nplant(ico) * area_fac / &
+              (cpatch%balive(ico) - cpatch%bleaf(ico)) * cpatch%nplant(ico) * area_fac / &
               c2n_leaf(ipft)
          clm_input_p(3) = clm_input_p(3) + (1.-survival_fac) * &
-              (cpatch%balive(ico) - cpatch%bleaf(ico) * cpatch%nplant(ico) * area_fac / &
+              (cpatch%balive(ico) - cpatch%bleaf(ico)) * cpatch%nplant(ico) * area_fac / &
               c2p_leaf(ipft)
          
          clm_input_c(2) = clm_input_c(2) + (1.-survival_fac) * &

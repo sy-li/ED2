@@ -21,9 +21,8 @@ subroutine ed_bigleaf_init(cgrid)
    use pft_coms       , only : hgt_max              & ! intent(in)
                              , dbh_bigleaf          & ! intent(in)
                              , sla                  & ! intent(in)
-                             , q                    & ! intent(in)
                              , qsw                  & ! intent(in)
-                             , agf_bs               ! ! intent(in)
+                             , agf_bs,root2leaf_min,root2leaf_max               ! ! intent(in)
    use fuse_fiss_utils, only : sort_cohorts         & ! subroutine
                              , sort_patches         ! ! subroutine
    use consts_coms    , only : pio4                 ! ! intent(in)
@@ -251,7 +250,7 @@ subroutine ed_bigleaf_init(cgrid)
                      cpatch%dbh          (1) = dbh_bigleaf(ipft)
                      cpatch%bleaf        (1) = size2bl(cpatch%dbh(1),cpatch%hite(1),ipft)
                      cpatch%bdead        (1) = dbh2bd (cpatch%dbh(1),ipft)
-                     cpatch%broot        (1) = cpatch%bleaf(1) * q(ipft)
+                     cpatch%broot        (1) = cpatch%bleaf(1) * 0.5 * (root2leaf_min(ipft) + root2leaf_max(ipft))
                      cpatch%bsapwooda    (1) = agf_bs(ipft) * cpatch%bleaf(1)              &
                                              * qsw(ipft) * cpatch%hite(1)
                      cpatch%bsapwoodb    (1) = (1.0 - agf_bs(ipft)) * cpatch%bleaf(1)      &

@@ -2335,7 +2335,6 @@ subroutine init_pft_alloc_params()
       , rho                   & ! intent(out)
       , SLA                   & ! intent(out)
       , horiz_branch          & ! intent(out)
-      , q                     & ! intent(out)
       , qsw                   & ! intent(out)
       , SRA                   & ! intent(out)
       , root_beta             & ! intent(out)
@@ -3322,13 +3321,13 @@ subroutine init_pft_nitro_params()
    c2n_storage    = 150.0 ! Carbon to Nitrogen ratio, storage pool.
    c2n_stem       = 150.0 ! Carbon to Nitrogen ratio, structural stem.
    l2n_stem       = 150.0 ! Carbon to Nitrogen ratio, structural stem.
-   C_resorption_factor(:) = 0.48
-   N_resorption_factor(:) = 0.48
+   C_resorption_fraction(:) = 0.48
+   N_resorption_fraction(:) = 0.48
 
 
    c2p_wood(:) = 3000.
    c2p_leaf(:) = 600.
-   P_resorption_factor(:) = 0.48
+   P_resorption_fraction(:) = 0.48
 
    plant_N_supply_scale = 0.5
 
@@ -3879,7 +3878,6 @@ subroutine init_pft_derived_params()
       , c2n_leaf             & ! intent(in)
       , c2n_stem             & ! intent(in)
       , hgt_min              & ! intent(in)
-      , q                    & ! intent(in)
       , qsw                  & ! intent(in)
       , sla                  & ! intent(in)
       , pft_name16           & ! intent(in)

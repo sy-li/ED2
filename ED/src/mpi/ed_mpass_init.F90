@@ -200,7 +200,7 @@ subroutine ed_masterput_nl(par_run)
                                    , zrough                    & ! intent(in)
                                    , layer_index               & ! intent(in)
                                    , nlon_lyr                  & ! intent(in)
-                                   , nlat_lyr,nlsl                  ! ! intent(in)
+                                   , nlat_lyr                  ! ! intent(in)
    use met_driver_coms      , only : ed_met_driver_db          & ! intent(in)
                                    , imettype                  & ! intent(in)
                                    , ishuffle                  & ! intent(in)
@@ -305,6 +305,7 @@ subroutine ed_masterput_nl(par_run)
                                    , min_recruit_dbh            & ! intent(in)
                                    , idetailed                  & ! intent(in)
                                    , patch_keep                 ! ! intent(in)
+   use nutrient_constants, only: nlsl
    implicit none
 #if defined(RAMS_MPI)
    include 'mpif.h'
@@ -1374,7 +1375,7 @@ subroutine ed_nodeget_nl
                                    , zrough                    & ! intent(out)
                                    , layer_index               & ! intent(out)
                                    , nlon_lyr                  & ! intent(out)
-                                   , nlat_lyr,nlsl                  ! ! intent(out)
+                                   , nlat_lyr                  ! ! intent(out)
    use met_driver_coms      , only : ed_met_driver_db          & ! intent(out)
                                    , imettype                  & ! intent(out)
                                    , ishuffle                  & ! intent(out)
@@ -1479,6 +1480,7 @@ subroutine ed_nodeget_nl
                                    , min_recruit_dbh            & ! intent(out)
                                    , idetailed                  & ! intent(out)
                                    , patch_keep                 ! ! intent(out)
+   use nutrient_constants, only: nlsl
    implicit none
 #if defined(RAMS_MPI)
    include 'mpif.h'
