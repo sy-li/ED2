@@ -401,7 +401,8 @@ module phenology_aux
                                                ,cpatch%bleaf(ico),cpatch%broot(ico)        &
                                                ,cpatch%bsapwooda(ico)                      &
                                                ,cpatch%bsapwoodb(ico)                      &
-                                               ,cpatch%balive(ico),cpatch%bstorage(ico))
+                                               ,cpatch%balive(ico),cpatch%bstorage(ico), &
+                                               cpatch%root2leaf(ico))
                   !------------------------------------------------------------------------!
 
 
@@ -463,7 +464,8 @@ module phenology_aux
    !---------------------------------------------------------------------------------------!
    subroutine pheninit_balive_bstorage(mzg,ipft,kroot,height,dbh,soil_water,ntext_soil     &
                                       ,paw_avg,elongf,phenology_status                     &
-                                      ,bleaf,broot,bsapwooda,bsapwoodb,balive,bstorage)
+                                      ,bleaf,broot,bsapwooda,bsapwoodb,balive,bstorage, &
+                                      root2leaf)
       use soil_coms     , only : soil                & ! intent(in), look-up table
                                , slz                 & ! intent(in)
                                , slzt                & ! intent(in)
@@ -471,7 +473,6 @@ module phenology_aux
       use phenology_coms, only : spot_phen           & ! intent(in)
                                , elongf_min          ! ! intent(in)
       use pft_coms      , only : phenology           & ! intent(in)
-                               , q                   & ! intent(in)
                                , qsw                 & ! intent(in)
                                , agf_bs              ! ! intent(in)
       use ed_max_dims   , only : n_pft               ! ! intent(in)
@@ -483,7 +484,7 @@ module phenology_aux
       integer                  , intent(in)  :: ipft              ! PFT type
       integer                  , intent(in)  :: kroot             ! Level of rooting depth
       real                     , intent(in)  :: height            ! Height
-      real                     , intent(in)  :: dbh               ! DBH
+      real                     , intent(in)  :: dbh,root2leaf               ! DBH
       integer, dimension(mzg)  , intent(in)  :: ntext_soil        ! Soil texture
       real   , dimension(mzg)  , intent(in)  :: soil_water        ! Soil water
       real                     , intent(out) :: paw_avg           ! Pot. available water
@@ -568,12 +569,12 @@ module phenology_aux
 
 
       !----- Compute the biomass of living tissues. ---------------------------------------!
-      salloc     = 1.0 + q(ipft) + qsw(ipft) * height
+      salloc     = 1.0 + root2leaf + qsw(ipft) * height
       salloci    = 1.0 / salloc
       bleaf_max  = size2bl(dbh,height,ipft)
       balive_max = bleaf_max * salloc
       bleaf      = bleaf_max * elongf
-      broot      = balive_max * q(ipft)   * salloci
+      broot      = balive_max * root2leaf   * salloci
       bsapwooda  = balive_max * qsw(ipft) * height * salloci * agf_bs(ipft)
       bsapwoodb  = balive_max * qsw(ipft) * height * salloci * (1.0 - agf_bs(ipft))
       balive     = bleaf + broot + bsapwooda + bsapwoodb

@@ -161,7 +161,7 @@ subroutine structural_growth(cgrid, month)
                ipft    = cpatch%pft(ico)
                !---------------------------------------------------------------------------!
 
-               salloc  = 1.0 + q(ipft) + qsw(ipft) * cpatch%hite(ico)
+               salloc  = 1.0 + cpatch%root2leaf(ico) + qsw(ipft) * cpatch%hite(ico)
                salloci = 1.0 / salloc
 
                !----- Remember inputs in order to calculate increments later on. ----------!
@@ -234,7 +234,7 @@ subroutine structural_growth(cgrid, month)
                case (1)
                    ! reserve enough carbon for reflushing canopy and fine roots
                   bstorage_min = size2bl(cpatch%dbh(ico),cpatch%hite(ico),ipft)    &
-                       * (1. + q(ipft))
+                       * (1. + cpatch%root2leaf(ico))
                   nstorage_min = bstorage_min / c2n_leaf(ipft)
                   pstorage_min = bstorage_min / c2p_leaf(ipft)
                   bstorage_available = max(0., cpatch%bstorage(ico) - bstorage_min)
@@ -697,7 +697,7 @@ subroutine structural_growth_eq_0(cgrid, month)
                !----- Assigning an alias for PFT type. ------------------------------------!
                ipft    = cpatch%pft(ico)
 
-               salloc  = 1.0 + q(ipft) + qsw(ipft) * cpatch%hite(ico)
+               salloc  = 1.0 + cpatch%root2leaf(ico) + qsw(ipft) * cpatch%hite(ico)
                salloci = 1.0 / salloc
 
                !---------------------------------------------------------------------------!
@@ -754,7 +754,7 @@ subroutine structural_growth_eq_0(cgrid, month)
                case (1)
                    ! reserve enough carbon for reflushing canopy and fine roots
                    bstorage_min = size2bl(cpatch%dbh(ico),cpatch%hite(ico),ipft)    &
-                                * (1. + q(ipft))
+                                * (1. + cpatch%root2leaf(ico))
                    bstorage_available = max(0., cpatch%bstorage(ico) - bstorage_min)
                end select
 

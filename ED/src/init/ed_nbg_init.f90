@@ -120,7 +120,7 @@ subroutine init_nbg_cohorts(csite,lsl,ipa_a,ipa_z)
                                  , include_pft_ag     & ! intent(in)
                                  , include_pft_fp     & ! intent(in)
                                  , init_density       & ! intent(in)
-                                 , agf_bs             ! ! intent(in)
+                                 , agf_bs,root2leaf_max,root2leaf_min             ! ! intent(in)
    use consts_coms        , only : t3ple              & ! intent(in)
                                  , pio4               & ! intent(in)
                                  , kgom2_2_tonoha     & ! intent(in)
@@ -223,13 +223,13 @@ subroutine init_nbg_cohorts(csite,lsl,ipa_a,ipa_z)
          cpatch%bdead(ico)            = dbh2bd(cpatch%dbh(ico),ipft)
          cpatch%bleaf(ico)            = size2bl(cpatch%dbh(ico),cpatch%hite(ico),ipft)
          cpatch%sla(ico)              = sla(ipft)
+         cpatch%root2leaf(ico) = 0.5 * (root2leaf_min(ipft) + root2leaf_max(ipft))
 
-
-         salloc                       = 1.0 + q(ipft) + qsw(ipft) * cpatch%hite(ico)
+         salloc                       = 1.0 + cpatch%root2leaf(ico) + qsw(ipft) * cpatch%hite(ico)
          salloci                      = 1. / salloc
 
          cpatch%balive(ico)           = cpatch%bleaf(ico) * salloc
-         cpatch%broot(ico)            = q(ipft) * cpatch%balive(ico) * salloci
+         cpatch%broot(ico)            = cpatch%root2leaf(ico) * cpatch%balive(ico) * salloci
          cpatch%bsapwooda(ico)        = qsw(ipft) * cpatch%hite(ico) * cpatch%balive(ico)  &
                                       * salloci * agf_bs(ipft)
          cpatch%bsapwoodb(ico)        = qsw(ipft) * cpatch%hite(ico) * cpatch%balive(ico)  &
@@ -290,7 +290,7 @@ subroutine init_cohorts_by_layers(csite,lsl,ipa_a,ipa_z)
                                  , sla                & ! intent(in)
                                  , include_pft        & ! intent(in)
                                  , include_these_pft  & ! intent(in)
-                                 , agf_bs             ! ! intent(in)
+                                 , agf_bs,root2leaf_min,root2leaf_max             ! ! intent(in)
    use consts_coms        , only : t3ple              & ! intent(in)
                                  , pio4               & ! intent(in)
                                  , kgom2_2_tonoha     & ! intent(in)
@@ -359,13 +359,14 @@ subroutine init_cohorts_by_layers(csite,lsl,ipa_a,ipa_z)
          cpatch%bdead(ico)            = dbh2bd(cpatch%dbh(ico),ipft)
          cpatch%bleaf(ico)            = size2bl(cpatch%dbh(ico),cpatch%hite(ico),ipft)
          cpatch%sla(ico)              = sla(ipft)
+         cpatch%root2leaf(ico) = 0.5 * (root2leaf_min(ipft) + root2leaf_max(ipft))
 
 
-         salloc                       = 1.0 + q(ipft) + qsw(ipft) * cpatch%hite(ico)
+         salloc                       = 1.0 + cpatch%root2leaf(ico) + qsw(ipft) * cpatch%hite(ico)
          salloci                      = 1. / salloc
 
          cpatch%balive(ico)           = cpatch%bleaf(ico) * salloc
-         cpatch%broot(ico)            = q(ipft) * cpatch%balive(ico) * salloci
+         cpatch%broot(ico)            = cpatch%root2leaf(ico) * cpatch%balive(ico) * salloci
          cpatch%bsapwooda(ico)        = qsw(ipft) * cpatch%hite(ico) * cpatch%balive(ico)  &
                                       * salloci * agf_bs(ipft)
          cpatch%bsapwoodb(ico)        = qsw(ipft) * cpatch%hite(ico) * cpatch%balive(ico)  &
@@ -540,11 +541,11 @@ subroutine near_bare_ground_big_leaf_init(cgrid)
                cpatch%bleaf(ico)            = size2bl(cpatch%dbh(ico),cpatch%hite(ico),ipft)
                cpatch%sla(ico)              = sla(ipft)
 
-               salloc                       = 1.0 + q(ipft) + qsw(ipft) * cpatch%hite(ico)
+               salloc                       = 1.0 + cpatch%root2leaf(ico) + qsw(ipft) * cpatch%hite(ico)
                salloci                      = 1. / salloc
 
                cpatch%balive(ico)           = cpatch%bleaf(ico) * salloc
-               cpatch%broot(ico)            = q(ipft) * cpatch%balive(ico) *salloci
+               cpatch%broot(ico)            = cpatch%root2leaf(ico) * cpatch%balive(ico) *salloci
                cpatch%bsapwooda(ico)        = qsw(ipft) * cpatch%hite(ico)                 &
                                             * cpatch%balive(ico) * salloci *agf_bs(ipft)
                cpatch%bsapwoodb(ico)        = qsw(ipft) * cpatch%hite(ico)                 &

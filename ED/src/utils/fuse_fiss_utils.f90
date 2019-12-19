@@ -931,7 +931,7 @@ module fuse_fiss_utils
          ! flushed.                                                                        !
          !---------------------------------------------------------------------------------! 
          stai = cpatch%nplant(ico) * cpatch%balive(ico) * green_leaf_factor(ipft)          &
-              * q(ipft) / ( 1.0 + q(ipft) + qsw(ipft) * cpatch%hite(ico) )                 &
+              * cpatch%root2leaf(ico) / ( 1.0 + cpatch%root2leaf(ico) + qsw(ipft) * cpatch%hite(ico) )                 &
               * cpatch%sla(ico) + cpatch%wai(ico)
 
          !----- If the resulting TAI is too large, split this cohort. ---------------------!

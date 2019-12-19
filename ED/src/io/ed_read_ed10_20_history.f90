@@ -23,7 +23,7 @@ subroutine read_ed10_ed20_history_file
                              , include_pft_ag      & ! intent(in)
                              , pft_1st_check       & ! intent(in)
                              , agf_bs              & ! intent(in)
-                             , include_these_pft   ! ! intent(in)
+                             , include_these_pft,root2leaf_min,root2leaf_max   ! ! intent(in)
    use ed_misc_coms   , only : sfilin              & ! intent(in)
                              , ied_init_mode       ! ! intent(in)
    use consts_coms    , only : pio180              & ! intent(in)
@@ -785,7 +785,7 @@ subroutine read_ed10_ed20_history_file
                            cpatch%dbh(ic2)   = max(dbh(ic),min_dbh(ipft(ic)))
                            cpatch%hite(ic2)  = dbh2h(ipft(ic),dbh(ic))
                            cpatch%bdead(ic2) = dbh2bd(dbh(ic),ipft(ic))
-
+                           cpatch%root2leaf(ic2) = 0.5 * (root2leaf_min(ipft(ic)) + root2leaf_max(ipft(ic)))
                         case default
                            !---------------------------------------------------------------!
                            !    Old ED files.  Check whether bdead is valid.  If it is, we !
@@ -803,6 +803,7 @@ subroutine read_ed10_ed20_history_file
                               cpatch%hite(ic2)  = dbh2h(ipft(ic),dbh(ic))
                               cpatch%bdead(ic2) = dbh2bd(dbh(ic),ipft(ic))
                            end if
+                           cpatch%root2leaf(ic2) = 0.5 * (root2leaf_min(ipft(ic)) + root2leaf_max(ipft(ic)))
                         end select
                         !------------------------------------------------------------------!
 
@@ -815,9 +816,7 @@ subroutine read_ed10_ed20_history_file
                         cpatch%bleaf(ic2)     = size2bl(dbh(ic), hite(ic),ipft(ic))
                         cpatch%balive(ic2)    = cpatch%bleaf(ic2) * (1.0 + q(ipft(ic))     &
                                               + qsw(ipft(ic)) * cpatch%hite(ic2))
-                        cpatch%broot(ic2)     = cpatch%balive(ic2) * q(ipft(ic))           &
-                                              / ( 1.0 + q(ipft(ic)) + qsw(ipft(ic))        &
-                                               * cpatch%hite(ic2))
+                        cpatch%broot(ic2)     = cpatch%bleaf(ic2) * cpatch%root2leaf(ic2)
                         cpatch%bsapwooda(ic2) = agf_bs(ipft(ic)) * cpatch%balive(ic2)                &
                                              * qsw(ipft(ic))* cpatch%hite(ic2)             &
                                              / ( 1.0 + q(ipft(ic)) + qsw(ipft(ic))         &

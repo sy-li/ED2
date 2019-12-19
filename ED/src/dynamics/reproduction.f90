@@ -229,6 +229,7 @@ subroutine reproduction(cgrid,month)
                      rectest%krdepth   = dbh2krdepth(rectest%hite,rectest%dbh              &
                                                     ,rectest%pft,cpoly%lsl(isi))
                      rectest%bdead     = dbh2bd(rectest%dbh, ipft)
+                     rectest%root2leaf = 0.5 * (root2leaf_min(ipft) + root2leaf_max(ipft))
 
                      call pheninit_balive_bstorage(nzg,rectest%pft,rectest%krdepth         &
                                                   ,rectest%hite,rectest%dbh                &
@@ -238,7 +239,7 @@ subroutine reproduction(cgrid,month)
                                                   ,rectest%phenology_status                &
                                                   ,rectest%bleaf,rectest%broot             &
                                                   ,rectest%bsapwooda,rectest%bsapwoodb     &
-                                                  ,rectest%balive,rectest%bstorage)
+                                                  ,rectest%balive,rectest%bstorage,rectest%root2leaf)
 
                      !---------------------------------------------------------------------!
                      !     Find the expected population from the reproduction stocks, and  !
@@ -402,6 +403,7 @@ subroutine reproduction(cgrid,month)
                      cpatch%leaf_temp_pv    (ico) = recruit(inew)%leaf_temp_pv
                      cpatch%wood_temp_pv    (ico) = recruit(inew)%wood_temp_pv
                      cpatch%leaf_vpdef      (ico) = recruit(inew)%leaf_vpdef
+                     cpatch%root2leaf(ico) = recruit(inew)%root2leaf
                      !---------------------------------------------------------------------!
 
 
@@ -645,7 +647,7 @@ subroutine reproduction(cgrid,month)
                      ! about elongation factor.                                            !
                      !---------------------------------------------------------------------!
                      bleaf_plant     = size2bl(cpatch%dbh(ico),cpatch%hite(ico),ipft)
-                     broot_plant     = bleaf_plant * q(ipft)
+                     broot_plant     = bleaf_plant * cpatch%root2leaf(ico)
                      bsapwood_plant  = bleaf_plant * qsw(ipft) * cpatch%hite(ico)
                      balive_plant    = bleaf_plant + broot_plant + bsapwood_plant
                      bdead_plant     = dbh2bd(cpatch%dbh(ico),ipft)

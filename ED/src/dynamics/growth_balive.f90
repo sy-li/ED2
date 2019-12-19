@@ -125,7 +125,7 @@ module growth_balive
                   N_uptake_pot    = 0.0
 
                   !----- Set allocation factors. ------------------------------------------!
-                  salloc  = 1.0 + qsw(ipft) * cpatch%hite(ico) + q(ipft)
+                  salloc  = 1.0 + qsw(ipft) * cpatch%hite(ico) + cpatch%root2leaf(ico)
                   salloci = 1.0 / salloc
 
                   !------------------------------------------------------------------------!
@@ -465,7 +465,7 @@ module growth_balive
                   N_uptake_pot    = 0.0
 
                   !----- Set allocation factors. ------------------------------------------!
-                  salloc  = 1.0 + qsw(ipft) * cpatch%hite(ico) + q(ipft)
+                  salloc  = 1.0 + qsw(ipft) * cpatch%hite(ico) + cpatch%root2leaf(ico)
                   salloci = 1.0 / salloc
 
                   !------------------------------------------------------------------------!
@@ -1032,7 +1032,7 @@ module growth_balive
       !------------------------------------------------------------------------------------!
       bleaf_max      = size2bl(cpatch%dbh(ico),cpatch%hite(ico),ipft)
       bleaf_aim      = bleaf_max * green_leaf_factor * cpatch%elongf(ico)
-      broot_aim      = bleaf_aim * q(ipft)
+      broot_aim      = bleaf_aim * cpatch%root2leaf(ico)
       bsapwooda_aim  = bleaf_aim * qsw(ipft) * cpatch%hite(ico) * agf_bs(ipft)
       bsapwoodb_aim  = bleaf_aim * qsw(ipft) * cpatch%hite(ico) * (1. - agf_bs(ipft))
       balive_aim     = bleaf_aim + broot_aim + bsapwooda_aim + bsapwoodb_aim
@@ -1762,7 +1762,7 @@ module growth_balive
             !-- Take the remaining carbon from balive -------------------------------------!
             cpatch%balive(ico)    = cpatch%balive(ico) - increment
             cpatch%bleaf(ico)     = cpatch%balive(ico) * salloci * green_leaf_factor
-            cpatch%broot(ico)     = cpatch%balive(ico) * salloci * q(ipft)
+            cpatch%broot(ico)     = cpatch%balive(ico) * salloci * cpatch%root2leaf(ico)
             cpatch%bsapwooda(ico) = cpatch%balive(ico) * salloci * qsw(ipft)               &
                                   * cpatch%hite(ico)   * agf_bs(ipft)
             cpatch%bsapwoodb(ico) = cpatch%balive(ico) * salloci * qsw(ipft)               &
@@ -1890,7 +1890,7 @@ module growth_balive
             !------------------------------------------------------------------------------!
             bleaf_max     = size2bl(cpatch%dbh(ico),cpatch%hite(ico),ipft)
             bleaf_aim     = bleaf_max * green_leaf_factor * cpatch%elongf(ico)
-            broot_aim     = bleaf_max * q(ipft)   * cpatch%elongf(ico)
+            broot_aim     = bleaf_max * cpatch%root2leaf(ico)   * cpatch%elongf(ico)
             bsapwooda_aim = bleaf_max * qsw(ipft) * cpatch%hite(ico) * cpatch%elongf(ico)  &
                           * agf_bs(ipft)
             bsapwoodb_aim = bleaf_max * qsw(ipft) * cpatch%hite(ico) * cpatch%elongf(ico)  &

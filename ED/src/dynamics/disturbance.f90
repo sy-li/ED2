@@ -3052,7 +3052,7 @@ module disturbance_utils
                                 , patchtype                ! ! structure
       use pft_coms       , only : hgt_min                  & ! intent(in)
                                 , hgt_max                  & ! intent(in)
-                                , dbh_bigleaf              ! ! intent(in)
+                                , dbh_bigleaf,root2leaf_max,root2leaf_min              ! ! intent(in)
       use ed_misc_coms   , only : ibigleaf                 ! ! intent(in)
       use fuse_fiss_utils, only : sort_cohorts             ! ! sub-routine
       use ed_therm_lib   , only : calc_veg_hcap            ! ! function
@@ -3139,7 +3139,7 @@ module disturbance_utils
       end select
       !------------------------------------------------------------------------------------!
 
-
+      cpatch%root2leaf(nc) = 0.5 * (root2leaf_min(pft) + root2leaf_max(pft))
 
 
       !----- Initialise other cohort-level variables. -------------------------------------!
@@ -3160,7 +3160,7 @@ module disturbance_utils
                                    ,cpatch%phenology_status(nc),cpatch%bleaf(nc)           &
                                    ,cpatch%broot(nc),cpatch%bsapwooda(nc)                  &
                                    ,cpatch%bsapwoodb(nc),cpatch%balive(nc)                 &
-                                   ,cpatch%bstorage(nc))
+                                   ,cpatch%bstorage(nc),cpatch%root2leaf(nc))
       !------------------------------------------------------------------------------------!
 
 

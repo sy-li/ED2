@@ -158,6 +158,8 @@ module ed_state_vars
       real ,pointer,dimension(:) :: hite
       !<Plant height (m)
 
+      real, pointer, dimension(:) :: root2leaf
+
       real, pointer, dimension(:) :: agb
       !<Above-ground biomass (kgC/plant)
 
@@ -4722,6 +4724,7 @@ module ed_state_vars
       allocate(cpatch%recruit_dbh                  (                    ncohorts))
       allocate(cpatch%census_status                (                    ncohorts))
       allocate(cpatch%hite                         (                    ncohorts))
+      allocate(cpatch%root2leaf                         (                    ncohorts))
       allocate(cpatch%agb                          (                    ncohorts))
       allocate(cpatch%basarea                      (                    ncohorts))
       allocate(cpatch%dagb_dt                      (                    ncohorts))
@@ -6596,6 +6599,7 @@ module ed_state_vars
       nullify(cpatch%recruit_dbh           )
       nullify(cpatch%census_status         )
       nullify(cpatch%hite                  )
+      nullify(cpatch%root2leaf                  )
       nullify(cpatch%agb                   )
       nullify(cpatch%basarea               )
       nullify(cpatch%dagb_dt               )
@@ -7592,6 +7596,7 @@ module ed_state_vars
       if(associated(cpatch%recruit_dbh         )) deallocate(cpatch%recruit_dbh         )
       if(associated(cpatch%census_status       )) deallocate(cpatch%census_status       )
       if(associated(cpatch%hite                )) deallocate(cpatch%hite                )
+      if(associated(cpatch%root2leaf                )) deallocate(cpatch%root2leaf                )
       if(associated(cpatch%agb                 )) deallocate(cpatch%agb                 )
       if(associated(cpatch%basarea             )) deallocate(cpatch%basarea             )
       if(associated(cpatch%dagb_dt             )) deallocate(cpatch%dagb_dt             )
@@ -9520,6 +9525,7 @@ module ed_state_vars
          opatch%recruit_dbh           (oco) = ipatch%recruit_dbh           (ico)
          opatch%census_status         (oco) = ipatch%census_status         (ico)
          opatch%hite                  (oco) = ipatch%hite                  (ico)
+         opatch%root2leaf                  (oco) = ipatch%root2leaf                  (ico)
          opatch%agb                   (oco) = ipatch%agb                   (ico)
          opatch%basarea               (oco) = ipatch%basarea               (ico)
          opatch%dagb_dt               (oco) = ipatch%dagb_dt               (ico)
@@ -10200,6 +10206,7 @@ module ed_state_vars
       opatch%recruit_dbh           (1:z) = pack(ipatch%recruit_dbh               ,lmask)
       opatch%census_status         (1:z) = pack(ipatch%census_status             ,lmask)
       opatch%hite                  (1:z) = pack(ipatch%hite                      ,lmask)
+      opatch%root2leaf                  (1:z) = pack(ipatch%root2leaf                      ,lmask)
       opatch%agb                   (1:z) = pack(ipatch%agb                       ,lmask)
       opatch%basarea               (1:z) = pack(ipatch%basarea                   ,lmask)
       opatch%dagb_dt               (1:z) = pack(ipatch%dagb_dt                   ,lmask)
@@ -24287,6 +24294,13 @@ module ed_state_vars
          nvar=nvar+1
            call vtable_edio_r(npts,cpatch%hite,nvar,igr,init,cpatch%coglob_id, &
            var_len,var_len_global,max_ptrs,'HITE :41:hist:anal:dail:mont:dcyc:year') 
+         call metadata_edio(nvar,igr,'No metadata available','[NA]','NA') 
+      end if
+
+      if (associated(cpatch%root2leaf)) then
+         nvar=nvar+1
+           call vtable_edio_r(npts,cpatch%root2leaf,nvar,igr,init,cpatch%coglob_id, &
+           var_len,var_len_global,max_ptrs,'ROOT2LEAF :41:hist:anal:dail:mont:dcyc:year') 
          call metadata_edio(nvar,igr,'No metadata available','[NA]','NA') 
       end if
 

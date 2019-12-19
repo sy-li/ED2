@@ -2377,7 +2377,7 @@ subroutine init_pft_alloc_params()
       , sla_scale             & ! intent(out)
       , sla_inter             & ! intent(out)
       , sla_slope             & ! intent(out)
-      , sapwood_ratio         ! ! intent(out)
+      , sapwood_ratio,root2leaf_min,root2leaf_max         ! ! intent(out)
    use allometry    , only : h2dbh                 & ! function
       , dbh2bd                & ! function
       , size2bl           ! ! function
@@ -2532,20 +2532,22 @@ subroutine init_pft_alloc_params()
 
 
    !----- Ratio between fine roots and leaves [kg_fine_roots/kg_leaves] -------------------!
-   q(1)     = 1.0
-   q(2)     = 1.0
-   q(3)     = 1.0
-   q(4)     = 1.0
-   q(5)     = 1.0
-   q(6)     = 0.3463 ! 1.0
-   q(7)     = 0.3463 ! 1.0
-   q(8)     = 0.3463 ! 1.0
-   q(9)     = 1.1274
-   q(10)    = 1.1274
-   q(11)    = 1.1274
-   q(12:15) = 1.0
-   q(16)    = 1.0
-   q(17)    = 1.0
+   root2leaf_min(1)     = 1.0
+   root2leaf_min(2)     = 1.0
+   root2leaf_min(3)     = 1.0
+   root2leaf_min(4)     = 1.0
+   root2leaf_min(5)     = 1.0
+   root2leaf_min(6)     = 0.3463 ! 1.0
+   root2leaf_min(7)     = 0.3463 ! 1.0
+   root2leaf_min(8)     = 0.3463 ! 1.0
+   root2leaf_min(9)     = 1.1274
+   root2leaf_min(10)    = 1.1274
+   root2leaf_min(11)    = 1.1274
+   root2leaf_min(12:15) = 1.0
+   root2leaf_min(16)    = 1.0
+   root2leaf_min(17)    = 1.0
+
+   root2leaf_max(:) = root2leaf_min
 
    sapwood_ratio(1:17) = 3900.0
 
@@ -3893,7 +3895,7 @@ subroutine init_pft_derived_params()
       , c2n_recruit          & ! intent(out)
       , veg_hcap_min         & ! intent(out)
       , seed_rain,b1Ht,b2Ht,b1CA,b2CA,bdead_crit,min_bdead,min_dbh,b2Bl_large,b1Bl_large &
-      , C2B, bleaf_adult, dbh_adult,c2p_recruit,c2p_leaf,c2p_wood! ! intent(out)
+      , C2B, bleaf_adult, dbh_adult,c2p_recruit,c2p_leaf,c2p_wood, root2leaf_min,root2leaf_max! ! intent(out)
    use allometry            , only : h2dbh                & ! function
       , dbh2h                & ! function
       , size2bl          & ! function
@@ -3927,6 +3929,7 @@ subroutine init_pft_derived_params()
    real                              :: min_plant_dens
    logical                           :: print_zero_table
    character(len=str_len), parameter :: zero_table_fn    = 'pft_sizes.txt'
+   real :: root2leaf_avg
    !---------------------------------------------------------------------------------------!
 
    !---------------------------------------------------------------------------------------!
@@ -3973,8 +3976,10 @@ subroutine init_pft_derived_params()
       b1Ca(ipft) = exp(-1.853) * exp(b1Ht(ipft)) ** 1.888
       b2Ca(ipft) = b2Ht(ipft) * 1.888
 
+      root2leaf_avg = 0.5 * (root2leaf_min(ipft) + root2leaf_max(ipft))
+
       bleaf_min    = size2bl(dbh,hgt_min(ipft),ipft)
-      broot_min    = bleaf_min * q(ipft)
+      broot_min    = bleaf_min * root2leaf_avg
       bsapwood_min = bleaf_min * qsw(ipft) * hgt_min(ipft)
       balive_min   = bleaf_min + broot_min + bsapwood_min
       bdead_min    = dbh2bd(dbh,ipft)
@@ -3989,7 +3994,7 @@ subroutine init_pft_derived_params()
       huge_dbh     = 3. * dbh_crit(ipft)
       huge_height  = dbh2h(ipft, dbh_crit(ipft))
       bleaf_max    = size2bl(huge_dbh,huge_height,ipft)
-      broot_max    = bleaf_max * q(ipft)
+      broot_max    = bleaf_max * root2leaf_avg
       bsapwood_max = bleaf_max * qsw(ipft) * huge_height
       balive_max   = bleaf_max + broot_max + bsapwood_max
       bdead_max    = dbh2bd(huge_dbh,ipft)
@@ -4000,7 +4005,7 @@ subroutine init_pft_derived_params()
       !    Biomass of one individual plant at recruitment.                                 !
       !------------------------------------------------------------------------------------!
       bleaf_bl          = size2bl(dbh_bigleaf(ipft),hgt_min(ipft),ipft)
-      broot_bl          = bleaf_bl * q(ipft)
+      broot_bl          = bleaf_bl * root2leaf_avg
       bsapwood_bl       = bleaf_bl * qsw(ipft) * hgt_max(ipft)
       balive_bl         = bleaf_bl + broot_bl + bsapwood_bl
       bdead_bl          = dbh2bd(dbh_bigleaf(ipft),ipft)
@@ -5695,7 +5700,7 @@ subroutine test_xml_params()
   print*,rrf_hor(ipft),rrf_q10(ipft),rho(ipft),sla(ipft),horiz_branch(ipft)
   print*
   print*,4
-  print*,q(ipft),sapwood_ratio(ipft),qsw(ipft),sra(ipft),root_beta(ipft)
+  print*,root2leaf_min(ipft),root2leaf_max(ipft),sapwood_ratio(ipft),qsw(ipft),sra(ipft),root_beta(ipft)
   print*,init_density(ipft),b1Ht(ipft),b2Ht(ipft),hgt_ref(ipft),hgt_min(ipft)
   print*,hgt_max(ipft),dbh_adult(ipft),dbh_bigleaf(ipft),b1Bl_small(ipft),b2Bl_large(ipft)
   print*

@@ -516,7 +516,7 @@ module pft_coms
    !----- The initialization parameters for SLA:  SLA = sla_pft_init for non-trop PFTs
    real   , dimension(n_pft)    :: sla_pft_init
    !----- Mass ratio between fine root and leaves [kg_fine_roots]/[kg_leaves]. ------------!
-   real   , dimension(n_pft)    :: q
+   real   , dimension(n_pft)    :: root2leaf_min, root2leaf_max
    !----- Mass ratio between sapwood and leaves [kg_sapwood]/[kg_leaves]. -----------------!
    real   , dimension(n_pft)    :: qsw
    real   , dimension(n_pft)    :: sapwood_ratio ! AREA ratio
@@ -781,6 +781,7 @@ module pft_coms
       real    :: elongf
       real    :: bstorage
       real    :: nplant
+      real    :: root2leaf
    end type recruittype
    !=======================================================================================!
    !=======================================================================================!
@@ -824,6 +825,7 @@ module pft_coms
          recruit(p)%elongf           = 0.
          recruit(p)%bstorage         = 0.
          recruit(p)%nplant           = 0.
+         recruit(p)%root2leaf        = 0.
       end do
 
       return
@@ -867,7 +869,7 @@ module pft_coms
       rectarget%elongf           = recsource%elongf
       rectarget%bstorage         = recsource%bstorage
       rectarget%nplant           = recsource%nplant
-
+      rectarget%root2leaf        = recsource%root2leaf
       return
    end subroutine copy_recruit
    !=======================================================================================!

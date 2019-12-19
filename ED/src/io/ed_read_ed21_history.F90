@@ -23,7 +23,7 @@ subroutine read_ed21_history_file
                              , include_pft_ag          & ! intent(in)
                              , pft_1st_check           & ! intent(in)
                              , agf_bs                  & ! intent(in)
-                             , include_these_pft       ! ! intent(in)
+                             , include_these_pft,root2leaf_min,root2leaf_max       ! ! intent(in)
    use ed_misc_coms   , only : sfilin                  & ! intent(in)
                              , imonthh                 & ! intent(in)
                              , iyearh                  & ! intent(in)
@@ -619,15 +619,15 @@ subroutine read_ed21_history_file
                               cpatch%bdead(ico) = dbh2bd(cpatch%dbh  (ico),ipft)
                            end if
 
-
+                           cpatch%root2leaf(ico) = 0.5  * (root2leaf_min(ipft) + root2leaf_max(ipft))
                            cpatch%bleaf(ico)  = size2bl(cpatch%dbh(ico),cpatch%hite(ico)   &
                                                         ,cpatch%pft(ico))
 
                            !----- Find the other pools. -----------------------------------!
-                           salloc  = (1.0 + q(ipft) + qsw(ipft) * cpatch%hite(ico))
+                           salloc  = (1.0 + cpatch%root2leaf(ico) + qsw(ipft) * cpatch%hite(ico))
                            salloci = 1.0 / salloc
                            cpatch%balive  (ico) = cpatch%bleaf(ico) * salloc
-                           cpatch%broot   (ico) = cpatch%balive(ico) * q(ipft) * salloci
+                           cpatch%broot   (ico) = cpatch%bleaf(ico) * cpatch%root2leaf(ico)
                            cpatch%bsapwooda(ico) = cpatch%balive(ico) * qsw(ipft)          &
                                                  * cpatch%hite(ico) * salloci * agf_bs(ipft)
                            cpatch%bsapwoodb(ico) = cpatch%balive(ico) * qsw(ipft)          &
@@ -911,7 +911,7 @@ subroutine read_ed21_history_unstruct
                              , include_pft_ag          & ! intent(in)
                              , pft_1st_check           & ! intent(in)
                              , include_these_pft       & ! intent(in)
-                             , agf_bs                  ! ! intent(in)
+                             , agf_bs,root2leaf_min,root2leaf_max                  ! ! intent(in)
    use ed_misc_coms   , only : sfilin                  & ! intent(in)
                              , ied_init_mode           & ! intent(in)
                              , igrass                  & ! intent(in)
@@ -1853,15 +1853,17 @@ subroutine read_ed21_history_unstruct
                               cpatch%bdead(ico) = dbh2bd(cpatch%dbh  (ico),ipft)
                            end if
 
+                           cpatch%root2leaf(ico) = 0.5 * (root2leaf_min(ipft) + root2leaf_max(ipft))
+
                            cpatch%bleaf(ico)  = size2bl( cpatch%dbh (ico)                  &
                                                        , cpatch%hite(ico)                  &
                                                        , ipft )
 
                            !----- Find the other pools. -----------------------------------!
-                           salloc  = (1.0 + q(ipft) + qsw(ipft) * cpatch%hite(ico))
+                           salloc  = (1.0 + cpatch%root2leaf(ico) + qsw(ipft) * cpatch%hite(ico))
                            salloci = 1.0 / salloc
                            cpatch%balive  (ico)  = cpatch%bleaf(ico)  * salloc
-                           cpatch%broot    (ico) = cpatch%balive(ico) * q(ipft) * salloci
+                           cpatch%broot    (ico) = cpatch%bleaf(ico) * cpatch%root2leaf(ico)
                            cpatch%bsapwooda(ico) = cpatch%balive(ico) * qsw(ipft)          &
                                                  * cpatch%hite(ico) * salloci * agf_bs(ipft)
                            cpatch%bsapwoodb(ico) = cpatch%balive(ico) * qsw(ipft)          &
@@ -2150,7 +2152,7 @@ subroutine read_ed21_polyclone
                              , include_pft_ag          & ! intent(in)
                              , pft_1st_check           & ! intent(in)
                              , include_these_pft       & ! intent(in)
-                             , agf_bs                  ! ! intent(in)
+                             , agf_bs,root2leaf_min,root2leaf_max                  ! ! intent(in)
    use ed_misc_coms   , only : sfilin                  & ! intent(in)
                              , igrass
    use ed_state_vars  , only : polygontype             & ! variable type
@@ -3060,16 +3062,17 @@ subroutine read_ed21_polyclone
                               cpatch%hite(ico)  = dbh2h (ipft,cpatch%dbh  (ico))
                               cpatch%bdead(ico) = dbh2bd(cpatch%dbh  (ico),ipft)
                            end if
+                           cpatch%root2leaf(ico) = 0.5 * (root2leaf_min(ipft) + root2leaf_max(ipft))
 
                            cpatch%bleaf(ico)  = size2bl( cpatch%dbh (ico)                  &
                                                        , cpatch%hite(ico)                  &
                                                        , ipft )
 
                            !----- Find the other pools. -----------------------------------!
-                           salloc  = (1.0 + q(ipft) + qsw(ipft) * cpatch%hite(ico))
+                           salloc  = (1.0 + cpatch%root2leaf(ico) + qsw(ipft) * cpatch%hite(ico))
                            salloci = 1.0 / salloc
                            cpatch%balive  (ico)  = cpatch%bleaf(ico) * salloc
-                           cpatch%broot   (ico)  = cpatch%balive(ico) * q(ipft) * salloci
+                           cpatch%broot   (ico)  = cpatch%bleaf(ico) * cpatch%root2leaf(ico)
                            cpatch%bsapwooda(ico) = cpatch%balive(ico) * qsw(ipft)          &
                                                  * cpatch%hite(ico) * salloci * agf_bs(ipft)
                            cpatch%bsapwoodb(ico) = cpatch%balive(ico) * qsw(ipft)          &

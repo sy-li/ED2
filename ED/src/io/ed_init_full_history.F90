@@ -4378,6 +4378,8 @@ subroutine fill_history_patch(cpatch,paco_index,ncohorts_global)
                      ,'NPLANT                    ',dsetrank,iparallel,.true. ,foundvar)
    call hdf_getslab_r(cpatch%hite                                                          &
                      ,'HITE                      ',dsetrank,iparallel,.true. ,foundvar)
+   call hdf_getslab_r(cpatch%root2leaf                                                          &
+                     ,'ROOT2LEAF                      ',dsetrank,iparallel,.true. ,foundvar)
    call hdf_getslab_r(cpatch%agb                                                           &
                      ,'AGB_CO                    ',dsetrank,iparallel,.true. ,foundvar)
    call hdf_getslab_r(cpatch%basarea                                                       &

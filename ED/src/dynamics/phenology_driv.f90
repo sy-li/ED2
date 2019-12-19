@@ -256,7 +256,7 @@ subroutine update_phenology(doy, cpoly, isi, lat)
       cohortloop: do ico = 1,cpatch%ncohorts
          ipft    = cpatch%pft(ico)
          kroot   = cpatch%krdepth(ico)
-         salloci = 1. / (1.0 + qsw(ipft) * cpatch%hite(ico) + q(ipft))
+         salloci = 1. / (1.0 + qsw(ipft) * cpatch%hite(ico) + cpatch%root2leaf(ico))
          
          !----- Initially, we assume all leaves stay. -------------------------------------!
          cpatch%leaf_drop(ico) = 0.0
@@ -645,7 +645,7 @@ subroutine update_phenology(doy, cpoly, isi, lat)
             ! plants in the dry season but reducing it to zero would diable
             ! water uptake when rain comes. The current fraction 50% is kind of
             ! arbitrary, need updates in the future.
-            br_max = bl_full * q(ipft) * (elongf_try + 1.0) / 2.0
+            br_max = bl_full * cpatch%root2leaf(ico) * (elongf_try + 1.0) / 2.0
             !------------------------------------------------------------------------------!
 
 
@@ -979,7 +979,7 @@ subroutine update_phenology_eq_0(doy, cpoly, isi, lat)
       cohortloop: do ico = 1,cpatch%ncohorts
          ipft    = cpatch%pft(ico)
          kroot   = cpatch%krdepth(ico)
-         salloci = 1. / (1.0 + qsw(ipft) * cpatch%hite(ico) + q(ipft))
+         salloci = 1. / (1.0 + qsw(ipft) * cpatch%hite(ico) + cpatch%root2leaf(ico))
          
          !----- Initially, we assume all leaves stay. -------------------------------------!
          cpatch%leaf_drop(ico) = 0.0
@@ -1295,7 +1295,7 @@ subroutine update_phenology_eq_0(doy, cpoly, isi, lat)
             !----- Find the maximum allowed leaf biomass. ---------------------------------!
             bleaf_full= size2bl(cpatch%dbh(ico),cpatch%hite(ico),ipft)
             bleaf_new = elongf_try * bleaf_full 
-            broot_new = bleaf_full * q(ipft) * (elongf_try + 1.0) / 2.0
+            broot_new = bleaf_full * cpatch%root2leaf(ico) * (elongf_try + 1.0) / 2.0
             !------------------------------------------------------------------------------!
 
 
