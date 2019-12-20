@@ -7,11 +7,11 @@
 subroutine init_ed_cohort_vars(cpatch,ico, lsl)
    use ed_state_vars , only : patchtype           ! ! structure
    use allometry     , only : dbh2krdepth         & ! function
-                            , dbh2sf              ! ! function
+                            , dbh2sf,size2bl              ! ! function
    use pft_coms      , only : phenology           & ! intent(in)
                             , leaf_turnover_rate  & ! intent(in)
                             , Vm0                 & ! intent(in)
-                            , sla                 ! ! intent(in)
+                            , sla, c2p_leaf, c2n_leaf                 ! ! intent(in)
    use ed_misc_coms  , only : writing_long        & ! intent(in)
                             , writing_eorq        & ! intent(in)
                             , writing_dcyc        ! ! intent(in)
@@ -23,6 +23,7 @@ subroutine init_ed_cohort_vars(cpatch,ico, lsl)
    use plant_hydro   , only : psi2rwc             & ! subroutine
                             , rwc2tw              ! ! subroutine 
    use physiology_coms,only : plant_hydro_scheme  ! ! intent(in)
+   use nutrient_constants, only: nstorage_max_factor
    implicit none
    !----- Arguments. ----------------------------------------------------------------------!
    type(patchtype), target     :: cpatch     ! Current patch
@@ -128,7 +129,7 @@ subroutine init_ed_cohort_vars(cpatch,ico, lsl)
    !---------------------------------------------------------------------------------------!
 
    cpatch%bstorage_max(ico) = size2bl(cpatch%dbh(ico),cpatch%hite(ico),cpatch%pft(ico)) * &
-        (1. + cpatch%root2leaf(cpatch%pft(ico))) * bstorage_max_factor
+        (1. + cpatch%root2leaf(cpatch%pft(ico))) * nstorage_max_factor
    cpatch%nstorage_max(ico) = cpatch%bstorage_max(ico) / c2n_leaf(ico)
    cpatch%pstorage_max(ico) = cpatch%bstorage_max(ico) / c2p_leaf(ico)
    cpatch%nstorage(ico) = cpatch%nstorage_max(ico)

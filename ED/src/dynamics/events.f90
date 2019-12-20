@@ -289,7 +289,7 @@ subroutine event_harvest(agb_frac8,bgb_frac8,fol_frac8,stor_frac8)
   use ed_state_vars,only: edgrid_g, &
        edtype,polygontype,sitetype, &
        patchtype,allocate_patchtype,copy_patchtype,deallocate_patchtype
-  use pft_coms, only: qsw,q,hgt_min, agf_bs, is_grass
+  use pft_coms, only: qsw,hgt_min, agf_bs, is_grass
   use ed_therm_lib, only: calc_veg_hcap,update_veg_energy_cweh
   use fuse_fiss_utils, only: terminate_cohorts
   use allometry, only : bd2dbh, dbh2h, bl2dbh, bl2h, h2dbh, area_indices, ed_biomass,dbh2sf
@@ -354,7 +354,7 @@ subroutine event_harvest(agb_frac8,bgb_frac8,fol_frac8,stor_frac8)
                  pft = cpatch%pft(ico)
                  !! calc new pool sizes
 
-                 ialloc     =  1.0 / (1.0 + q(pft) + qsw(pft) * cpatch%hite(ico))
+                 ialloc     =  1.0 / (1.0 + cpatch%root2leaf(ico) + qsw(pft) * cpatch%hite(ico))
                  bdead_new  = cpatch%bdead(ico) *                                        &
                               (1.0-agb_frac * agf_bs(pft) - bgb_frac*(1.0-agf_bs(pft)))
                  bswa_new   = cpatch%balive(ico) * qsw(pft) * cpatch%hite(ico)           &
@@ -368,7 +368,7 @@ subroutine event_harvest(agb_frac8,bgb_frac8,fol_frac8,stor_frac8)
                  nstore_new = cpatch%nstorage(ico) * (1.0-stor_frac)
                  pstore_new = cpatch%pstorage(ico) * (1.0-stor_frac)
                  bleaf_new  = cpatch%balive(ico)   * ialloc *(1.0-fol_frac)
-                 bfr_new    = cpatch%balive(ico)   * q(pft) * ialloc * (1.0-bgb_frac)
+                 bfr_new    = cpatch%balive(ico)   * cpatch%root2leaf(ico) * ialloc * (1.0-bgb_frac)
 
                  !! move residual frac to debris/litter pools
                    !! For now assume 100% removal [[needs to be updated]]

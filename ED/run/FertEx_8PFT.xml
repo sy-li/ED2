@@ -2,7 +2,6 @@
 <!DOCTYPE config SYSTEM "ed.dtd">
 <config>
   <phenology>
-    <retained_carbon_fraction>0.250000</retained_carbon_fraction>
     <elongf_min>0.020000</elongf_min>
   </phenology>
   <pft>
@@ -46,7 +45,11 @@
     <rho>0.520000</rho>
     <SLA>20.500000</SLA>
     <horiz_branch>0.5</horiz_branch>
-    <q>1.000000</q>
+    <root2leaf_min>1.000000</root2leaf_min>
+    <root2leaf_max>1.000000</root2leaf_max>
+    <C_resorption_fraction>0.25</C_resorption_fraction>
+    <N_resorption_fraction>0.48</N_resorption_fraction>
+    <P_resorption_fraction>0.48</P_resorption_fraction>
     <sapwood_ratio>3900.</sapwood_ratio>
     <qsw>0.000000</qsw>
     <SRA>48.</SRA>
@@ -180,7 +183,11 @@
     <rho>0.740000</rho>
     <SLA>18.700000</SLA>
     <horiz_branch>0.5</horiz_branch>
-    <q>1.000000</q>
+    <root2leaf_min>1.000000</root2leaf_min>
+    <root2leaf_max>1.000000</root2leaf_max>
+    <C_resorption_fraction>0.25</C_resorption_fraction>
+    <N_resorption_fraction>0.48</N_resorption_fraction>
+    <P_resorption_fraction>0.48</P_resorption_fraction>
     <sapwood_ratio>3900.</sapwood_ratio>
     <qsw>0.000000</qsw>
     <SRA>48.</SRA>
@@ -314,7 +321,11 @@
     <rho>0.840000</rho>
     <SLA>15.700000</SLA>
     <horiz_branch>0.5</horiz_branch>
-    <q>1.000000</q>
+    <root2leaf_min>1.000000</root2leaf_min>
+    <root2leaf_max>1.000000</root2leaf_max>
+    <C_resorption_fraction>0.25</C_resorption_fraction>
+    <N_resorption_fraction>0.48</N_resorption_fraction>
+    <P_resorption_fraction>0.48</P_resorption_fraction>
     <sapwood_ratio>3900.</sapwood_ratio>
     <qsw>0.000000</qsw>
     <SRA>48.</SRA>
@@ -448,7 +459,11 @@
     <rho>0.250000</rho>
     <SLA>20.800000</SLA>
     <horiz_branch>0.5</horiz_branch>
-    <q>1.000000</q>
+    <root2leaf_min>1.000000</root2leaf_min>
+    <root2leaf_max>1.000000</root2leaf_max>
+    <C_resorption_fraction>0.25</C_resorption_fraction>
+    <N_resorption_fraction>0.48</N_resorption_fraction>
+    <P_resorption_fraction>0.48</P_resorption_fraction>
     <sapwood_ratio>3900.</sapwood_ratio>
     <qsw>0.000000</qsw>
     <SRA>48.</SRA>
@@ -582,7 +597,11 @@
     <rho>0.520000</rho>
     <SLA>20.500000</SLA>
     <horiz_branch>0.5</horiz_branch>
-    <q>1.000000</q>
+    <root2leaf_min>1.000000</root2leaf_min>
+    <root2leaf_max>1.000000</root2leaf_max>
+    <C_resorption_fraction>0.25</C_resorption_fraction>
+    <N_resorption_fraction>0.48</N_resorption_fraction>
+    <P_resorption_fraction>0.48</P_resorption_fraction>
     <sapwood_ratio>3900.</sapwood_ratio>
     <qsw>0.000000</qsw>
     <SRA>48.</SRA>
@@ -716,7 +735,11 @@
     <rho>0.740000</rho>
     <SLA>18.700000</SLA>
     <horiz_branch>0.5</horiz_branch>
-    <q>1.000000</q>
+    <root2leaf_min>1.000000</root2leaf_min>
+    <root2leaf_max>1.000000</root2leaf_max>
+    <C_resorption_fraction>0.25</C_resorption_fraction>
+    <N_resorption_fraction>0.48</N_resorption_fraction>
+    <P_resorption_fraction>0.48</P_resorption_fraction>
     <sapwood_ratio>3900.</sapwood_ratio>
     <qsw>0.000000</qsw>
     <SRA>48.</SRA>
@@ -850,7 +873,11 @@
     <rho>0.840000</rho>
     <SLA>15.700000</SLA>
     <horiz_branch>0.5</horiz_branch>
-    <q>1.000000</q>
+    <root2leaf_min>1.000000</root2leaf_min>
+    <root2leaf_max>1.000000</root2leaf_max>
+    <C_resorption_fraction>0.25</C_resorption_fraction>
+    <N_resorption_fraction>0.48</N_resorption_fraction>
+    <P_resorption_fraction>0.48</P_resorption_fraction>
     <sapwood_ratio>3900.</sapwood_ratio>
     <qsw>0.000000</qsw>
     <SRA>48.</SRA>
@@ -984,7 +1011,11 @@
     <rho>0.250000</rho>
     <SLA>20.800000</SLA>
     <horiz_branch>0.5</horiz_branch>
-    <q>1.000000</q>
+    <root2leaf_min>1.000000</root2leaf_min>
+    <root2leaf_max>1.000000</root2leaf_max>
+    <C_resorption_fraction>0.25</C_resorption_fraction>
+    <N_resorption_fraction>0.48</N_resorption_fraction>
+    <P_resorption_fraction>0.48</P_resorption_fraction>
     <sapwood_ratio>3900.</sapwood_ratio>
     <qsw>0.000000</qsw>
     <SRA>48.</SRA>

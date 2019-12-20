@@ -14,8 +14,7 @@ subroutine structural_growth(cgrid, month)
                              , polygontype            & ! structure
                              , sitetype               & ! structure
                              , patchtype              ! ! structure
-   use pft_coms       , only : q                      & ! intent(in)
-                             , qsw                    & ! intent(in)
+   use pft_coms       , only : qsw                    & ! intent(in)
                              , seedling_mortality     & ! intent(in)
                              , c2n_leaf, c2p_leaf               & ! intent(in)
                              , c2n_storage            & ! intent(in)
@@ -43,6 +42,7 @@ subroutine structural_growth(cgrid, month)
    use plant_hydro,     only : rwc2tw                 ! ! sub-routine
    use allometry,       only : dbh2sf                 & ! function
                              , size2bl                ! ! function
+
    implicit none
    !----- Arguments -----------------------------------------------------------------------!
    type(edtype)     , target     :: cgrid
@@ -93,6 +93,7 @@ subroutine structural_growth(cgrid, month)
    real                          :: old_wood_hcap
    real                          :: bstorage_min
    real                          :: bstorage_available
+   real :: nstorage_min, pstorage_min, N_avail, P_avail, N_demand, P_demand
    logical          , parameter  :: printout  = .false.
    character(len=17), parameter  :: fracfile  = 'struct_growth.txt'
    !----- Locally saved variables. --------------------------------------------------------!
@@ -603,8 +604,7 @@ subroutine structural_growth_eq_0(cgrid, month)
                              , polygontype            & ! structure
                              , sitetype               & ! structure
                              , patchtype              ! ! structure
-   use pft_coms       , only : q                      & ! intent(in)
-                             , qsw                    & ! intent(in)
+   use pft_coms       , only : qsw                    & ! intent(in)
                              , seedling_mortality     & ! intent(in)
                              , c2n_storage            & ! intent(in)
                              , c2n_recruit            & ! intent(in)
@@ -1241,7 +1241,7 @@ end subroutine plant_structural_allocation
 subroutine update_derived_cohort_props(cpatch,ico,lsl,month)
 
    use ed_state_vars , only : patchtype           ! ! structure
-   use pft_coms      , only : is_grass            ! ! function
+   use pft_coms      , only : is_grass,c2n_leaf,c2p_leaf            ! ! function
    use allometry     , only : bd2dbh              & ! function
                             , dbh2h               & ! function
                             , dbh2krdepth         & ! function
@@ -1258,6 +1258,7 @@ subroutine update_derived_cohort_props(cpatch,ico,lsl,month)
                             , mon1st_census       & ! intent(in)
                             , min_recruit_dbh     ! ! intent(in)
    use physiology_coms,only : trait_plasticity_scheme
+   use nutrient_constants, only: nstorage_max_factor
    implicit none
    !----- Arguments -----------------------------------------------------------------------!
    type(patchtype), target     :: cpatch
@@ -1346,8 +1347,8 @@ subroutine update_derived_cohort_props(cpatch,ico,lsl,month)
    end select
    !---------------------------------------------------------------------------------------!
        
-   cpatch%bstorage_max(ico) = dbh2bl(cpatch%dbh(ico),cpatch%pft(ico)) * &
-        (1. + cpatch%root2leaf(ico)) * bstorage_max_factor
+   cpatch%bstorage_max(ico) = size2bl(cpatch%dbh(ico),cpatch%hite(ico),cpatch%pft(ico)) * &
+        (1. + cpatch%root2leaf(ico)) * nstorage_max_factor
    cpatch%nstorage_max(ico) = cpatch%bstorage_max(ico) / c2n_leaf(cpatch%pft(ico))
    cpatch%pstorage_max(ico) = cpatch%bstorage_max(ico) / c2p_leaf(cpatch%pft(ico))
 

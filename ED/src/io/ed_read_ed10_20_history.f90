@@ -14,8 +14,7 @@ subroutine read_ed10_ed20_history_file
                              , str_len             & ! intent(in)
                              , maxfiles            & ! intent(in)
                              , maxlist             ! ! intent(in)
-   use pft_coms       , only : q                   & ! intent(in)
-                             , qsw                 & ! intent(in)
+   use pft_coms       , only : qsw                 & ! intent(in)
                              , min_dbh             & ! intent(in)
                              , min_bdead           & ! intent(in)
                              , is_grass            & ! intent(in)
@@ -23,7 +22,7 @@ subroutine read_ed10_ed20_history_file
                              , include_pft_ag      & ! intent(in)
                              , pft_1st_check       & ! intent(in)
                              , agf_bs              & ! intent(in)
-                             , include_these_pft,root2leaf_min,root2leaf_max   ! ! intent(in)
+                             , include_these_pft,root2leaf_min,root2leaf_max,c2p_leaf,c2n_leaf   ! ! intent(in)
    use ed_misc_coms   , only : sfilin              & ! intent(in)
                              , ied_init_mode       ! ! intent(in)
    use consts_coms    , only : pio180              & ! intent(in)
@@ -47,6 +46,7 @@ subroutine read_ed10_ed20_history_file
    use fuse_fiss_utils, only : sort_cohorts        & ! subroutine
                              , sort_patches        ! ! subroutine
    use disturb_coms   , only : ianth_disturb       ! ! intent(in)
+   use nutrient_constants, only: nstorage_max_factor
    implicit none
 
    !----- Local constants. ----------------------------------------------------------------!
@@ -561,9 +561,9 @@ subroutine read_ed10_ed20_history_file
                   csite%sum_dgd           (ip) = 0.0
                   csite%sum_chd           (ip) = 0.0
                   csite%cohort_count      (ip) = 0
-                  csite%plant_input_C(ip) = 0.
-                  csite%plant_input_N(ip) = 0.
-                  csite%plant_input_P(ip) = 0.
+                  csite%plant_input_C(:,ip) = 0.
+                  csite%plant_input_N(:,ip) = 0.
+                  csite%plant_input_P(:,ip) = 0.
                end do
                !---------------------------------------------------------------------------!
 
@@ -814,16 +814,16 @@ subroutine read_ed10_ed20_history_file
                         ! pools.                                                           !
                         !------------------------------------------------------------------!
                         cpatch%bleaf(ic2)     = size2bl(dbh(ic), hite(ic),ipft(ic))
-                        cpatch%balive(ic2)    = cpatch%bleaf(ic2) * (1.0 + q(ipft(ic))     &
-                                              + qsw(ipft(ic)) * cpatch%hite(ic2))
+                        cpatch%balive(ic2)    = cpatch%bleaf(ic2) * (1.0 + cpatch%root2leaf(ic2)     &
+                             + qsw(ipft(ic)) * cpatch%hite(ic2))
                         cpatch%broot(ic2)     = cpatch%bleaf(ic2) * cpatch%root2leaf(ic2)
                         cpatch%bsapwooda(ic2) = agf_bs(ipft(ic)) * cpatch%balive(ic2)                &
                                              * qsw(ipft(ic))* cpatch%hite(ic2)             &
-                                             / ( 1.0 + q(ipft(ic)) + qsw(ipft(ic))         &
+                                             / ( 1.0 + cpatch%root2leaf(ic2) + qsw(ipft(ic))         &
                                                * cpatch%hite(ic2))
                         cpatch%bsapwoodb(ic2) = (1.-agf_bs(ipft(ic))) * cpatch%balive(ic2)           &
                                              * qsw(ipft(ic))* cpatch%hite(ic2)             &
-                                             / ( 1.0 + q(ipft(ic)) + qsw(ipft(ic))         &
+                                             / ( 1.0 + cpatch%root2leaf(ic2) + qsw(ipft(ic))         &
                                                * cpatch%hite(ic2))
 
 
@@ -832,7 +832,7 @@ subroutine read_ed10_ed20_history_file
                         ! phenology after this sub-routine.                                !
                         !------------------------------------------------------------------!
                         cpatch%phenology_status(ic2) = 0
-                        cpatch%bstorage_max(ic2) = bstorage_max_factor *  &
+                        cpatch%bstorage_max(ic2) = nstorage_max_factor *  &
                              (cpatch%bleaf(ic2) + cpatch%broot(ic2))
                         cpatch%nstorage_max(ic2) = cpatch%bstorage_max(ic2) /  &
                              c2n_leaf(cpatch%pft(ic2))
