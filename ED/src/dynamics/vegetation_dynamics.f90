@@ -100,10 +100,10 @@ subroutine vegetation_dynamics(new_month,new_year)
       if (new_month) then
 
          !----- Update the mean workload counter. -----------------------------------------!
-!         call update_workload(cgrid)
+         call update_workload(cgrid)
 
          !----- Update the growth of the structural biomass. ------------------------------!
-!         call structural_growth(cgrid, current_time%month)
+         call structural_growth(cgrid, current_time%month)
 
          !----- Solve the reproduction rates. ---------------------------------------------!
 !         call reproduction(cgrid,current_time%month)
