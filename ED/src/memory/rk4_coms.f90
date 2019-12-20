@@ -11,7 +11,7 @@ module rk4_coms
    use ed_max_dims, only : n_pft   & ! intent(in)
                          , nzgmax  & ! intent(in)
                          , str_len ! ! intent(in)
-
+   use mend_state_vars, only: mend_model
    implicit none
 
    !=======================================================================================!
@@ -352,6 +352,9 @@ module rk4_coms
       real(kind=8) :: wbudget_loss2atm
       real(kind=8) :: wbudget_loss2drainage
       real(kind=8) :: wbudget_loss2runoff
+
+      type(mend_model) :: mend
+
    end type rk4patchtype
    !---------------------------------------------------------------------------------------!
 
@@ -866,6 +869,7 @@ module rk4_coms
    subroutine allocate_rk4_patch(y)
       use grid_coms     , only : nzg          & ! intent(in)
                                , nzs          ! ! intent(in)
+      use mend_state_vars, only: mend_allocate
       implicit none
       !----- Argument ---------------------------------------------------------------------!
       type(rk4patchtype), target :: y
@@ -895,6 +899,8 @@ module rk4_coms
       allocate(y%flx_sensible_gg          (nzg))
       allocate(y%flx_smoist_gg            (nzg))
       allocate(y%flx_transloss            (nzg))
+
+      call mend_allocate(y%mend, 1)
 
       call zero_rk4_patch(y)
 
@@ -969,6 +975,7 @@ module rk4_coms
    !    Forcing all variables to be zero.                                                  !
    !---------------------------------------------------------------------------------------!
    subroutine zero_rk4_patch(y)
+     use mend_state_vars, only: mend_zero_vars
       implicit none
       !----- Argument ---------------------------------------------------------------------!
       type(rk4patchtype), target :: y
@@ -1125,6 +1132,8 @@ module rk4_coms
       if(associated(y%flx_smoist_gg         ))   y%flx_smoist_gg   (:)            = 0.d0
       if(associated(y%flx_transloss         ))   y%flx_transloss   (:)            = 0.d0
       if(associated(y%flx_sensible_gg       ))   y%flx_sensible_gg (:)            = 0.d0
+
+      if(allocated(y%mend%som%cvars%amb))call mend_zero_vars(y%mend, 1, 1)
 
       return
    end subroutine zero_rk4_patch

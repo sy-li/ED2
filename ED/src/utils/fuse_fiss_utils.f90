@@ -4239,6 +4239,7 @@ module fuse_fiss_utils
       use budget_utils       , only : update_budget         ! ! intent(in)
       use consts_coms        , only : wdns                  ! ! intent(in)
       use fusion_fission_coms, only : corr_patch            ! ! intent(in)
+      use mend_rk4, only: mend_rk4_inc
       implicit none
       !----- Arguments --------------------------------------------------------------------!
       type(sitetype)         , target      :: csite             ! Current site
@@ -4293,7 +4294,10 @@ module fuse_fiss_utils
       end if
       !------------------------------------------------------------------------------------!
 
-
+      call mend_rk4_inc(csite%mend, csite%mend, csite%area(recp) / (csite%area(donp) + &
+           csite%area(recp)) - 1., recp, recp)
+      call mend_rk4_inc(csite%mend, csite%mend, csite%area(donp) / (csite%area(donp) + &
+           csite%area(recp)), recp, donp)
 
       !----- We now take the weighted average, scale by the individual patch area. --------!
       csite%age(recp)                = newareai *                                          &

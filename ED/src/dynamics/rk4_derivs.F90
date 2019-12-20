@@ -13,6 +13,7 @@ subroutine leaf_derivs(initp,dinitp,csite,ipa,dt,is_hybrid)
    use ed_state_vars          , only : sitetype           & ! structure
                                      , polygontype        ! ! structure
    use grid_coms              , only : nzg                ! ! intent(in)
+   use mend_coupler, only: mend_derivs_coupler
    implicit none
    !----- Arguments -----------------------------------------------------------------------!
    type(rk4patchtype) , target     :: initp     ! Structure with RK4 intermediate state
@@ -61,6 +62,10 @@ subroutine leaf_derivs(initp,dinitp,csite,ipa,dt,is_hybrid)
    !----- Find the derivatives. -----------------------------------------------------------!
    call leaftw_derivs(nzg,initp,dinitp,csite,ipa,dt,is_hybrid)
    !---------------------------------------------------------------------------------------!
+
+   call mend_derivs_coupler(initp%mend%som, dinitp%mend%som, csite, ipa, &
+        dinitp%avg_nutrient_layer_drainage, initp%soil_water, dinitp%can_co2, &
+        dinitp%co2_budget_storage)
 
    return
 end subroutine leaf_derivs

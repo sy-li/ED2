@@ -322,7 +322,7 @@ subroutine load_ecosystem_state()
 #endif
    use grid_coms         , only : ngrids          ! ! intent(in)
    use ed_state_vars     , only : edgrid_g        ! ! structure
-
+   use mend_coupler, only: mend_init
    implicit none
 #if defined(RAMS_MPI)
    include 'mpif.h'
@@ -392,7 +392,7 @@ subroutine load_ecosystem_state()
          do igr=1,ngrids
               call near_bare_ground_init(edgrid_g(igr))
          end do
-
+         call mend_init(0)
       case (1)
          !----- Initialize everything with near-bare ground -------------------------------!
          if (mynum /= 1) then
@@ -412,6 +412,7 @@ subroutine load_ecosystem_state()
          do igr=1,ngrids
             call ed_bigleaf_init(edgrid_g(igr))
          end do
+         call mend_init(0)
       end select
 
    case (4)   

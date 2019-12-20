@@ -35,6 +35,12 @@ module rk4_driver
       use therm_lib              , only : tq2enthalpy          ! ! function
       use budget_utils           , only : update_budget        & ! function
                                         , compute_budget       ! ! function
+      use mend_coupler, only: mend_extern_forcing, mend_update_parameters_coupler
+      use mend_rk4, only: mend_rk4_inc, mend_zero_fluxes
+      use mend_plant, only: som_plant_feedback
+      use mend_consts_coms, only: som_consts
+      use mend_state_vars, only: mend_mm_time
+
       !$ use omp_lib
       implicit none
 
@@ -131,6 +137,14 @@ module rk4_driver
 
             patchloop: do ipa = 1,csite%npatches
                cpatch => csite%patch(ipa)
+
+               call mend_extern_forcing(csite%mend, ipa, &
+                    cpatch%ncohorts, cpatch%broot, cpatch%nplant, &
+                    cpatch%pft, cpatch%krdepth, csite%mend%bulk_den(ipa), &
+                    cpatch%nstorage, cpatch%bstorage, cpatch%nstorage_max(ipa), &
+                    cpatch%pstorage_max(ipa), cpatch%water_supply_layer_frac, cpatch%lai)
+               call mend_update_parameters_coupler(csite%soil_tempk(:,ipa), &
+                    csite%soil_water(:,ipa),csite%ntext_soil(:,ipa), csite%mend%pH(ipa))
 
                ibuff = 1
                !$ ibuff = OMP_get_thread_num()+1
@@ -257,6 +271,26 @@ module rk4_driver
                                        ,wcurr_loss2drainage,ecurr_loss2drainage            &
                                        ,wcurr_loss2runoff,ecurr_loss2runoff,nsteps)
                !---------------------------------------------------------------------------!
+
+
+               call som_plant_feedback( &
+                    initp%mend%som%fluxes%nh4_plant(:,1), &
+                    initp%mend%som%fluxes%no3_plant(:,1), &
+                    initp%mend%som%fluxes%p_plant(:,1), &
+                    csite%mend%bulk_den(ipa), &
+                    som_consts, &
+                    csite%patch(ipa)%ncohorts, &
+                    csite%patch(ipa)%nstorage, &
+                    csite%patch(ipa)%pstorage, &
+                    csite%patch(ipa)%nstorage_max, &
+                    csite%patch(ipa)%pstorage_max, &
+                    csite%patch(ipa)%nplant, &
+                    csite%patch(ipa)%broot, csite%rh(ipa), &
+                    initp%mend%som%fluxes%co2_lost(1), &
+                    csite%patch(ipa)%pft, &
+                    csite%patch(ipa)%krdepth, &
+                    csite%patch(ipa)%water_supply_layer_frac, &
+                    csite%patch(ipa)%lai)
 
 
                !----- Add the number of steps into the step counter. ----------------------!

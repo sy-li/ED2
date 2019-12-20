@@ -362,6 +362,7 @@ subroutine inc_rk4_patch(rkp, inc, fac, cpatch)
                             , print_detailed     ! ! intent(in)
    use grid_coms     , only : nzg                ! ! intent(in)
    use ed_misc_coms  , only : fast_diagnostics   ! ! intent(in)
+   use mend_rk4, only: mend_rk4_inc
    implicit none
 
    !----- Arguments -----------------------------------------------------------------------!
@@ -544,6 +545,8 @@ subroutine inc_rk4_patch(rkp, inc, fac, cpatch)
    end if
    !---------------------------------------------------------------------------------------!
 
+   call mend_rk4_inc(rkp%mend, inc%mend, real(fac), 1, 1)
+
    return
 end subroutine inc_rk4_patch
 !==========================================================================================!
@@ -576,6 +579,7 @@ subroutine get_yscal(y,dy,htry,yscal,cpatch)
    use soil_coms            , only : isoilbc               & ! intent(in)
                                    , dslzi8                ! ! intent(in)
    use physiology_coms      , only : plant_hydro_scheme    ! ! intent(in)
+   use mend_rk4, only: mend_rk4_scale
    implicit none
    !----- Arguments -----------------------------------------------------------------------!
    type(rk4patchtype), target     :: y                     ! Struct. with the guesses
@@ -955,6 +959,8 @@ subroutine get_yscal(y,dy,htry,yscal,cpatch)
       yscal%wbudget_loss2drainage   = huge_offset
    end if
 
+   call mend_rk4_scale(y%mend, dy%mend, yscal%mend, real(htry))
+
    return
 end subroutine get_yscal
 !==========================================================================================!
@@ -985,6 +991,8 @@ subroutine get_errmax(errmax,yerr,yscal,cpatch,y,ytemp)
                                     , oswm               ! ! intent(in)
    use ed_state_vars         , only : patchtype          ! ! structure
    use grid_coms             , only : nzg                ! ! intent(in)
+   use mend_rk4, only: mend_rk4_errmax
+
    implicit none
    !----- Arguments -----------------------------------------------------------------------!
    type(rk4patchtype) , target      :: yerr             ! Error structure
@@ -1238,6 +1246,8 @@ subroutine get_errmax(errmax,yerr,yscal,cpatch,y,ytemp)
       if(record_err .and. err > rk4eps) integ_err(oswm+k,1) = integ_err(oswm+k,1) + 1_8
    end do
    !---------------------------------------------------------------------------------------!
+
+   call mend_rk4_errmax(yscal%mend, yerr%mend, errmax)
 
    return
 end subroutine get_errmax
@@ -2226,6 +2236,8 @@ end subroutine initialize_misc_stepvars
       use ed_state_vars         , only : sitetype              & ! structure
                                        , patchtype             ! ! structure
       use grid_coms             , only : nzg                   ! ! intent(in)
+      use mend_rk4, only: mend_rk4_sanity
+
       !$ use omp_lib
 
       implicit none
@@ -2875,6 +2887,8 @@ end subroutine initialize_misc_stepvars
          write(unit=*,fmt='(78a)')         ('=',k=1,78)
          write(unit=*,fmt='(a)')           ' '
       end if
+
+      call mend_rk4_sanity(y%mend, reject_step)
 
       return
    end subroutine rk4_sanity_check

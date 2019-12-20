@@ -40,6 +40,7 @@ subroutine copy_patch_init(sourcesite,ipa,targetp,vels)
    use ed_therm_lib          , only : ed_grndvap8            ! ! subroutine
    use canopy_air_coms       , only : ubmin8
    use canopy_struct_dynamics, only : canopy_turbulence8     ! ! subroutine
+   use mend_state_vars, only: copy_mendtype
    !$ use omp_lib
    implicit none
 
@@ -472,6 +473,9 @@ subroutine copy_patch_init(sourcesite,ipa,targetp,vels)
 
 
    if (print_detailed) call reset_rk4_fluxes(targetp)
+
+   call copy_mendtype(sourcesite%mend, targetp%mend, ipa, 1)
+
    return
 end subroutine copy_patch_init
 !==========================================================================================!
@@ -611,6 +615,7 @@ subroutine update_diagnostic_vars(initp, csite,ipa)
    use canopy_struct_dynamics, only : canopy_turbulence8    ! ! subroutine
    use ed_therm_lib          , only : ed_grndvap8           ! ! subroutine
    use physiology_coms       , only : plant_hydro_scheme    ! ! intent(in)
+   use mend_coupler, only: mend_update_diag
    !$ use omp_lib
    implicit none
    !----- Arguments -----------------------------------------------------------------------!
@@ -1296,7 +1301,8 @@ subroutine update_diagnostic_vars(initp, csite,ipa)
       call canopy_turbulence8(csite,initp,ipa)
    end if
    !---------------------------------------------------------------------------------------!
-
+   
+   call mend_update_diag(initp%mend)
 
    return
 end subroutine update_diagnostic_vars

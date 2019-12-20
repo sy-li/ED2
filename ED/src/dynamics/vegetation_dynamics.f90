@@ -35,6 +35,7 @@ subroutine vegetation_dynamics(new_month,new_year)
    use average_utils    , only : normalize_ed_today_vars    & ! sub-routine
                                , normalize_ed_todaynpp_vars & ! sub-routine
                                , zero_ed_today_vars         ! ! sub-routine
+   use mend_coupler, only: mend_slow_P
    implicit none
    !----- Arguments. ----------------------------------------------------------------------!
    logical          , intent(in)   :: new_month             !< First dtlsm of a new month?
@@ -80,6 +81,7 @@ subroutine vegetation_dynamics(new_month,new_year)
                csite%plant_input_C(:,ipa) = 0.
                csite%plant_input_N(:,ipa) = 0.
                csite%plant_input_P(:,ipa) = 0.
+               call mend_slow_P(csite%mend, ipa)
             enddo
          enddo
       enddo
@@ -114,8 +116,8 @@ subroutine vegetation_dynamics(new_month,new_year)
          !----- This is actually the yearly time-step, apply the disturbances. ------------!
          if (new_year) then
             !----- Update the disturbance rates. ------------------------------------------!
-!            call site_disturbance_rates(current_time%year, cgrid)
-!            call apply_disturbances(cgrid)
+            call site_disturbance_rates(current_time%year, cgrid)
+            call apply_disturbances(cgrid)
             !------------------------------------------------------------------------------!
          end if
          !---------------------------------------------------------------------------------!

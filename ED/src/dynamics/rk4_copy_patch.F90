@@ -18,7 +18,7 @@ subroutine copy_rk4_patch(sourcep, targetp, cpatch)
                             , nzs               ! ! intent(in)
    use ed_max_dims   , only : n_pft             ! ! intent(in)
    use ed_misc_coms  , only : fast_diagnostics  ! ! intent(in)
-
+   use mend_state_vars, only: copy_mendtype
    implicit none
    !----- Arguments -----------------------------------------------------------------------!
    type(rk4patchtype) , target     :: sourcep
@@ -267,7 +267,7 @@ subroutine copy_rk4_patch(sourcep, targetp, cpatch)
       end do
    end if
 
-
+   call copy_mendtype(sourcep%mend, targetp%mend, 1, 1)
 
    return
 end subroutine copy_rk4_patch

@@ -451,7 +451,6 @@ module disturbance_utils
 
 
 
-
             !------------------------------------------------------------------------------!
             !     Loop over the new LU patches, and check whether any of them would        !
             ! have enough area to become a patch.                                          !
@@ -1122,6 +1121,7 @@ module disturbance_utils
             call copy_sitetype_mask(csite,tsite,disturb_mask,size(disturb_mask)            &
                                    ,count(disturb_mask))
             call deallocate_sitetype(csite)
+
             !----- Re-allocate the tracked site and copy data from temporary site. --------!
             call allocate_sitetype(csite,tsite%npatches)
             call copy_sitetype(tsite,csite,1,tsite%npatches,1,tsite%npatches)

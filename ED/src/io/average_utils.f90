@@ -4968,6 +4968,8 @@ module average_utils
                                       , soil               ! ! intent(in)
       use consts_coms          , only : t00                & ! intent(in)
                                       , wdns               ! ! intent(in)
+      use mend_averages, only: mend_normalize
+      use mend_state_vars, only: mend_mm_time
       implicit none
       !----- Arguments. -------------------------------------------------------------------!
       type(edtype)                          , target  :: cgrid
@@ -5014,6 +5016,8 @@ module average_utils
          !---------------------------------------------------------------------------------!
          siteloop: do isi=1,cpoly%nsites
             csite => cpoly%site(isi)
+
+            call mend_normalize(csite%mend_mm, mend_mm_time)
 
             !----- Inverse of this site area (it should be always 1.) ---------------------!
             site_area_i = 1./sum(csite%area)
@@ -5288,6 +5292,7 @@ module average_utils
                                 , sitetype       & ! structure
                                 , patchtype      ! ! structure
       use physiology_coms, only : iddmort_scheme ! ! intent(in)
+      use mend_state_vars, only: mend_zero_vars
       implicit none
       !----- Arguments. -------------------------------------------------------------------!
       type(edtype)     , target  :: cgrid
@@ -5524,6 +5529,8 @@ module average_utils
             cpoly%mmean_qpcpg          (isi) = 0.0
             cpoly%mmean_dpcpg          (isi) = 0.0
 
+
+            call mend_zero_vars(csite%mend_mm,1,csite%npatches)
 
             !------------------------------------------------------------------------------!
             !       Loop over sites.                                                       !
