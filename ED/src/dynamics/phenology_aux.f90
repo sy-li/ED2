@@ -366,8 +366,9 @@ module phenology_aux
       integer                                      :: isi        ! Site counter
       integer                                      :: ipa        ! Patch counter
       integer                                      :: ico        ! Cohort counter
+      logical :: need_biomass
       !------------------------------------------------------------------------------------!
-
+      need_biomass = .false.
 
 
       !------------------------------------------------------------------------------------!
@@ -402,7 +403,7 @@ module phenology_aux
                                                ,cpatch%bsapwooda(ico)                      &
                                                ,cpatch%bsapwoodb(ico)                      &
                                                ,cpatch%balive(ico),cpatch%bstorage(ico), &
-                                               cpatch%root2leaf(ico))
+                                               cpatch%root2leaf(ico),need_biomass)
                   !------------------------------------------------------------------------!
 
 
@@ -465,7 +466,7 @@ module phenology_aux
    subroutine pheninit_balive_bstorage(mzg,ipft,kroot,height,dbh,soil_water,ntext_soil     &
                                       ,paw_avg,elongf,phenology_status                     &
                                       ,bleaf,broot,bsapwooda,bsapwoodb,balive,bstorage, &
-                                      root2leaf)
+                                      root2leaf,need_biomass)
       use soil_coms     , only : soil                & ! intent(in), look-up table
                                , slz                 & ! intent(in)
                                , slzt                & ! intent(in)
@@ -505,6 +506,7 @@ module phenology_aux
       real                                   :: balive_max        ! balive if on-allometry
       real                                   :: psi_layer         ! Water pot. of this layer
       real                                   :: mcheight          ! Mid-crown height
+      logical, intent(in) :: need_biomass
       !------------------------------------------------------------------------------------!
 
 
@@ -567,28 +569,29 @@ module phenology_aux
       !------------------------------------------------------------------------------------!
 
 
-
-      !----- Compute the biomass of living tissues. ---------------------------------------!
-      salloc     = 1.0 + root2leaf + qsw(ipft) * height
-      salloci    = 1.0 / salloc
-      bleaf_max  = size2bl(dbh,height,ipft)
-      balive_max = bleaf_max * salloc
-      bleaf      = bleaf_max * elongf
-      broot      = balive_max * root2leaf   * salloci
-      bsapwooda  = balive_max * qsw(ipft) * height * salloci * agf_bs(ipft)
-      bsapwoodb  = balive_max * qsw(ipft) * height * salloci * (1.0 - agf_bs(ipft))
-      balive     = bleaf + broot + bsapwooda + bsapwoodb
-      !------------------------------------------------------------------------------------!
-
-
-      !------------------------------------------------------------------------------------!
-      !    Here we account for part of the carbon that didn't go to the leaves.  At this   !
-      ! point  we will be nice to the plants and leave all the carbon that didn't go to    !
-      ! leaves in the storage.  This gives some extra chance for the plant whilst it       !
-      ! conserves the total carbon.                                                        !
-      !------------------------------------------------------------------------------------!
-      bstorage = max(0.0, bleaf_max - bleaf)
-      !------------------------------------------------------------------------------------!
+      if(need_biomass)then
+         !----- Compute the biomass of living tissues. ---------------------------------------!
+         salloc     = 1.0 + root2leaf + qsw(ipft) * height
+         salloci    = 1.0 / salloc
+         bleaf_max  = size2bl(dbh,height,ipft)
+         balive_max = bleaf_max * salloc
+         bleaf      = bleaf_max * elongf
+         broot      = balive_max * root2leaf   * salloci
+         bsapwooda  = balive_max * qsw(ipft) * height * salloci * agf_bs(ipft)
+         bsapwoodb  = balive_max * qsw(ipft) * height * salloci * (1.0 - agf_bs(ipft))
+         balive     = bleaf + broot + bsapwooda + bsapwoodb
+         !------------------------------------------------------------------------------------!
+         
+         
+         !------------------------------------------------------------------------------------!
+         !    Here we account for part of the carbon that didn't go to the leaves.  At this   !
+         ! point  we will be nice to the plants and leave all the carbon that didn't go to    !
+         ! leaves in the storage.  This gives some extra chance for the plant whilst it       !
+         ! conserves the total carbon.                                                        !
+         !------------------------------------------------------------------------------------!
+         bstorage = max(0.0, bleaf_max - bleaf)
+         !------------------------------------------------------------------------------------!
+      endif
 
       return
    end subroutine pheninit_balive_bstorage

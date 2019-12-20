@@ -3160,7 +3160,7 @@ module disturbance_utils
                                    ,cpatch%phenology_status(nc),cpatch%bleaf(nc)           &
                                    ,cpatch%broot(nc),cpatch%bsapwooda(nc)                  &
                                    ,cpatch%bsapwoodb(nc),cpatch%balive(nc)                 &
-                                   ,cpatch%bstorage(nc),cpatch%root2leaf(nc))
+                                   ,cpatch%bstorage(nc),cpatch%root2leaf(nc),.true.)
       !------------------------------------------------------------------------------------!
 
 

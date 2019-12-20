@@ -100,22 +100,22 @@ subroutine vegetation_dynamics(new_month,new_year)
       if (new_month) then
 
          !----- Update the mean workload counter. -----------------------------------------!
-         call update_workload(cgrid)
+!         call update_workload(cgrid)
 
          !----- Update the growth of the structural biomass. ------------------------------!
-         call structural_growth(cgrid, current_time%month)
+!         call structural_growth(cgrid, current_time%month)
 
          !----- Solve the reproduction rates. ---------------------------------------------!
-         call reproduction(cgrid,current_time%month)
+!         call reproduction(cgrid,current_time%month)
 
          !----- Update the fire disturbance rates. ----------------------------------------!
-         call fire_frequency(cgrid)
+!         call fire_frequency(cgrid)
 
          !----- This is actually the yearly time-step, apply the disturbances. ------------!
          if (new_year) then
             !----- Update the disturbance rates. ------------------------------------------!
-            call site_disturbance_rates(current_time%year, cgrid)
-            call apply_disturbances(cgrid)
+!            call site_disturbance_rates(current_time%year, cgrid)
+!            call apply_disturbances(cgrid)
             !------------------------------------------------------------------------------!
          end if
          !---------------------------------------------------------------------------------!

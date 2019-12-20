@@ -400,7 +400,7 @@ subroutine update_phenology(doy, cpoly, isi, lat)
                if (cpoly%green_leaf_factor(ipft,isi) < elongf_min) then
                    bl_max = 0.0
                end if
-               delta_bleaf = bl_max - cpatch%bleaf(ico)
+               delta_bleaf = min(0.,bl_max - cpatch%bleaf(ico))
 
                if (delta_bleaf < 0.0) then
                   !------------------------------------------------------------------------!
@@ -495,7 +495,7 @@ subroutine update_phenology(doy, cpoly, isi, lat)
             ! maximum permitted given the soil moisture conditions.  If delta_bleaf is     !
             ! positive, it means that the plant has more leaves than it should.            !
             !------------------------------------------------------------------------------!
-            delta_bleaf = bl_max - cpatch%bleaf(ico)
+            delta_bleaf = min(0.,bl_max - cpatch%bleaf(ico))
             !------------------------------------------------------------------------------!
 
 
@@ -654,8 +654,8 @@ subroutine update_phenology(doy, cpoly, isi, lat)
             ! maximum permitted given the soil moisture conditions.  If delta_bleaf is     !
             ! positive, it means that the plant has more leaves than it should.            !
             !------------------------------------------------------------------------------!
-            delta_bleaf = bl_max - cpatch%bleaf(ico)
-            delta_broot = br_max - cpatch%broot(ico)
+            delta_bleaf = min(0.,bl_max - cpatch%bleaf(ico))
+            delta_broot = min(0.,br_max - cpatch%broot(ico))
             !------------------------------------------------------------------------------!
 
 
@@ -727,7 +727,7 @@ subroutine update_phenology(doy, cpoly, isi, lat)
                cpatch%elongf          (ico) = elongf_try
                ! only modify phenology_status when delta_bleaf > 0. This avoids
                ! changing phenology_status = 1 while elongf = 0.
-               if (delta_bleaf > 0.) cpatch%phenology_status(ico) = 1
+               if (delta_bleaf == 0.) cpatch%phenology_status(ico) = 1
                !---------------------------------------------------------------------------!
             end if
             !------------------------------------------------------------------------------!
@@ -815,23 +815,23 @@ subroutine update_phenology(doy, cpoly, isi, lat)
          endif
          
          ! Update leaf and root litter.
-         csite%plant_input_C(2,ipa) = csite%plant_input_C(2,ipa) + &
+         csite%plant_input_C(2,ipa) = csite%plant_input_C(2,ipa) - &
               delta_bleaf * cpatch%nplant(ico) * &
               (1.-C_resorption_fraction(ipft))
-         csite%plant_input_N(2,ipa) = csite%plant_input_N(2,ipa) + &
+         csite%plant_input_N(2,ipa) = csite%plant_input_N(2,ipa) - &
               delta_bleaf / c2n_leaf(ipft) * cpatch%nplant(ico) * &
               (1.-N_resorption_fraction(ipft))
-         csite%plant_input_P(2,ipa) = csite%plant_input_P(2,ipa) + &
+         csite%plant_input_P(2,ipa) = csite%plant_input_P(2,ipa) - &
               delta_bleaf / c2p_leaf(ipft) * cpatch%nplant(ico) *  &
               (1.-P_resorption_fraction(ipft))
 
-         csite%plant_input_C(3,ipa) = csite%plant_input_C(3,ipa) + &
+         csite%plant_input_C(3,ipa) = csite%plant_input_C(3,ipa) - &
               delta_broot * cpatch%nplant(ico) * &
               (1.-C_resorption_fraction(ipft))
-         csite%plant_input_N(3,ipa) = csite%plant_input_N(3,ipa) + &
+         csite%plant_input_N(3,ipa) = csite%plant_input_N(3,ipa) - &
               delta_broot / c2n_leaf(ipft) * cpatch%nplant(ico) * &
               (1.-N_resorption_fraction(ipft))
-         csite%plant_input_P(3,ipa) = csite%plant_input_P(3,ipa) + &
+         csite%plant_input_P(3,ipa) = csite%plant_input_P(3,ipa) - &
               delta_broot / c2p_leaf(ipft) * cpatch%nplant(ico) * &
               (1.-P_resorption_fraction(ipft))
          
@@ -839,8 +839,6 @@ subroutine update_phenology(doy, cpoly, isi, lat)
          !----- Update LAI, WAI, and CAI accordingly. -------------------------------------!
          call area_indices(cpatch, ico)
          !---------------------------------------------------------------------------------!
-
-
 
 
          !----- Update above-ground biomass. ----------------------------------------------!

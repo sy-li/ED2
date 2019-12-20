@@ -239,7 +239,8 @@ subroutine reproduction(cgrid,month)
                                                   ,rectest%phenology_status                &
                                                   ,rectest%bleaf,rectest%broot             &
                                                   ,rectest%bsapwooda,rectest%bsapwoodb     &
-                                                  ,rectest%balive,rectest%bstorage,rectest%root2leaf)
+                                                  ,rectest%balive,rectest%bstorage,rectest%root2leaf, &
+                                                  .true.)
 
                      !---------------------------------------------------------------------!
                      !     Find the expected population from the reproduction stocks, and  !

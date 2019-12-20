@@ -844,7 +844,6 @@ subroutine read_ed10_ed20_history_file
                         !------------------------------------------------------------------!
 
 
-
                         !------------------------------------------------------------------!
                         !     Initialise the carbon balance.  We ignore the carbon balance !
                         ! even for ED-1.0, the models are so different that there is no    !
