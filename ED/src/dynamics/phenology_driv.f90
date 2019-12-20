@@ -727,7 +727,7 @@ subroutine update_phenology(doy, cpoly, isi, lat)
                cpatch%elongf          (ico) = elongf_try
                ! only modify phenology_status when delta_bleaf > 0. This avoids
                ! changing phenology_status = 1 while elongf = 0.
-               if (delta_bleaf == 0.) cpatch%phenology_status(ico) = 1
+               if (elongf_try > 0.) cpatch%phenology_status(ico) = 1
                !---------------------------------------------------------------------------!
             end if
             !------------------------------------------------------------------------------!
