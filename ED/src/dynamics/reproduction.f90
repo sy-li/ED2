@@ -33,7 +33,8 @@ subroutine reproduction(cgrid,month)
                                  , root2leaf_min, root2leaf_max                        & ! intent(in)
                                  , agf_bs                   & ! intent(in)
                                  , hgt_min                  & ! intent(in)
-                                 , plant_min_temp           ! ! intent(in)
+                                 , plant_min_temp,c2p_wood, c2p_recruit,c2n_stem, &
+                                 c2p_leaf,c2n_leaf ! ! intent(in)
    use ed_max_dims        , only : n_pft                    ! ! intent(in)
    use fuse_fiss_utils    , only : sort_cohorts             & ! subroutine
                                  , terminate_cohorts        & ! subroutine
@@ -242,6 +243,8 @@ subroutine reproduction(cgrid,month)
                                                   ,rectest%balive,rectest%bstorage,rectest%root2leaf, &
                                                   .true.)
 
+                     rectest%bstorage = 0.5 * rectest%bleaf
+
                      !---------------------------------------------------------------------!
                      !     Find the expected population from the reproduction stocks, and  !
                      ! also include the "seed_rain" term, which represents sources of      !
@@ -262,7 +265,16 @@ subroutine reproduction(cgrid,month)
                                          + rectest%bstorage)                               
                      !---------------------------------------------------------------------!
 
+                     rectest%nstorage = (rectest%balive + rectest%bdead + rectest%bstorage) / &
+                          c2n_recruit(ipft) - rectest%balive / c2n_leaf(ipft) - &
+                          rectest%bdead / c2n_stem(ipft)
 
+                     rectest%pstorage = (rectest%balive + rectest%bdead + rectest%bstorage) / &
+                          c2p_recruit(ipft) - rectest%balive / c2p_leaf(ipft) - &
+                          rectest%bdead / c2p_wood(ipft)
+
+                     rectest%nstorage = max(0., rectest%nstorage)
+                     rectest%pstorage = max(0., rectest%pstorage)
 
                      !----- Find the total biomass for this potential new cohort. ---------!
                      rec_biomass = rectest%nplant * ( rectest%balive + rectest%bdead       &
@@ -399,6 +411,8 @@ subroutine reproduction(cgrid,month)
                      cpatch%bsapwoodb       (ico) = recruit(inew)%bsapwoodb
                      cpatch%balive          (ico) = recruit(inew)%balive
                      cpatch%bstorage        (ico) = recruit(inew)%bstorage
+                     cpatch%nstorage        (ico) = recruit(inew)%nstorage
+                     cpatch%pstorage        (ico) = recruit(inew)%pstorage
                      cpatch%leaf_temp       (ico) = recruit(inew)%leaf_temp
                      cpatch%wood_temp       (ico) = recruit(inew)%wood_temp
                      cpatch%leaf_temp_pv    (ico) = recruit(inew)%leaf_temp_pv

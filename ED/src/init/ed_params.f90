@@ -3928,6 +3928,7 @@ subroutine init_pft_derived_params()
    logical                           :: print_zero_table
    character(len=str_len), parameter :: zero_table_fn    = 'pft_sizes.txt'
    real :: root2leaf_avg
+   real :: bstorage_min, nstorage_min, pstorage_min
    !---------------------------------------------------------------------------------------!
 
    !---------------------------------------------------------------------------------------!
@@ -3981,6 +3982,9 @@ subroutine init_pft_derived_params()
       bsapwood_min = bleaf_min * qsw(ipft) * hgt_min(ipft)
       balive_min   = bleaf_min + broot_min + bsapwood_min
       bdead_min    = dbh2bd(dbh,ipft)
+      bstorage_min = 0.5 * bleaf_min
+      nstorage_min = bstorage_min / c2n_leaf(ipft)
+      pstorage_min = bstorage_min / c2p_leaf(ipft)
       !------------------------------------------------------------------------------------!
 
 
@@ -4064,16 +4068,16 @@ subroutine init_pft_derived_params()
 
 
       !----- Find the recruit carbon to nitrogen ratio. -----------------------------------!
-      c2n_recruit(ipft)      = (balive_min + bdead_min)                                    &
+      c2n_recruit(ipft)      = (balive_min + bdead_min + bstorage_min)                                    &
          / (balive_min * ( f_labile(ipft) / c2n_leaf(ipft)             &
          + (1.0 - f_labile(ipft)) / c2n_stem(ipft))                    &
-         + bdead_min/c2n_stem(ipft))
+         + bdead_min/c2n_stem(ipft) + nstorage_min)
       !------------------------------------------------------------------------------------!
 
       !----- Find the recruit carbon to phosphorus ratio. -----------------------------------!
-      c2p_recruit(ipft)      = (balive_min + bdead_min)                                    &
+      c2p_recruit(ipft)      = (balive_min + bdead_min + bstorage_min)                                    &
          / (balive_min / c2p_leaf(ipft)                    &
-         + bdead_min/c2p_wood(ipft))
+         + bdead_min/c2p_wood(ipft) + pstorage_min)
       !------------------------------------------------------------------------------------!
 
 

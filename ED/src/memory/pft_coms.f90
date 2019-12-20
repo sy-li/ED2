@@ -782,6 +782,7 @@ module pft_coms
       real    :: bstorage
       real    :: nplant
       real    :: root2leaf
+      real :: nstorage, pstorage
    end type recruittype
    !=======================================================================================!
    !=======================================================================================!
@@ -826,6 +827,8 @@ module pft_coms
          recruit(p)%bstorage         = 0.
          recruit(p)%nplant           = 0.
          recruit(p)%root2leaf        = 0.
+         recruit(p)%nstorage = 0.
+         recruit(p)%pstorage = 0.
       end do
 
       return
@@ -870,6 +873,9 @@ module pft_coms
       rectarget%bstorage         = recsource%bstorage
       rectarget%nplant           = recsource%nplant
       rectarget%root2leaf        = recsource%root2leaf
+      rectarget%nstorage = recsource%nstorage
+      rectarget%pstorage = recsource%pstorage
+
       return
    end subroutine copy_recruit
    !=======================================================================================!

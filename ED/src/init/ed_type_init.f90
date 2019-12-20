@@ -132,9 +132,9 @@ subroutine init_ed_cohort_vars(cpatch,ico, lsl)
         (1. + cpatch%root2leaf(cpatch%pft(ico))) * nstorage_max_factor
    cpatch%nstorage_max(ico) = cpatch%bstorage_max(ico) / c2n_leaf(cpatch%pft(ico))
    cpatch%pstorage_max(ico) = cpatch%bstorage_max(ico) / c2p_leaf(cpatch%pft(ico))
-   cpatch%nstorage(ico) = cpatch%nstorage_max(ico)
-   cpatch%pstorage(ico) = cpatch%pstorage_max(ico)
-   cpatch%bstorage(ico) = cpatch%bstorage_max(ico)
+!   cpatch%nstorage(ico) = cpatch%nstorage_max(ico)
+!   cpatch%pstorage(ico) = cpatch%pstorage_max(ico)
+!   cpatch%bstorage(ico) = cpatch%bstorage_max(ico)
 
    !---------------------------------------------------------------------------------------!
    !     The carbon balance must be initialised with a number other than zero (and better  !
