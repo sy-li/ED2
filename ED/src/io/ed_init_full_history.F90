@@ -4056,11 +4056,11 @@ subroutine fill_history_site(csite,sipa_index,npatches_global,is_burnt)
    chnkdims(1) = int(nlitter+1,8)
    memdims(1) = int(nlitter+1,8)
    memsize(1) = int(nlitter+1,8)
-   call hdf5_getslab_r(csite%plant_input_C,'PLANT_INPUT_C ',dsetrank,  &
+   call hdf_getslab_r(csite%plant_input_C,'PLANT_INPUT_C ',dsetrank,  &
         iparallel,.true.,foundvar)
-   call hdf5_getslab_r(csite%plant_input_N,'PLANT_INPUT_N ',dsetrank,  &
+   call hdf_getslab_r(csite%plant_input_N,'PLANT_INPUT_N ',dsetrank,  &
         iparallel,.true.,foundvar)
-   call hdf5_getslab_r(csite%plant_input_P,'PLANT_INPUT_P ',dsetrank,  &
+   call hdf_getslab_r(csite%plant_input_P,'PLANT_INPUT_P ',dsetrank,  &
         iparallel,.true.,foundvar)
 
    !---------------------------------------------------------------------------------------!

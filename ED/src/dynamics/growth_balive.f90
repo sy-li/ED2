@@ -36,8 +36,7 @@ module growth_balive
                                  , polygontype            & ! structure
                                  , sitetype               & ! structure
                                  , patchtype              ! ! structure
-      use pft_coms        , only : q                      & ! intent(in)
-                                 , qsw                    & ! intent(in)
+      use pft_coms        , only : qsw                    & ! intent(in)
                                  , plant_N_supply_scale   & ! intent(in)
                                  , c2n_storage            & ! intent(in)
                                  , growth_resp_factor     & ! intent(in)
@@ -240,7 +239,7 @@ module growth_balive
 
                      call apply_c_xfers(cpatch,ico,carbon_balance,tr_bleaf,tr_broot        &
                                        ,tr_bsapwooda,tr_bsapwoodb,tr_bstorage,tr_nstorage, &
-                                       tr_pstorage)
+                                       tr_pstorage,csite,ipa)
 
                      call update_today_npp_vars(cpatch,ico,tr_bleaf,tr_broot,tr_bsapwooda  &
                                                 ,tr_bsapwoodb,carbon_balance)
@@ -396,8 +395,7 @@ module growth_balive
                                  , polygontype            & ! structure
                                  , sitetype               & ! structure
                                  , patchtype              ! ! structure
-      use pft_coms        , only : q                      & ! intent(in)
-                                 , qsw                    & ! intent(in)
+      use pft_coms        , only : qsw                    & ! intent(in)
                                  , plant_N_supply_scale   & ! intent(in)
                                  , growth_resp_factor     & ! intent(in)
                                  , storage_turnover_rate  ! ! intent(in)
@@ -936,9 +934,8 @@ module growth_balive
                          ,balive_aim)
       use ed_state_vars , only : sitetype     & ! structure
                                , patchtype    ! ! structure
-      use pft_coms      , only : q            & ! intent(in)
-                               , qsw          & ! intent(in)
-                               , agf_bs,c2n_leaf,c2p_leaf       ! ! intent(in)
+      use pft_coms      , only : qsw          & ! intent(in)
+                               , agf_bs,c2n_leaf,c2p_leaf,c2n_stem,c2p_wood       ! ! intent(in)
       use allometry     , only : size2bl      ! ! function
       use consts_coms   , only : tiny_num     ! ! intent(in)
       implicit none
@@ -1276,13 +1273,14 @@ module growth_balive
    !=======================================================================================!
    !=======================================================================================!
    subroutine apply_c_xfers(cpatch,ico,carbon_balance,tr_bleaf,tr_broot,tr_bsapwooda       &
-                           ,tr_bsapwoodb,tr_bstorage,tr_nstorage,tr_pstorage)
-      use ed_state_vars , only : patchtype  ! ! structure
+                           ,tr_bsapwoodb,tr_bstorage,tr_nstorage,tr_pstorage, csite, ipa)
+      use ed_state_vars , only : sitetype, patchtype  ! ! structure
       use nutrient_constants, only: nstorage_max_factor, pstorage_max_factor
       implicit none
       !----- Arguments. -------------------------------------------------------------------!
+      type(sitetype), target        :: csite
       type(patchtype), target        :: cpatch
-      integer        , intent(in)    :: ico
+      integer        , intent(in)    :: ico,ipa
       real           , intent(in)    :: carbon_balance
       real           , intent(in)    :: tr_bleaf
       real           , intent(in)    :: tr_broot
@@ -1324,12 +1322,12 @@ module growth_balive
       cpatch%nstorage(ico) = cpatch%nstorage(ico) + tr_nstorage
       extra_storage = max(0., cpatch%nstorage(ico) - cpatch%nstorage_max(ico))
       cpatch%nstorage(ico) = cpatch%nstorage(ico) - extra_storage
-      csite%plant_soil_N(3,ipa) = csite%plant_soil_N(3,ipa) + extra_storage
+      csite%plant_input_N(3,ipa) = csite%plant_input_N(3,ipa) + extra_storage
 
       cpatch%pstorage(ico) = cpatch%pstorage(ico) + tr_pstorage
       extra_storage = max(0., cpatch%pstorage(ico) - cpatch%pstorage_max(ico))
       cpatch%pstorage(ico) = cpatch%pstorage(ico) - extra_storage
-      csite%plant_soil_P(3,ipa) = csite%plant_soil_P(3,ipa) + extra_storage         
+      csite%plant_input_P(3,ipa) = csite%plant_input_P(3,ipa) + extra_storage         
 
       return
    end subroutine apply_c_xfers
@@ -1600,7 +1598,6 @@ module growth_balive
                                , patchtype    ! ! structure
       use pft_coms      , only : c2n_storage  & ! intent(in)
                                , c2n_leaf     & ! intent(in)
-                               , q            & ! intent(in)
                                , qsw          & ! intent(in)
                                , agf_bs       & ! intent(in)
                                , hgt_max      & ! intent(in)
@@ -1656,7 +1653,7 @@ module growth_balive
             increment    = available_carbon * (1. - cpatch%elongf(ico))
 
             delta_bleaf     = delta_balive * salloci * green_leaf_factor
-            delta_broot     = delta_balive * salloci * q  (ipft)
+            delta_broot     = delta_balive * salloci * cpatch%root2leaf(ico)
             delta_bsapwooda = delta_balive * salloci * qsw(ipft) * cpatch%hite(ico)         &
                             * agf_bs(ipft)
             delta_bsapwoodb = delta_balive * salloci * qsw(ipft) * cpatch%hite(ico)         &
@@ -1816,7 +1813,6 @@ module growth_balive
                                , patchtype    ! ! structure
       use pft_coms      , only : c2n_storage  & ! intent(in)
                                , c2n_leaf     & ! intent(in)
-                               , q            & ! intent(in)
                                , qsw          & ! intent(in)
                                , agf_bs       & ! intent(in)
                                , c2n_stem     ! ! intent(in)

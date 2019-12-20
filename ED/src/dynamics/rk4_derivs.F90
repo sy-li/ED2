@@ -94,7 +94,7 @@ subroutine leaftw_derivs(mzg,initp,dinitp,csite,ipa,dt,is_hybrid)
                                    , isoilbc               & ! intent(in)
                                    , sin_sldrain8          & ! intent(in)
                                    , matric_potential8     & ! function
-                                   , hydr_conduct8,nlsl         ! ! function
+                                   , hydr_conduct8         ! ! function
    use rk4_coms             , only : checkbudget           & ! intent(in)
                                    , rk4site               & ! intent(in)
                                    , rk4patchtype          & ! structure
@@ -106,6 +106,7 @@ subroutine leaftw_derivs(mzg,initp,dinitp,csite,ipa,dt,is_hybrid)
    use therm_lib8           , only : tl2uint8              ! ! functions
    use physiology_coms      , only : h2o_plant_lim         & ! intent(in)
                                    , plant_hydro_scheme    ! ! intent(in)
+   use nutrient_constants, only: nlsl
    !$ use omp_lib
 
    implicit none

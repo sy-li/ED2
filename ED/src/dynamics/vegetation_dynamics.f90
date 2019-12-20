@@ -42,6 +42,7 @@ subroutine vegetation_dynamics(new_month,new_year)
    !----- Local variables. ----------------------------------------------------------------!
    type(edtype)     , pointer      :: cgrid
    type(polygontype), pointer      :: cpoly
+   type(sitetype), pointer      :: csite
    real                            :: dtlsm_o_day
    real                            :: one_o_year
    integer                         :: doy
@@ -50,7 +51,7 @@ subroutine vegetation_dynamics(new_month,new_year)
    integer          , external     :: julday
    !---------------------------------------------------------------------------------------!
    integer                       :: ipy
-   integer                       :: isi
+   integer                       :: isi, ipa
 
    !----- Find the day of year. -----------------------------------------------------------!
    doy = julday(current_time%month, current_time%date, current_time%year)
