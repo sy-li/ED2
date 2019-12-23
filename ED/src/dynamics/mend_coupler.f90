@@ -49,8 +49,6 @@ Contains
     use mend_consts_coms, only: mend_init_consts, litt_consts, wood_consts, &
          som_consts
     use mend_som, only: som_init
-!    use mend_litter, only: litt_init
-!    use mend_wood, only: wood_init
     use mend_state_vars, only: npom, nwood, mend_zero_vars, mend_mm_time
     use nutrient_constants, only: soil_cpct, soil_som_c2n, soil_totp,   &
          soil_extrp
@@ -64,15 +62,9 @@ Contains
     integer :: ipa
     integer :: iwood
     integer, intent(in) :: sens_params
-    integer :: sens_code
 
-!    sens_code = sens_params + 1
-!    if(sens_code > 40)sens_code = sens_code - 40
-    sens_code = sens_params
-
-    write(*,*)'sens_params = ',sens_params, sens_code
-!    call mend_init_consts(sens_code)
-    call mend_init_consts(0)
+    write(*,*)'sens_params = ',sens_params
+    call mend_init_consts(sens_params)
 
     mend_mm_time = 0.
 
@@ -87,57 +79,6 @@ Contains
 
              csite%mend%bulk_den(ipa) = soil_bulk_den
              csite%mend%pH(ipa) = soil_ph
-
-!             if(fertex == 'FE_A')then
-!                csite%mend%bulk_den(ipa) = 954.
-!                csite%mend%pH(ipa) = 6.45
-!             elseif(fertex == 'FE_B')then
-!                csite%mend%bulk_den(ipa) = 808.
-!                csite%mend%pH(ipa) = 6.26
-!             elseif(fertex == 'FE_C')then
-!                csite%mend%bulk_den(ipa) = 834.
-!                csite%mend%pH(ipa) = 6.33
-!             elseif(fertex == 'FE_D')then
-!                csite%mend%bulk_den(ipa) = 1012.
-!                csite%mend%pH(ipa) = 6.51
-!             elseif(fertex == 'FE_E')then
-!                csite%mend%bulk_den(ipa) = 1037.
-!                csite%mend%pH(ipa) = 6.58
-!             elseif(fertex == 'FE_F')then
-!                csite%mend%bulk_den(ipa) = 883.
-!                csite%mend%pH(ipa) = 6.60
-!             elseif(fertex == 'FE_G')then
-!                csite%mend%bulk_den(ipa) = 827.
-!                csite%mend%pH(ipa) = 6.67
-!             elseif(fertex == 'FE_H')then
-!                csite%mend%bulk_den(ipa) = 959.
-!                csite%mend%pH(ipa) = 6.49
-!             elseif(fertex == 'FE_I')then
-!                csite%mend%bulk_den(ipa) = 855.
-!                csite%mend%pH(ipa) = 6.46
-!             elseif(fertex == 'FE_J')then
-!                csite%mend%bulk_den(ipa) = 917.
-!                csite%mend%pH(ipa) = 6.45
-!             elseif(fertex == 'FE_K')then
-!                csite%mend%bulk_den(ipa) = 879.
-!                csite%mend%pH(ipa) = 6.59
-!             elseif(fertex == 'FE_L')then
-!                csite%mend%bulk_den(ipa) = 747.
-!                csite%mend%pH(ipa) = 6.83
-!             elseif(fertex == 'M')then
-!                csite%mend%bulk_den(ipa) = 911.
-!                csite%mend%pH(ipa) = 6.36
-!             elseif(fertex == 'N')then
-!                csite%mend%bulk_den(ipa) = 779.
-!                csite%mend%pH(ipa) = 6.61
-!             elseif(fertex == 'O')then
-!                csite%mend%bulk_den(ipa) = 841.
-!                csite%mend%pH(ipa) = 6.86
-!             elseif(fertex == 'P')then
-!                csite%mend%bulk_den(ipa) = 836.
-!                csite%mend%pH(ipa) = 6.64
-!             endif
-
              csite%mend_mm%bulk_den(ipa) = csite%mend%bulk_den(ipa)
              csite%mend_mm%pH(ipa) = csite%mend%pH(ipa)
 
@@ -180,109 +121,6 @@ Contains
                   csite%mend%som%plvars%plant_input_P_dom(ipa), &
                   som_consts, csite%mend%bulk_den(ipa),   &
                   soil_cpct, soil_som_c2n, soil_totp, soil_extrp)
-
-             ! call litt_init(npom,  &
-             !      csite%mend%litt%cvars%pom(:,ipa), csite%mend%litt%cvars%dom(ipa), &
-             !      csite%mend%litt%cvars%enz_pom(:,ipa), csite%mend%litt%cvars%mom(ipa),  &
-             !      csite%mend%litt%cvars%qom(ipa), csite%mend%litt%cvars%enz_mom(ipa),  &
-             !      csite%mend%litt%cvars%amb(ipa), csite%mend%litt%cvars%dmb(ipa),   &
-             !      csite%mend%litt%nvars%pom(:,ipa), csite%mend%litt%nvars%dom(ipa),  &
-             !      csite%mend%litt%nvars%enz_pom(:,ipa), csite%mend%litt%nvars%mom(ipa),  &
-             !      csite%mend%litt%nvars%qom(ipa), csite%mend%litt%nvars%enz_mom(ipa),  &
-             !      csite%mend%litt%nvars%amb(ipa), csite%mend%litt%nvars%dmb(ipa),   &
-             !      csite%mend%litt%pvars%pom(:,ipa), csite%mend%litt%pvars%dom(ipa),  &
-             !      csite%mend%litt%pvars%enz_pom(:,ipa), csite%mend%litt%pvars%mom(ipa),  &
-             !      csite%mend%litt%pvars%qom(ipa), csite%mend%litt%pvars%enz_mom(ipa),  &
-             !      csite%mend%litt%pvars%amb(ipa), csite%mend%litt%pvars%dmb(ipa),   &
-             !      csite%mend%litt%fluxes%co2_lost(ipa),  &
-             !      csite%mend%litt%fluxes%nmin(ipa), &
-             !      csite%mend%litt%fluxes%nitr(ipa), &
-             !      csite%mend%litt%invars%nh4(ipa),  &
-             !      csite%mend%litt%invars%no3(ipa), csite%mend%litt%invars%psol(ipa), &
-             !      csite%mend%litt%invars%plab(ipa), csite%mend%litt%fluxes%ngas_lost(ipa),  &
-             !      csite%mend%litt%cvars%enz_ptase(ipa), csite%mend%litt%nvars%enz_ptase(ipa),  &
-             !      csite%mend%litt%pvars%enz_ptase(ipa), csite%mend%litt%fluxes%nh4_dep(ipa),  &
-             !      csite%mend%litt%fluxes%no3_dep(ipa), csite%mend%litt%fluxes%ppar_dep(ipa), &
-             !      csite%mend%litt%fluxes%nh4_plant(:,ipa), csite%mend%litt%fluxes%nh4_bnf(ipa),  &
-             !      csite%mend%litt%fluxes%no3_plant(:,ipa), csite%mend%litt%fluxes%c_leach(ipa),  &
-             !      csite%mend%litt%fluxes%n_leach(ipa), csite%mend%litt%fluxes%p_leach(ipa),  &
-             !      csite%mend%litt%fluxes%p_plant(:,ipa), csite%mend%litt%invars%pocc(ipa),  &
-             !      csite%mend%litt%invars%psec(ipa), &
-             !      csite%mend%litt%invars%ppar(ipa), csite%mend%litt%plvars%enz_plant_n(:,ipa),  &
-             !      csite%mend%litt%plvars%enz_plant_p(:,ipa), csite%mend%litt%plvars%vnh4up_plant(:,ipa), &
-             !      csite%mend%litt%plvars%vno3up_plant(:,ipa),  &
-             !      csite%mend%litt%plvars%vpup_plant(:,ipa), &
-             !      csite%mend%litt%plvars%plant_input_C_pom(:,ipa), &
-             !      csite%mend%litt%plvars%plant_input_N_pom(:,ipa), &
-             !      csite%mend%litt%plvars%plant_input_P_pom(:,ipa), &
-             !      csite%mend%litt%plvars%plant_input_C_dom(ipa), &
-             !      csite%mend%litt%plvars%plant_input_N_dom(ipa), &
-             !      csite%mend%litt%plvars%plant_input_P_dom(ipa), &
-             !      litt_consts, csite%mend%bulk_den(ipa))
-             
-             ! do iwood = 1, nwood
-             !    call wood_init(iwood, npom,  &
-             !         csite%mend%wood(iwood)%cvars%pom(:,ipa),  &
-             !         csite%mend%wood(iwood)%cvars%dom(ipa),  &
-             !         csite%mend%wood(iwood)%cvars%enz_pom(:,ipa),  &
-             !         csite%mend%wood(iwood)%cvars%mom(ipa),  &
-             !         csite%mend%wood(iwood)%cvars%qom(ipa),  &
-             !         csite%mend%wood(iwood)%cvars%enz_mom(ipa),  &
-             !         csite%mend%wood(iwood)%cvars%amb(ipa),  &
-             !         csite%mend%wood(iwood)%cvars%dmb(ipa), &
-             !         csite%mend%wood(iwood)%nvars%pom(:,ipa),  &
-             !         csite%mend%wood(iwood)%nvars%dom(ipa),  &
-             !         csite%mend%wood(iwood)%nvars%enz_pom(:,ipa),  &
-             !         csite%mend%wood(iwood)%nvars%mom(ipa),  &
-             !         csite%mend%wood(iwood)%nvars%qom(ipa),  &
-             !         csite%mend%wood(iwood)%nvars%enz_mom(ipa),  &
-             !         csite%mend%wood(iwood)%nvars%amb(ipa),  &
-             !         csite%mend%wood(iwood)%nvars%dmb(ipa),  &
-             !         csite%mend%wood(iwood)%pvars%pom(:,ipa),  &
-             !         csite%mend%wood(iwood)%pvars%dom(ipa),  &
-             !         csite%mend%wood(iwood)%pvars%enz_pom(:,ipa),  &
-             !         csite%mend%wood(iwood)%pvars%mom(ipa), &
-             !         csite%mend%wood(iwood)%pvars%qom(ipa),  &
-             !         csite%mend%wood(iwood)%pvars%enz_mom(ipa), &
-             !         csite%mend%wood(iwood)%pvars%amb(ipa),  &
-             !         csite%mend%wood(iwood)%pvars%dmb(ipa),  &
-             !         csite%mend%wood(iwood)%fluxes%co2_lost(ipa),  &
-             !         csite%mend%wood(iwood)%fluxes%nmin(ipa),  &
-             !         csite%mend%wood(iwood)%fluxes%nitr(ipa),  &
-             !         csite%mend%wood(iwood)%invars%nh4(ipa),  &
-             !         csite%mend%wood(iwood)%invars%no3(ipa),  &
-             !         csite%mend%wood(iwood)%invars%psol(ipa), &
-             !         csite%mend%wood(iwood)%invars%plab(ipa), &
-             !         csite%mend%wood(iwood)%fluxes%ngas_lost(ipa), &
-             !         csite%mend%wood(iwood)%cvars%enz_ptase(ipa), &
-             !         csite%mend%wood(iwood)%nvars%enz_ptase(ipa), &
-             !         csite%mend%wood(iwood)%pvars%enz_ptase(ipa), &
-             !         csite%mend%wood(iwood)%fluxes%nh4_dep(ipa), &
-             !         csite%mend%wood(iwood)%fluxes%no3_dep(ipa), &
-             !         csite%mend%wood(iwood)%fluxes%ppar_dep(ipa),   &
-             !         csite%mend%wood(iwood)%fluxes%nh4_plant(:,ipa),  &
-             !         csite%mend%wood(iwood)%fluxes%nh4_bnf(ipa), &
-             !         csite%mend%wood(iwood)%fluxes%no3_plant(:,ipa), &
-             !         csite%mend%wood(iwood)%fluxes%c_leach(ipa),  &
-             !         csite%mend%wood(iwood)%fluxes%n_leach(ipa),  &
-             !         csite%mend%wood(iwood)%fluxes%p_leach(ipa), &
-             !         csite%mend%wood(iwood)%fluxes%p_plant(:,ipa), &
-             !         csite%mend%wood(iwood)%invars%pocc(ipa), &
-             !         csite%mend%wood(iwood)%invars%psec(ipa), &
-             !         csite%mend%wood(iwood)%invars%ppar(ipa),  &
-             !         csite%mend%wood(iwood)%plvars%enz_plant_n(:,ipa), &
-             !         csite%mend%wood(iwood)%plvars%enz_plant_p(:,ipa),  &
-             !         csite%mend%wood(iwood)%plvars%vnh4up_plant(:,ipa),  &
-             !         csite%mend%wood(iwood)%plvars%vno3up_plant(:,ipa),  &
-             !         csite%mend%wood(iwood)%plvars%vpup_plant(:,ipa),  &
-             !         csite%mend%wood(iwood)%plvars%plant_input_C_pom(:,ipa), &
-             !         csite%mend%wood(iwood)%plvars%plant_input_N_pom(:,ipa), &
-             !         csite%mend%wood(iwood)%plvars%plant_input_P_pom(:,ipa), &
-             !         csite%mend%wood(iwood)%plvars%plant_input_C_dom(ipa), &
-             !         csite%mend%wood(iwood)%plvars%plant_input_N_dom(ipa), &
-             !         csite%mend%wood(iwood)%plvars%plant_input_P_dom(ipa), &
-             !         wood_consts(iwood), csite%mend%bulk_den(ipa))
-             ! enddo
           enddo
        enddo
     enddo
@@ -291,12 +129,9 @@ Contains
   end subroutine mend_init
 
   subroutine mend_extern_forcing(mend, ipa, ncohorts, broot, nplant, &
-       pft,  &
-       krdepth, slden, nstorage, pstorage, nstorage_max, pstorage_max, &
-       water_supply_layer_frac, lai)
+       pft, krdepth, slden, nstorage, pstorage,   &
+       nstorage_max, pstorage_max, water_supply_nl, lai)
     use mend_state_vars, only: mend_model, nwood
-!    use mend_wood, only: wood_extern_forcing
-!    use mend_litter, only: litt_extern_forcing
     use mend_som, only: som_extern_forcing
     use mend_consts_coms, only: som_consts
     use nutrient_constants, only: ndep_rate, pdep_rate, ndep_appl, pdep_appl, nlsl
@@ -317,16 +152,12 @@ Contains
     real, intent(in), dimension(ncohorts) :: nstorage_max
     real, intent(in), dimension(ncohorts) :: pstorage_max
     real, intent(in), dimension(ncohorts) :: lai
-    real, intent(in), dimension(nzg,ncohorts) :: water_supply_layer_frac
+    real, intent(in), dimension(ncohorts) :: water_supply_nl
     real :: broot_total
     integer :: ico
     real, intent(in) :: slden
-    real, dimension(ncohorts) :: water_supply
 
-    do ico = 1, ncohorts
-       water_supply(ico) = sum(water_supply_layer_frac(nlsl:nzg,ico))
-    enddo
-
+print*,water_supply_nl;stop
     call som_extern_forcing(ndep_rate, som_consts, slden, &
          mend%som%fluxes%nh4_dep(ipa), mend%som%fluxes%no3_dep(ipa), &
          pdep_rate, mend%som%fluxes%ppar_dep(ipa), current_time%year, &
@@ -338,7 +169,7 @@ Contains
          mend%som%plvars%vnh4up_plant(:,ipa),  &
          mend%som%plvars%vno3up_plant(:,ipa), &
          mend%som%plvars%vpup_plant(:,ipa), som_consts, nstorage, pstorage, &
-         nstorage_max, pstorage_max, water_supply, lai)
+         nstorage_max, pstorage_max, water_supply_nl, lai)
 
 !    call litt_extern_forcing(mend%litt%fluxes%nh4_dep(ipa), &
 !         mend%litt%fluxes%no3_dep(ipa), mend%litt%fluxes%ppar_dep(ipa))
@@ -559,20 +390,6 @@ Contains
          mend%som%invars%ppar(ipa), &
          mend%som%invars%psol(ipa), mend%bulk_den(ipa))
     call mend_update_diag_layer(mend%som, som_consts, ipa, mend%bulk_den(ipa))
-
-!    call mend_slow_P_layer(litt_consts, mend%litt%invars%plab(ipa), &
-!         mend%litt%invars%pocc(ipa), mend%litt%invars%ppar(ipa), &
-!         mend%litt%invars%psol(ipa))
-!    call mend_update_diag_layer(mend%som, litt_consts, ipa)
-
-!    do iwood = 1, nwood
-!       call mend_slow_P_layer(wood_consts(iwood),   &
-!            mend%wood(iwood)%invars%plab(ipa), &
-!            mend%wood(iwood)%invars%pocc(ipa),   &
-!            mend%wood(iwood)%invars%ppar(ipa), &
-!            mend%wood(iwood)%invars%psol(ipa))
-!       call mend_update_diag_layer(mend%wood(iwood), wood_consts(iwood), ipa)
-!    enddo
 
     return
   end subroutine mend_slow_P

@@ -273,7 +273,8 @@ subroutine copy_nl(copy_type)
                                    , hr_sec                    & ! intent(in)
                                    , min_sec                   ! ! intent(in)
 
-   use nutrient_constants, only: nlsl
+   use nutrient_constants, only: nlsl, ndep_rate, pdep_rate, soil_bulk_den, soil_pH, &
+        soil_cpct, soil_som_c2n, soil_totp, soil_extrp
    implicit none
    !----- Arguments. ----------------------------------------------------------------------!
    character(len=*), intent(in) :: copy_type
@@ -548,6 +549,15 @@ subroutine copy_nl(copy_type)
       end_time%time  = real(int(real(itimez) * 0.01)) * hr_sec                             &
                      + (real(itimez) * 0.01 - real(int(real(itimez)*0.01)))                &
                      * 100.0 * min_sec
+
+      ndep_rate = nl%ndep_rate
+      pdep_rate = nl%pdep_rate
+      soil_bulk_den = nl%soil_bulk_den
+      soil_pH = nl%soil_pH
+      soil_cpct = nl%soil_cpct
+      soil_som_c2n = nl%soil_som_c2n
+      soil_totp = nl%soil_totp
+      soil_extrp = nl%soil_extrp
 
    case ('NOT_HISTORY')
       !------------------------------------------------------------------------------------!

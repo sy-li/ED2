@@ -392,7 +392,6 @@ subroutine load_ecosystem_state()
          do igr=1,ngrids
               call near_bare_ground_init(edgrid_g(igr))
          end do
-         call mend_init(0)
       case (1)
          !----- Initialize everything with near-bare ground -------------------------------!
          if (mynum /= 1) then
@@ -402,6 +401,7 @@ subroutine load_ecosystem_state()
             call near_bare_ground_big_leaf_init(edgrid_g(igr))
          end do
       end select
+      call mend_init(0)
 
    case (1,2,3,6)
       !----- Initialize with ED1-type restart information. --------------------------------!
@@ -412,8 +412,8 @@ subroutine load_ecosystem_state()
          do igr=1,ngrids
             call ed_bigleaf_init(edgrid_g(igr))
          end do
-         call mend_init(0)
       end select
+      call mend_init(0)
 
    case (4)   
       write(unit=*,fmt='(a,i3.3)') ' + Initializing from ED2.1 state file. Node: ',mynum

@@ -243,7 +243,8 @@ module plant_hydro
                        ,cpatch%leaf_psi(ico),cpatch%wood_psi(ico)     &!input
                        ,soil_psi,soil_cond,ipa,ico                    &!input
                        ,cpatch%wflux_wl(ico),cpatch%wflux_gw(ico)     &!output
-                       ,cpatch%wflux_gw_layer(:,ico))                 !!output
+                       ,cpatch%wflux_gw_layer(:,ico),cpatch%water_supply_nl(ico), &
+                       cpatch%nplant(ico))                 !!output
 
             !else
             !    cpatch%wflux_wl(ico) = 0.
@@ -344,7 +345,7 @@ module plant_hydro
                ,transp,leaf_psi,wood_psi                                & !plant input
                ,soil_psi,soil_cond                                      & !soil  input
                ,ipa,ico                                                 & !for debugging
-               ,wflux_wl,wflux_gw,wflux_gw_layer)                       ! !flux  output
+               ,wflux_wl,wflux_gw,wflux_gw_layer, water_supply_nl,nplant)                       ! !flux  output
       use soil_coms       , only : slz8                 & ! intent(in)
                                  , dslz8                ! ! intent(in)
       use grid_coms       , only : nzg                  ! ! intent(in)
@@ -363,6 +364,7 @@ module plant_hydro
                                  , SRA                  & ! intent(in)
                                  , C2B                  & ! intent(in)
                                  , hgt_min              ! ! intent(in)
+      use nutrient_constants, only: nlsl
       implicit none
       !----- Arguments --------------------------------------------------------------------!
       real   ,                 intent(in)  :: dt              !time step [s]
@@ -434,6 +436,8 @@ module plant_hydro
       logical                               :: small_tree_flag
       logical                               :: zero_flow_flag
       logical                               :: error_flag
+      real, intent(out) :: water_supply_nl
+      real, intent(in) :: nplant
       !----- External function ------------------------------------------------------------!
       real(kind=4), external                :: sngloff           ! Safe dble 2 single precision
       !------------------------------------------------------------------------------------!
@@ -454,7 +458,7 @@ module plant_hydro
       wood_psi_d    = dble(wood_psi)
       soil_psi_d    = dble(soil_psi)
       soil_cond_d   = dble(soil_cond)
-   
+      water_supply_nl = 0.
 
 
 
@@ -707,7 +711,8 @@ module plant_hydro
                                wflux_gw_d
         endif
 
-
+        water_supply_nl = sum(layer_water_supply(nlsl:nzg)) / sum(layer_water_supply) * &
+             wflux_gw_d * nplant * dt
 
 
       !--------------------------------------------------------------------------

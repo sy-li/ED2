@@ -8,7 +8,7 @@ Contains
   subroutine som_plant_enzymes(ncohorts, broot, nplant, pft, &
        krdepth, slden, enz_plant_n, &
        enz_plant_p, vnh4up_plant, vno3up_plant, vpup_plant, consts, &
-       nstorage, pstorage, nstorage_max, pstorage_max, water_supply, lai)
+       nstorage, pstorage, nstorage_max, pstorage_max, water_supply_nl, lai)
     use mend_consts_coms, only: decomp_consts
     use pft_coms, only: root_beta
     use soil_coms, only: slz
@@ -21,7 +21,7 @@ Contains
     integer, dimension(ncohorts), intent(in) :: krdepth
     real, dimension(ncohorts), intent(in) :: broot
     real, dimension(ncohorts), intent(in) :: nplant
-    real, dimension(ncohorts), intent(in) :: water_supply
+    real, dimension(ncohorts), intent(in) :: water_supply_nl
     real, dimension(ncohorts), intent(in) :: lai
     real, intent(in) :: slden
     real, intent(out), dimension(n_pft) :: enz_plant_n
@@ -158,7 +158,7 @@ Contains
 
   subroutine som_plant_feedback(nh4_plant, no3_plant, p_plant, slden,  &
        consts, ncohorts, nstorage, pstorage, nstorage_max, pstorage_max, &
-       nplant, broot, rh, co2_lost, pft, krdepth, water_supply_layer_frac, lai)
+       nplant, broot, rh, co2_lost, pft, krdepth, water_supply_nl, lai)
     use ed_misc_coms, only: dtlsm
     use mend_consts_coms, only: decomp_consts
     use nutrient_constants, only: nlsl
@@ -188,8 +188,7 @@ Contains
     real, intent(inout), dimension(ncohorts) :: nstorage
     real, intent(inout), dimension(ncohorts) :: pstorage
     real, intent(in), dimension(ncohorts) :: lai
-    real, intent(in), dimension(nzg,ncohorts) :: water_supply_layer_frac
-    real, dimension(ncohorts) :: water_supply
+    real, intent(in), dimension(ncohorts) :: water_supply_nl
     real, intent(in), dimension(ncohorts) :: nstorage_max
     real, intent(in), dimension(ncohorts) :: pstorage_max
     real, intent(in), dimension(ncohorts) :: nplant
@@ -205,10 +204,6 @@ Contains
     real :: total_nlim
     real :: total_plim
     real :: transp_fact
-
-    do ico =1, ncohorts
-       water_supply(ico) = sum(water_supply_layer_frac(nlsl:nzg,ico))
-    enddo
 
     ! kgN/m2
     plant_n_uptake = (nh4_plant + no3_plant) * 1.0e-6  * &

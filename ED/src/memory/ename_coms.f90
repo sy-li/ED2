@@ -271,6 +271,10 @@ module ename_coms
 
       !----- ED restart grid resolution. --------------------------------------------------!
       real                                              :: edres
+
+      real :: ndep_rate, pdep_rate
+      real :: soil_bulk_den, soil_pH, soil_cpct, soil_som_c2n, soil_totp, soil_extrp
+
    end Type ename_vars
 
    !----- This is the name of the structure containing the namelist. ----------------------!
@@ -535,6 +539,16 @@ module ename_coms
 
       enl%zrough                    = undef_real
       enl%edres                     = undef_real 
+
+      enl%ndep_rate = undef_real
+      enl%pdep_rate = undef_real
+
+      enl%soil_bulk_den = undef_real
+      enl%soil_pH = undef_real
+      enl%soil_cpct = undef_real
+      enl%soil_som_c2n = undef_real
+      enl%soil_totp = undef_real
+      enl%soil_extrp = undef_real
 
       return
    end subroutine init_ename_vars

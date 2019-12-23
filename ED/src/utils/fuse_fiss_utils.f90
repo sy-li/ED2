@@ -1504,6 +1504,7 @@ module fuse_fiss_utils
       cpatch%psi_closed  (recc) = cpatch%psi_closed(recc) * rlai                           &
                                 + cpatch%psi_closed(donc) * dlai
       cpatch%water_supply(recc) = cpatch%water_supply(recc) + cpatch%water_supply(donc)
+      cpatch%water_supply_nl(recc) = cpatch%water_supply_nl(recc) + cpatch%water_supply_nl(donc)
       !------------------------------------------------------------------------------------!
 
 
@@ -4294,10 +4295,10 @@ module fuse_fiss_utils
       end if
       !------------------------------------------------------------------------------------!
 
-      call mend_rk4_inc(csite%mend, csite%mend, csite%area(recp) / (csite%area(donp) + &
-           csite%area(recp)) - 1., recp, recp)
-      call mend_rk4_inc(csite%mend, csite%mend, csite%area(donp) / (csite%area(donp) + &
-           csite%area(recp)), recp, donp)
+!      call mend_rk4_inc(csite%mend, csite%mend, csite%area(recp) / (csite%area(donp) + &
+!           csite%area(recp)) - 1., recp, recp)
+!      call mend_rk4_inc(csite%mend, csite%mend, csite%area(donp) / (csite%area(donp) + &
+!           csite%area(recp)), recp, donp)
 
       !----- We now take the weighted average, scale by the individual patch area. --------!
       csite%age(recp)                = newareai *                                          &

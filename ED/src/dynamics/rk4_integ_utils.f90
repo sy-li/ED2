@@ -545,7 +545,7 @@ subroutine inc_rk4_patch(rkp, inc, fac, cpatch)
    end if
    !---------------------------------------------------------------------------------------!
 
-   call mend_rk4_inc(rkp%mend, inc%mend, real(fac), 1, 1)
+!   call mend_rk4_inc(rkp%mend, inc%mend, real(fac), 1, 1)
 
    return
 end subroutine inc_rk4_patch
@@ -959,7 +959,7 @@ subroutine get_yscal(y,dy,htry,yscal,cpatch)
       yscal%wbudget_loss2drainage   = huge_offset
    end if
 
-   call mend_rk4_scale(y%mend, dy%mend, yscal%mend, real(htry))
+!   call mend_rk4_scale(y%mend, dy%mend, yscal%mend, real(htry))
 
    return
 end subroutine get_yscal
@@ -1247,7 +1247,7 @@ subroutine get_errmax(errmax,yerr,yscal,cpatch,y,ytemp)
    end do
    !---------------------------------------------------------------------------------------!
 
-   call mend_rk4_errmax(yscal%mend, yerr%mend, errmax)
+!   call mend_rk4_errmax(yscal%mend, yerr%mend, errmax)
 
    return
 end subroutine get_errmax
@@ -2888,7 +2888,7 @@ end subroutine initialize_misc_stepvars
          write(unit=*,fmt='(a)')           ' '
       end if
 
-      call mend_rk4_sanity(y%mend, reject_step)
+!      call mend_rk4_sanity(y%mend, reject_step)
 
       return
    end subroutine rk4_sanity_check

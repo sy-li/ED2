@@ -511,6 +511,9 @@ module ed_state_vars
       real , pointer, dimension(:) :: water_supply
       !<Water supply (kg_H2O/m2/s)
 
+      real , pointer, dimension(:) :: water_supply_nl
+      !<Water supply in nutrient layer
+
       real ,pointer,dimension(:) :: leaf_maintenance
       !<Plant maintenance costs due to turnover of leaves [kgC/plant]
       real ,pointer,dimension(:) :: root_maintenance
@@ -4845,6 +4848,7 @@ module ed_state_vars
       allocate(cpatch%fsn                          (                    ncohorts))
       allocate(cpatch%fs_open                      (                    ncohorts))
       allocate(cpatch%water_supply                 (                    ncohorts))
+      allocate(cpatch%water_supply_nl             (                    ncohorts))
       allocate(cpatch%leaf_maintenance             (                    ncohorts))
       allocate(cpatch%root_maintenance             (                    ncohorts))
       allocate(cpatch%leaf_drop                    (                    ncohorts))
@@ -6719,6 +6723,7 @@ module ed_state_vars
       nullify(cpatch%fsn                   )
       nullify(cpatch%fs_open               )
       nullify(cpatch%water_supply          )
+      nullify(cpatch%water_supply_nl          )
       nullify(cpatch%leaf_maintenance      )
       nullify(cpatch%root_maintenance      )
       nullify(cpatch%leaf_drop             )
@@ -7716,6 +7721,7 @@ module ed_state_vars
       if(associated(cpatch%fsn                 )) deallocate(cpatch%fsn                 )
       if(associated(cpatch%fs_open             )) deallocate(cpatch%fs_open             )
       if(associated(cpatch%water_supply        )) deallocate(cpatch%water_supply        )
+      if(associated(cpatch%water_supply_nl      )) deallocate(cpatch%water_supply_nl     )
       if(associated(cpatch%leaf_maintenance    )) deallocate(cpatch%leaf_maintenance    )
       if(associated(cpatch%root_maintenance    )) deallocate(cpatch%root_maintenance    )
       if(associated(cpatch%leaf_drop           )) deallocate(cpatch%leaf_drop           )
@@ -9639,6 +9645,7 @@ module ed_state_vars
          opatch%fsn                   (oco) = ipatch%fsn                   (ico)
          opatch%fs_open               (oco) = ipatch%fs_open               (ico)
          opatch%water_supply          (oco) = ipatch%water_supply          (ico)
+         opatch%water_supply_nl      (oco) = ipatch%water_supply_nl       (ico)
          opatch%leaf_maintenance      (oco) = ipatch%leaf_maintenance      (ico)
          opatch%root_maintenance      (oco) = ipatch%root_maintenance      (ico)
          opatch%leaf_drop             (oco) = ipatch%leaf_drop             (ico)
@@ -10320,6 +10327,7 @@ module ed_state_vars
       opatch%fsn                   (1:z) = pack(ipatch%fsn                       ,lmask)
       opatch%fs_open               (1:z) = pack(ipatch%fs_open                   ,lmask)
       opatch%water_supply          (1:z) = pack(ipatch%water_supply              ,lmask)
+      opatch%water_supply_nl       (1:z) = pack(ipatch%water_supply_nl          ,lmask)
       opatch%leaf_maintenance      (1:z) = pack(ipatch%leaf_maintenance          ,lmask)
       opatch%root_maintenance      (1:z) = pack(ipatch%root_maintenance          ,lmask)
       opatch%leaf_drop             (1:z) = pack(ipatch%leaf_drop                 ,lmask)

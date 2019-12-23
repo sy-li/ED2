@@ -19,7 +19,6 @@ Contains
     use mend_consts_coms, only: decomp_consts
     implicit none
 
-!    character(len=1), intent(in) :: fertex
     real, intent(in) :: soil_cpct
     real, intent(in) :: soil_som_c2n
     real, intent(in) :: soil_totp
@@ -102,98 +101,8 @@ Contains
     totp = soil_totp
     extrp = soil_extrp
 
-!    if(fertex == 'A')then
-!       cpct = 50.4
-    !    c2n = 11.2
-    !    totp = 395.33
-    !    extrp = 7.872
-    ! elseif(fertex == 'B')then
-    !    cpct = 59.6
-    !    c2n = 10.78
-    !    totp = 550.93
-    !    extrp = 13.02
-    ! elseif(fertex == 'C')then
-    !    cpct = 51.8
-    !    c2n = 10.8
-    !    totp = 614.83
-    !    extrp = 19.474
-    ! elseif(fertex == 'D')then
-    !    cpct = 43.3
-    !    c2n = 10.78
-    !    totp = 452.5
-    !    extrp = 7.159
-    ! elseif(fertex == 'E')then
-    !    cpct = 48.1
-    !    c2n = 10.66
-    !    totp = 441.03
-    !    extrp = 6.12
-    ! elseif(fertex == 'F')then
-    !    cpct = 58.7
-    !    c2n = 11.11
-    !    totp = 607.33
-    !    extrp = 10.011
-    ! elseif(fertex == 'G')then
-    !    cpct = 60.9
-    !    c2n = 11.38
-    !    totp = 638.59
-    !    extrp = 13.32
-    ! elseif(fertex == 'H')then
-    !    cpct = 39.3
-    !    c2n = 11.3
-    !    totp = 540.37
-    !    extrp = 6.087
-    ! elseif(fertex == 'I')then
-    !    cpct = 49.7
-    !    c2n = 10.73
-    !    totp = 459.95
-    !    extrp = 8.439
-    ! elseif(fertex == 'J')then
-    !    cpct = 40.1
-    !    c2n = 10.61
-    !    totp = 442.44
-    !    extrp = 6.507
-    ! elseif(fertex == 'K')then
-    !    cpct = 38.9
-    !    c2n = 10.77
-    !    totp = 596.51
-    !    extrp = 6.746
-    ! elseif(fertex == 'L')then
-    !    cpct = 42.2
-    !    c2n = 10.9
-    !    totp = 646.95
-    !    extrp = 9.963
-    ! elseif(fertex == 'M')then
-    !    cpct = 43.7
-    !    c2n = 10.64
-    !    totp = 402.22
-    !    extrp = 6.38
-    ! elseif(fertex == 'N')then
-    !    cpct = 43.3
-    !    c2n = 10.72
-    !    totp = 551.04
-    !    extrp = 7.126
-    ! elseif(fertex == 'O')then
-    !    cpct = 36.5
-    !    c2n = 10.67
-    !    totp = 525.29
-    !    extrp = 7.047
-    ! elseif(fertex == 'P')then
-    !    cpct = 35.8
-    !    c2n = 10.77
-    !    totp = 518.76
-    !    extrp = 6.818
-    ! endif
-
-!    cpct = 37.9
-!    c2n = 10.8
-!    extrp = 0.0455*1000.
-!    totp = 150. * 2. / bulk_den * 1000. + extrp
-
-!    c2p = 60.
-!    c2p = consts%mb_cp_max
 ! Tipping et al. (2016) Biogeochemistry
     c2p = (cpct*0.1) / (0.012*(cpct*0.1)**0.57)
-!    c2p = 800.
 
 ! density (g/cm3):
 ! SROAK:0.87  SRTDF:0.90  PVTDF:0.77
@@ -212,43 +121,11 @@ Contains
     dom_n = dom_c / c2n
     dom_p = dom_c / c2p
 
-! a1
-!    enz_pom_c(1) = 0.001 / 31. * cpct
-! a2-4
-!    enz_pom_c(1) = 0.025
-! a5
-!    enz_pom_c(1) = 0.0042
-! a6
-!    enz_pom_c(1) = 0.022
-! a7
-!    enz_pom_c(1) = 0.098
-! a8
-!    enz_pom_c(1) = 0.0026
-! a9
     enz_pom_c(1) = 0.014
-! a10
-!    enz_pom_c(1) = 0.066
-
     enz_pom_n(1) = enz_pom_c(1) / consts%enz_pom_c2n(1)
     enz_pom_p(1) = enz_pom_c(1) / consts%enz_pom_c2p(1)
 
-! a1
-!    enz_pom_c(2) = 0.0004 / 31. * cpct
-! a2-4
-!    enz_pom_c(2) = 0.025
-! a5
-!    enz_pom_c(2) = 0.00013
-! a6
-!    enz_pom_c(2) = 0.00083
-! a7
-!    enz_pom_c(2) = 0.0019
-! a8
-!    enz_pom_c(2) = 0.000071
-! a9
     enz_pom_c(2) = 0.00044
-! a10
-!    enz_pom_c(2) = 0.0015
-
     enz_pom_n(2) = enz_pom_c(2) / consts%enz_pom_c2n(2)
     enz_pom_p(2) = enz_pom_c(2) / consts%enz_pom_c2p(2)
 
@@ -260,137 +137,19 @@ Contains
     qom_n = qom_c / c2n
     qom_p = qom_c / c2p
 
-! a1
-!    enz_mom_c = 0.001 / 31. * cpct
-! a2-4
-!    enz_mom_c = 0.025
-! a5
-!    enz_mom_c = 0.0037
-! a6
-!    enz_mom_c = 0.020
-! a7
-!    enz_mom_c = 0.086
-! a8
-!    enz_mom_c = 0.0023
-! a9
     enz_mom_c = 0.013
-! a10
-!    enz_mom_c = 0.058
-
     enz_mom_n = enz_mom_c / consts%enz_mom_c2n
     enz_mom_p = enz_mom_c / consts%enz_mom_c2p
 
-! a1
-!    amb_c = 0.25 / 31. * cpct
-! a2-4
-!    amb_c = 1.
-! a5
-!    amb_c = 0.0021
-! a6
-!    amb_c = 0.043
-! a7
-!    amb_c = 0.31
-! a8
-!    amb_c = 0.0014
-! a9
     amb_c = 0.023
-! a10
-!    amb_c = 0.21
-
-! a1-4
-!    amb_n = amb_c / (0.5 * (consts%mb_cn_min + consts%mb_cn_max))
-! a5
-!    amb_n = 0.00027
-! a6
-!    amb_n = 0.0085
-! a7
-!    amb_n = 0.059
-! a8
-!    amb_n = 0.00017
-! a9
     amb_n = 0.0046
-! a10
-!    amb_n = 0.038
-
-! a1-4
-!    amb_p = amb_c / (0.5 * (consts%mb_cp_min + consts%mb_cp_max))
-! a5
-!    amb_p = 3.5e-5
-! a6
-!    amb_p = 0.00098
-! a7
-!    amb_p = 0.0068
-! a8
-!    amb_p = 2.2e-5
-! a9
     amb_p = 0.00055
-! a10
-!    amb_p = 0.0044
 
-! a1
-!    dmb_c = 0.25 / 31. * cpct
-! a2-4
-!    dmb_c = 0.001
-! a5
-!    dmb_c = 0.36
-! a6
-!    dmb_c = 0.34
-! a7
-!    dmb_c = 0.13
-! a8
-!    dmb_c = 0.30
-! a9
     dmb_c = 0.27
-! a10
-!    dmb_c = 0.12
-
-! a1-4
-!    dmb_n = dmb_c / (0.5 * (consts%mb_cn_min + consts%mb_cn_max))
-! a5
-!    dmb_n = 0.072
-! a6
-!    dmb_n = 0.070
-! a7
-!    dmb_n = 0.024
-! a8
-!    dmb_n = 0.052
-! a9
     dmb_n = 0.046
-! a10
-!    dmb_n = 0.021
-
-! a1-4
-!    dmb_p = dmb_c / (0.5 * (consts%mb_cp_min + consts%mb_cp_max))
-! a5
-!    dmb_p = 0.0083
-! a6
-!    dmb_p = 0.0078
-! a7
-!    dmb_p = 0.0028
-! a8
-!    dmb_p = 0.0061
-! a9
     dmb_p = 0.0055
-! a10
-!    dmb_p = 0.0024
 
-! a1
-!    enz_ptase_c = 0.0001 / 31. * cpct
-! a2-4
-!    enz_ptase_c = 0.025
-! a5
-!    enz_ptase_c = 0.0021
-! a6
-!    enz_ptase_c = 0.012
-! a7
-!    enz_ptase_c = 0.050
-! a8
-!    enz_ptase_c = 0.0013
-! a9
     enz_ptase_c = 0.0075
-! a10
-!    enz_ptase_c = 0.034
-
     enz_ptase_n = enz_ptase_c / consts%enz_ptase_c2n
     enz_ptase_p = enz_ptase_c / consts%enz_ptase_c2p
 
@@ -406,7 +165,6 @@ Contains
     pocc = (totp - extrp) * 0.001 * 0.75
     psec = (totp - extrp) * 0.001 * 0.25
     ppar = 100. * 2. / bulk_den ! gP/m2 * 1000mg/g / 0.5 m / bulk_den / 1000kg/g
-!    ppar = 0.
 
     ! SROAK:84 SRTDF:358 PV:527  mgP/kg
     my_total = extrp * 0.001
@@ -414,15 +172,12 @@ Contains
     my_c = - consts%kmm_plang / bulk_den * my_total
     psol = (-my_b + sqrt(my_b**2-4.*my_c))*0.5
     plab = my_total - psol
-!print*,plab,psol,consts%plab_max/bulk_den
-!    plab = extrp * 0.001 ! mgP/gSOIL
+
     if(plab > consts%plab_max / bulk_den)then
        print*,'initialization problem.'
        print*,'initial plab > plab_max'
        stop
     endif
-!    psol = plab * consts%kmm_plang / bulk_den / (consts%plab_max / bulk_den - plab) 
-!print*,plab,psol,consts%plab_max/bulk_den;stop
 
     nh4_plant = 0.
     nh4_bnf = 0.

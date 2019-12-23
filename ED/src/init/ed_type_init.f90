@@ -247,6 +247,7 @@ subroutine init_ed_cohort_vars(cpatch,ico, lsl)
    cpatch%psi_open              (ico) = 0.0
    cpatch%psi_closed            (ico) = 0.0
    cpatch%water_supply          (ico) = 0.0
+   cpatch%water_supply_nl          (ico) = 0.0
    cpatch%gsw_open              (ico) = 0.0
    cpatch%gsw_closed            (ico) = 0.0
    cpatch%leaf_gsw              (ico) = 0.0

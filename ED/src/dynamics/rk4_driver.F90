@@ -138,11 +138,11 @@ module rk4_driver
             patchloop: do ipa = 1,csite%npatches
                cpatch => csite%patch(ipa)
 
-!               call mend_extern_forcing(csite%mend, ipa, &
-!                    cpatch%ncohorts, cpatch%broot, cpatch%nplant, &
-!                    cpatch%pft, cpatch%krdepth, csite%mend%bulk_den(ipa), &
-!                    cpatch%nstorage, cpatch%bstorage, cpatch%nstorage_max(ipa), &
-!                    cpatch%pstorage_max(ipa), cpatch%water_supply_layer_frac, cpatch%lai)
+               call mend_extern_forcing(csite%mend, ipa, &
+                    cpatch%ncohorts, cpatch%broot, cpatch%nplant, &
+                    cpatch%pft, cpatch%krdepth, csite%mend%bulk_den(ipa), &
+                    cpatch%nstorage, cpatch%pstorage, cpatch%nstorage_max, &
+                    cpatch%pstorage_max, cpatch%water_supply_nl, cpatch%lai)
                call mend_update_parameters_coupler(csite%soil_tempk(:,ipa), &
                     csite%soil_water(:,ipa),cpoly%ntext_soil(:,isi), csite%mend%pH(ipa))
 
@@ -289,7 +289,7 @@ module rk4_driver
 !                    initp%mend%som%fluxes%co2_lost(1), &
 !                    csite%patch(ipa)%pft, &
 !                    csite%patch(ipa)%krdepth, &
-!                    csite%patch(ipa)%water_supply_layer_frac, &
+!                    csite%patch(ipa)%water_supply_nl, &
 !                    csite%patch(ipa)%lai)
 
 
@@ -318,13 +318,13 @@ module rk4_driver
                                   ,cpoly%area(isi),cgrid%cbudget_nep(ipy),old_can_enthalpy &
                                   ,old_can_shv,old_can_co2,old_can_rhos,old_can_prss)
 
-               call mend_rk4_inc(csite%mend_mm, csite%mend, dtlsm, ipa, ipa)
+!               call mend_rk4_inc(csite%mend_mm, csite%mend, dtlsm, ipa, ipa)
 
                !---------------------------------------------------------------------------!
             end do patchloop
             !$OMP END PARALLEL DO
 
-            call mend_zero_fluxes(csite%mend)
+!            call mend_zero_fluxes(csite%mend)
 
             !------------------------------------------------------------------------------!
          end do siteloop
@@ -332,7 +332,7 @@ module rk4_driver
       end do polygonloop
       !------------------------------------------------------------------------------------!
 
-      mend_mm_time = mend_mm_time + dtlsm
+!      mend_mm_time = mend_mm_time + dtlsm
 
       return
    end subroutine rk4_timestep
@@ -1609,7 +1609,7 @@ module rk4_driver
       end do
       !------------------------------------------------------------------------------------!
 
-      call copy_mendtype(initp%mend, csite%mend, 1, ipa)
+!      call copy_mendtype(initp%mend, csite%mend, 1, ipa)
 
      return
    end subroutine initp2modelp

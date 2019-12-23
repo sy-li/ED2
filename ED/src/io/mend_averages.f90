@@ -8,13 +8,8 @@ Contains
     implicit none
     type(mend_model) :: y
     real, intent(inout) :: step
-!    integer :: iwood
 
     call mend_normalize_type(y%som, step)
-!    call mend_normalize_type(y%litt, step)
-!    do iwood = 1, nwood
-!       call mend_normalize_type(y%wood(iwood), step)
-!    enddo
 
     step = 0.
 
