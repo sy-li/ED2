@@ -63,9 +63,9 @@ subroutine leaf_derivs(initp,dinitp,csite,ipa,dt,is_hybrid)
    call leaftw_derivs(nzg,initp,dinitp,csite,ipa,dt,is_hybrid)
    !---------------------------------------------------------------------------------------!
 
-   call mend_derivs_coupler(initp%mend%som, dinitp%mend%som, csite, ipa, &
-        dinitp%avg_nutrient_layer_drainage, initp%soil_water, dinitp%can_co2, &
-        dinitp%co2_budget_storage)
+!   call mend_derivs_coupler(initp%mend%som, dinitp%mend%som, csite, ipa, &
+!        dinitp%avg_nutrient_layer_drainage, initp%soil_water, dinitp%can_co2, &
+!        dinitp%co2_budget_storage)
 
    return
 end subroutine leaf_derivs

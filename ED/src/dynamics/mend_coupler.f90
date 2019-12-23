@@ -436,7 +436,7 @@ Contains
     ! No negative drainage.
     som_water_drainage_ps = max(0., som_water_drainage) / (total_water * wdns)
 
-    call plant2som_exchange(npom, &
+    call mend_plant2som_exchange(npom, &
          plant2som%pom_c, plant2som%pom_n, plant2som%pom_p, &
          plant2som%dom_c, plant2som%dom_n, plant2som%dom_p, &
          plant2som%nh4, plant2som%no3, plant2som%psol,   &
