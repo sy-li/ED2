@@ -317,15 +317,22 @@ module rk4_driver
                                   ,ecurr_loss2drainage,wcurr_loss2runoff,ecurr_loss2runoff &
                                   ,cpoly%area(isi),cgrid%cbudget_nep(ipy),old_can_enthalpy &
                                   ,old_can_shv,old_can_co2,old_can_rhos,old_can_prss)
+
+               call mend_rk4_inc(csite%mend_mm, csite%mend, dtlsm, ipa, ipa)
+
                !---------------------------------------------------------------------------!
             end do patchloop
             !$OMP END PARALLEL DO
+
+            call mend_zero_fluxes(csite%mend)
 
             !------------------------------------------------------------------------------!
          end do siteloop
          !---------------------------------------------------------------------------------!
       end do polygonloop
       !------------------------------------------------------------------------------------!
+
+      mend_mm_time = mend_mm_time + dtlsm
 
       return
    end subroutine rk4_timestep
@@ -470,6 +477,7 @@ module rk4_driver
                                       , k_fire_first         ! ! intent(in)
       use plant_hydro          , only : tw2rwc               ! ! subroutine
       use physiology_coms      , only : plant_hydro_scheme
+      use mend_state_vars, only: copy_mendtype
       implicit none
       !----- Arguments --------------------------------------------------------------------!
       type(rk4patchtype), target      :: initp
@@ -1600,6 +1608,9 @@ module rk4_driver
                                         * dtlsm_o_frqsum
       end do
       !------------------------------------------------------------------------------------!
+
+      call copy_mendtype(initp%mend, csite%mend, 1, ipa)
+
      return
    end subroutine initp2modelp
    !=======================================================================================!
