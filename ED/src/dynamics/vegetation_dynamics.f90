@@ -81,7 +81,7 @@ subroutine vegetation_dynamics(new_month,new_year)
                csite%plant_input_C(:,ipa) = 0.
                csite%plant_input_N(:,ipa) = 0.
                csite%plant_input_P(:,ipa) = 0.
-!               call mend_slow_P(csite%mend, ipa)
+               call mend_slow_P(csite%mend, ipa)
             enddo
          enddo
       enddo

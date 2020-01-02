@@ -221,7 +221,6 @@ subroutine leaftw_derivs(mzg,initp,dinitp,csite,ipa,dt,is_hybrid)
    cpatch => csite%patch(ipa)
    !---------------------------------------------------------------------------------------!
 
-
    !----- Copy the # of surface water/snow layers and bottom layer to aliases -------------!
    ksn  = initp%nlev_sfcwater
    klsl = rk4site%lsl

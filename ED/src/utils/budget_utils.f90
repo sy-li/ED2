@@ -374,6 +374,9 @@ module budget_utils
       if (checkbudget) then
          co2_ok  = abs(co2curr_residual) <= rk4eps * ( abs(co2budget_finalstorage)         &
                                                      + abs(co2budget_deltastorage) )
+
+co2_ok = .true.
+
          energy_ok = abs(ecurr_residual) <= rk4eps * ( abs(ebudget_finalstorage)           &
                                                      + abs(ebudget_deltastorage)   )
          water_ok  = abs(wcurr_residual) <= rk4eps * ( abs(wbudget_finalstorage)           &

@@ -322,6 +322,7 @@ Contains
     d_p_leach = 0.
     d_p_plant = 0.
 
+
 !    if(trim(consts%type) /= 'som' .and. trim(consts%type) /= 'litter')return
 !    if(trim(consts%type) == 'som')return
 !    if(trim(consts%type) == 'som')return

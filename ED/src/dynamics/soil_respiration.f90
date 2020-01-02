@@ -149,7 +149,7 @@ subroutine soil_respiration(csite,ipa,mzg,ntext_soil)
    csite%A_decomp(ipa) = het_resp_weight(avg_soil_temp,rel_soil_moist)
    !---------------------------------------------------------------------------------------!
 
-
+return
 
    !----- Compute nitrogen immobilization factor. -----------------------------------------!
    call resp_f_decomp(csite,ipa, Lc)

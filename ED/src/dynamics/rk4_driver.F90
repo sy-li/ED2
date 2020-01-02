@@ -333,7 +333,7 @@ module rk4_driver
       !------------------------------------------------------------------------------------!
 
       mend_mm_time = mend_mm_time + dtlsm
-print*,'mend_mm_time',mend_mm_time
+
       return
    end subroutine rk4_timestep
    !=======================================================================================!
