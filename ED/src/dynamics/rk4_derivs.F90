@@ -9,7 +9,7 @@
 !------------------------------------------------------------------------------------------!
 subroutine leaf_derivs(initp,dinitp,csite,ipa,dt,is_hybrid)
 
-   use rk4_coms               , only : rk4patchtype       ! ! structure
+   use rk4_coms               , only : rk4patchtype,rk4site,rk4aux       ! ! structure
    use ed_state_vars          , only : sitetype           & ! structure
                                      , polygontype        ! ! structure
    use grid_coms              , only : nzg                ! ! intent(in)
@@ -63,9 +63,9 @@ subroutine leaf_derivs(initp,dinitp,csite,ipa,dt,is_hybrid)
    call leaftw_derivs(nzg,initp,dinitp,csite,ipa,dt,is_hybrid)
    !---------------------------------------------------------------------------------------!
 
-!   call mend_derivs_coupler(initp%mend%som, dinitp%mend%som, csite, ipa, &
-!        dinitp%avg_nutrient_layer_drainage, initp%soil_water, dinitp%can_co2, &
-!        dinitp%co2_budget_storage)
+   call mend_derivs_coupler(initp%mend%som, dinitp%mend%som, csite, ipa, &
+        dinitp%avg_nutrient_layer_drainage, initp%soil_water, dinitp%can_co2, &
+        dinitp%co2budget_storage, rk4aux(1)%ccapcani, rk4site%ntext_soil)
 
    return
 end subroutine leaf_derivs

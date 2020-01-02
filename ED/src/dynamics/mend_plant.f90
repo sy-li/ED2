@@ -5,7 +5,7 @@ Module mend_plant
 
 Contains
 
-  subroutine som_plant_enzymes(ncohorts, broot, nplant, pft, &
+  subroutine mend_som_plant_enzymes(ncohorts, broot, nplant, pft, &
        krdepth, slden, enz_plant_n, &
        enz_plant_p, vnh4up_plant, vno3up_plant, vpup_plant, consts, &
        nstorage, pstorage, nstorage_max, pstorage_max, water_supply_nl, lai)
@@ -44,8 +44,6 @@ Contains
     real :: pstorage_max_total
     real :: nplant_total
     integer, parameter :: nutr_limit_scheme = 1
-    real :: transp_fact
-    real, save :: transp_fact_max = 0.
 
     enz_plant_n = 0.
     enz_plant_p = 0.
@@ -53,19 +51,18 @@ Contains
     vno3up_plant = 0.
     vpup_plant = 0.
 
-!    print*,sum(water_supply/lai)/600*86400.*5.
-! Aim for 3
-! Normalization factor = 3/5/86400*600*lai = 0.004 * lai
-
     ! Plant enzyme carrier abundance.
+
     ! (1) In a typical tropical forest, Zhu et al. assume that the number of plant
     ! carrier enzymes is equal to the number of microbial carrier
-    ! enzymes. But this statement is quite ambiguous. Does it apply to NH4
+    ! enzymes. But this statement is ambiguous. Does it apply to NH4
     ! carriers, PO4 carriers, sum of all carriers? Does it mean that the number of 
-    ! enzymes is the same, or the amount of C in enzymes is the same? 
-    ! Say that it applies to the number of enzymes, in moles. Further assume
+    ! enzymes is the same (which they do not simulate), or the amount of C in enzymes 
+    ! (which they do simulate) is the same? 
+    ! Here I assume that it applies to the number of enzymes, in moles. I further assume
     ! that it applies to each enzyme type individually.
-    ! (2) Even more confusingly, they say that the scaling factor between
+
+    ! (2) Zhu et al. also say that the scaling factor between
     ! microbial biomass and enzyme abundance is 0.05. Does this mean 0.05 g C enzyme
     ! per g C microbe? Does it apply to all types of transport enzymes - is it a sum
     ! over types? Are transport enzymes generic? Further, Tang and Riley suggest a huge
@@ -76,6 +73,7 @@ Contains
     ! Enzyme amount is then 4e-5 mgC/gSoil.
     ! They estimate plant root biomass at 400 gC/m2, or 3 mgC/gSoil.
     ! Then, enzyme C per fine root C should be: 1e-5. This agrees with their 0.0000125.
+
     ! ANOTHER APPROACH.
     ! Say that it applies to number counts (moles).
     ! Number of enzymes is 0.05 * amb_c * (g soil) * (# microbes/ mg micr biomass C)
@@ -85,6 +83,7 @@ Contains
     ! (# plant enz / mg C fine root) = 1e-5 * (# microbes / mg micr biomass C) = K1
     ! This, I guess, would represent the sum of all transporter enzymes.
     ! 5e7 cells/gram soil, 5e10 cell/kgSoil, 4e13 cell/m3 soil, 8e12 cell/m2, 8e13 cell/g micr C, 8e10 cell/mg micr C
+
     ! (3) The MM constants are listed in grams/m2. Presumably this is in gN/m2, but I am
     ! not 100% sure. If so, I convert to gN/kgSoil. So conversion of the plant enzymes is:
     ! [E_plant_sum] = (8e5) * (1e6 mg C fine root / kg C fine root) * broot * nplant / soildepth / bulkden / AvoNum * (14 gN/mol)  
@@ -119,7 +118,6 @@ Contains
     ! 1000mgCenz / 1 gCenz     /            ! mgCenz / gsoil
     ! enzC:Nratio                           ! mgNenz / gsoil
 
-    ! Ecosystem-level nutrient limitation
     do ico = 1, ncohorts
        broot_nl = broot(ico) * (1. - root_beta(pft(ico))**  &
             (-slz(nlsl)/(-slz(krdepth(ico)))))
@@ -138,25 +136,24 @@ Contains
             consts%enz2biomass_plant * nplant(ico) * broot_nl /   & 
             consts%eff_soil_depth / slden * 31.
        
-       transp_fact = 1.
        vnh4up_plant(pft(ico)) = vnh4up_plant(pft(ico)) + consts%vnh4up_plant_base *  &
             consts%enz2biomass_plant * nplant(ico) * broot_nl /   & 
             consts%eff_soil_depth / slden * 14. * &
-            n_limit_factor * transp_fact
+            n_limit_factor
        vno3up_plant(pft(ico)) = vno3up_plant(pft(ico)) + consts%vno3up_plant_base *  &
             consts%enz2biomass_plant * nplant(ico) * broot_nl /   & 
             consts%eff_soil_depth / slden * 14. * &
-            n_limit_factor * transp_fact
+            n_limit_factor
        vpup_plant(pft(ico)) = vpup_plant(pft(ico)) + consts%vpup_plant_base *  &
             consts%enz2biomass_plant * nplant(ico) * broot_nl /   & 
             consts%eff_soil_depth / slden * 31. * &
-            p_limit_factor * transp_fact
+            p_limit_factor
     enddo
 
     return
-  end subroutine som_plant_enzymes
+  end subroutine mend_som_plant_enzymes
 
-  subroutine som_plant_feedback(nh4_plant, no3_plant, p_plant, slden,  &
+  subroutine mend_som_plant_feedback(nh4_plant, no3_plant, p_plant, slden,  &
        consts, ncohorts, nstorage, pstorage, nstorage_max, pstorage_max, &
        nplant, broot, rh, co2_lost, pft, krdepth, water_supply_nl, lai)
     use ed_misc_coms, only: dtlsm
@@ -278,50 +275,6 @@ Contains
 !    co2_lost = 0.
 
     return
-  end subroutine som_plant_feedback
-
-  subroutine litt_plant_enzymes(enz_plant_n, enz_plant_p, vnh4up_plant,  &
-       vno3up_plant, vpup_plant)
-    use ed_max_dims, only: n_pft
-    implicit none
-    
-    real, intent(out), dimension(n_pft) :: enz_plant_n
-    real, intent(out), dimension(n_pft) :: enz_plant_p
-    real, intent(out), dimension(n_pft) :: vnh4up_plant
-    real, intent(out), dimension(n_pft) :: vno3up_plant
-    real, intent(out), dimension(n_pft) :: vpup_plant
-
-    enz_plant_n = 0.
-    enz_plant_p = 0.
-
-    vnh4up_plant = 0.
-    vno3up_plant = 0.
-    vpup_plant = 0.
-
-    return
-  end subroutine litt_plant_enzymes
-
-  subroutine wood_plant_enzymes(iwood, enz_plant_n, enz_plant_p,  &
-       vnh4up_plant, vno3up_plant, vpup_plant)
-    use ed_max_dims, only: n_pft
-    implicit none
-    
-    integer, intent(in) :: iwood
-    real, intent(out), dimension(n_pft) :: enz_plant_n
-    real, intent(out), dimension(n_pft) :: enz_plant_p
-    real, intent(out), dimension(n_pft) :: vnh4up_plant
-    real, intent(out), dimension(n_pft) :: vno3up_plant
-    real, intent(out), dimension(n_pft) :: vpup_plant
-
-    enz_plant_n = 0.
-    enz_plant_p = 0.
-
-    vnh4up_plant = 0.
-    vno3up_plant = 0.
-    vpup_plant = 0.
-
-    return
-  end subroutine wood_plant_enzymes
-
+  end subroutine mend_som_plant_feedback
 
 end Module mend_plant

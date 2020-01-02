@@ -18,23 +18,13 @@ Contains
     
     real :: tp
     real :: wp
-    real, intent(in) :: pH !=6.24  ! SROAK: 5.82; SRTDF: 6.24; PVTDF: 6.83
+    real, intent(in) :: pH
     real :: wfp
     integer :: ntxt
 
     ntxt = ntext_soil(nzg)
     tp = soil_tempk(nzg) - 273.15
     wfp = soil_water(nzg) / soil(ntxt)%slmsts
-
-!tp = tp + 2.
-!wfp = 0.8
-
-!    root_avail_water = 0.
-!    do k = krdepth, nzg
-!       root_avail_water = root_avail_water + soil_water(k)*dslz(k) !m3/m2
-!    enddo
-!    root_avail_water = root_avail_water / (-slz(krdepth)) !m3/m3
-!    wgpfrac = root_avail_water / slmsts
     wp = wdns * grav * soil(ntxt)%slpots / wfp**soil(ntxt)%slbs * 1.0e-6
 
     call mend_update_parameters(tp, wp, pH, wfp, som_consts, som_consts_base, &
@@ -46,9 +36,8 @@ Contains
   subroutine mend_init(sens_params)
     use ed_state_vars, only: edgrid_g, edtype, polygontype, sitetype
     use nutrient_constants, only: soil_bulk_den, soil_ph
-    use mend_consts_coms, only: mend_init_consts, litt_consts, wood_consts, &
-         som_consts
-    use mend_som, only: som_init
+    use mend_consts_coms, only: mend_init_consts, som_consts
+    use mend_som, only: mend_som_init
     use mend_state_vars, only: npom, nwood, mend_zero_vars, mend_mm_time
     use nutrient_constants, only: soil_cpct, soil_som_c2n, soil_totp,   &
          soil_extrp
@@ -82,7 +71,7 @@ Contains
              csite%mend_mm%bulk_den(ipa) = csite%mend%bulk_den(ipa)
              csite%mend_mm%pH(ipa) = csite%mend%pH(ipa)
 
-             call som_init(npom,  &
+             call mend_som_init(npom,  &
                   csite%mend%som%cvars%pom(:,ipa), csite%mend%som%cvars%dom(ipa), &
                   csite%mend%som%cvars%enz_pom(:,ipa), csite%mend%som%cvars%mom(ipa),  &
                   csite%mend%som%cvars%qom(ipa), csite%mend%som%cvars%enz_mom(ipa),  &
@@ -132,11 +121,11 @@ Contains
        pft, krdepth, slden, nstorage, pstorage,   &
        nstorage_max, pstorage_max, water_supply_nl, lai)
     use mend_state_vars, only: mend_model, nwood
-    use mend_som, only: som_extern_forcing
+    use mend_som, only: mend_som_extern_forcing
     use mend_consts_coms, only: som_consts
     use nutrient_constants, only: ndep_rate, pdep_rate, ndep_appl, pdep_appl, nlsl
     use ed_misc_coms, only: current_time
-    use mend_plant, only: som_plant_enzymes, litt_plant_enzymes, wood_plant_enzymes
+    use mend_plant, only: mend_som_plant_enzymes
     use soil_coms, only: nzg
     implicit none
     type(mend_model) :: mend
@@ -157,13 +146,12 @@ Contains
     integer :: ico
     real, intent(in) :: slden
 
-print*,water_supply_nl;stop
-    call som_extern_forcing(ndep_rate, som_consts, slden, &
+    call mend_som_extern_forcing(ndep_rate, som_consts, slden, &
          mend%som%fluxes%nh4_dep(ipa), mend%som%fluxes%no3_dep(ipa), &
          pdep_rate, mend%som%fluxes%ppar_dep(ipa), current_time%year, &
          ndep_appl, pdep_appl)
     
-    call som_plant_enzymes(ncohorts, broot, nplant, pft,  &
+    call mend_som_plant_enzymes(ncohorts, broot, nplant, pft,  &
          krdepth, slden, mend%som%plvars%enz_plant_n(:,ipa),  &
          mend%som%plvars%enz_plant_p(:,ipa), &
          mend%som%plvars%vnh4up_plant(:,ipa),  &
@@ -171,41 +159,18 @@ print*,water_supply_nl;stop
          mend%som%plvars%vpup_plant(:,ipa), som_consts, nstorage, pstorage, &
          nstorage_max, pstorage_max, water_supply_nl, lai)
 
-!    call litt_extern_forcing(mend%litt%fluxes%nh4_dep(ipa), &
-!         mend%litt%fluxes%no3_dep(ipa), mend%litt%fluxes%ppar_dep(ipa))
-    
-!    call litt_plant_enzymes(mend%litt%plvars%enz_plant_n(:,ipa), &
-!         mend%litt%plvars%enz_plant_p(:,ipa), &
-!         mend%litt%plvars%vnh4up_plant(:,ipa),  &
-!         mend%litt%plvars%vno3up_plant(:,ipa), &
-!         mend%litt%plvars%vpup_plant(:,ipa))
-    
-!    do iwood = 1, nwood
-!       call wood_extern_forcing(iwood, mend%wood(iwood)%fluxes%nh4_dep(ipa), &
-!            mend%wood(iwood)%fluxes%no3_dep(ipa),  &
-!            mend%wood(iwood)%fluxes%ppar_dep(ipa))
-!       call wood_plant_enzymes(iwood, &
-!            mend%wood(iwood)%plvars%enz_plant_n(:,ipa), &
-!            mend%wood(iwood)%plvars%enz_plant_p(:,ipa), &
-!            mend%wood(iwood)%plvars%vnh4up_plant(:,ipa), &
-!            mend%wood(iwood)%plvars%vno3up_plant(:,ipa), &
-!            mend%wood(iwood)%plvars%vpup_plant(:,ipa))
-!    enddo
-
     return
   end subroutine mend_extern_forcing
 
-  subroutine mend_derivs_coupler(som, d_som, litt, d_litt, wood, d_wood, &
+  subroutine mend_derivs_coupler(som, d_som, &
        csite, ipa, som_water_drainage, soil_water, d_can_co2, &
        d_co2budget_storage,ccapcani, ntext_soil)
-    use mend_exchange, only: litt2som_exchange, plant2litt_exchange, &
-         mend_plant2som_exchange, plant2wood_exchange, wood2litt_exchange, &
-         wood2som_exchange, zero_exchange_vars, inc_exchange_vars, &
-         wood2wood_exchange, som2canopy_exchange
+    use mend_exchange, only: mend_plant2som_exchange, zero_exchange_vars, inc_exchange_vars, &
+         mend_som2canopy_exchange
     use ed_state_vars, only: sitetype
     use mend_derivs, only: mend_derivs_layer
-    use mend_consts_coms, only: som_consts, litt_consts, wood_consts
-    use mend_state_vars, only: mend_vars, exchange_vars, npom, nwood
+    use mend_consts_coms, only: som_consts
+    use mend_state_vars, only: mend_vars, exchange_vars, npom
     use grid_coms, only: nzg
     use soil_coms, only: dslz, soil
     use consts_coms, only: wdns, pi1
@@ -215,26 +180,12 @@ print*,water_supply_nl;stop
 
     real(kind=8), intent(in) :: som_water_drainage
     real(kind=8), dimension(nzg), intent(in) :: soil_water
-    real :: litt_water_drainage
-    real :: wood_water_drainage
     integer, intent(in) :: ipa
     type(sitetype), target :: csite
     type(mend_vars) :: som
     type(mend_vars) :: d_som
-    type(mend_vars) :: litt
-    type(mend_vars) :: d_litt
-    type(mend_vars), dimension(nwood) :: wood
-    type(mend_vars), dimension(nwood) :: d_wood
     real(kind=8), intent(in) :: ccapcani
-    type(exchange_vars) :: litt2som
-    type(exchange_vars) :: plant2litt
     type(exchange_vars) :: plant2som
-    type(exchange_vars), dimension(nwood) :: plant2wood
-    type(exchange_vars), dimension(nwood) :: wood2litt
-    type(exchange_vars), dimension(nwood) :: wood2som
-    type(exchange_vars) :: wood2litt_sum
-    type(exchange_vars) :: wood2som_sum
-    type(exchange_vars), dimension(nwood, nwood) :: wood2wood
 
     real, dimension(npom) :: input_pom_c_net
     real, dimension(npom) :: input_pom_n_net
@@ -246,8 +197,6 @@ print*,water_supply_nl;stop
     real :: input_no3_net
     real :: input_psol_net
     real :: input_ppar_net
-    integer :: iwood
-    integer :: jwood
     real :: gm2_mgg
     real :: total_water
     integer :: k
@@ -258,7 +207,6 @@ print*,water_supply_nl;stop
     integer, dimension(nzg) :: ntext_soil
 
     wfp = soil_water(nzg) / soil(ntext_soil(nzg))%slmsts
-!    wfp = soil_water(nzg) / soil(csite%ntext_soil(nzg,ipa))%slmsts
     gm2_mgg = 1. / (som_consts%eff_soil_depth * csite%mend%bulk_den(ipa))
     total_water = 0.
     do k = nlsl, nzg
@@ -281,23 +229,23 @@ print*,water_supply_nl;stop
     d_som%plvars%plant_input_N_dom = plant2som%dom_n * gm2_mgg * 1000./86400.
     d_som%plvars%plant_input_P_dom = plant2som%dom_p * gm2_mgg * 1000./86400.
 
-    input_pom_c_net = (plant2som%pom_c+litt2som%pom_c+wood2som_sum%pom_c) * &
+    input_pom_c_net = (plant2som%pom_c) * &
          gm2_mgg * 1000./86400.
-    input_dom_c_net = (plant2som%dom_c+litt2som%dom_c+wood2som_sum%dom_c) * &
+    input_dom_c_net = (plant2som%dom_c) * &
          gm2_mgg * 1000./86400.
-    input_pom_n_net = (plant2som%pom_n+litt2som%pom_n+wood2som_sum%pom_n) * &
+    input_pom_n_net = (plant2som%pom_n) * &
          gm2_mgg * 1000./86400.
-    input_dom_n_net = (plant2som%dom_n+litt2som%dom_n+wood2som_sum%dom_n) * &
+    input_dom_n_net = (plant2som%dom_n) * &
          gm2_mgg * 1000./86400.
-    input_pom_p_net = (plant2som%pom_p+litt2som%pom_p+wood2som_sum%pom_p) * &
+    input_pom_p_net = (plant2som%pom_p) * &
          gm2_mgg * 1000./86400.
-    input_dom_p_net = (plant2som%dom_p+litt2som%dom_p+wood2som_sum%dom_p) * &
+    input_dom_p_net = (plant2som%dom_p) * &
          gm2_mgg * 1000./86400.
-    input_nh4_net = (plant2som%nh4 + litt2som%nh4 + wood2som_sum%nh4) * &
+    input_nh4_net = (plant2som%nh4) * &
          gm2_mgg  * 1000./86400. + som%fluxes%nh4_dep(1)
-    input_no3_net = (plant2som%no3 + litt2som%no3 + wood2som_sum%no3) * &
+    input_no3_net = (plant2som%no3) * &
          gm2_mgg  * 1000./86400. + som%fluxes%no3_dep(1)
-    input_psol_net = (plant2som%psol + litt2som%psol + wood2som_sum%psol) * &
+    input_psol_net = (plant2som%psol) * &
          gm2_mgg  * 1000./86400. + som%fluxes%ppar_dep(1)
     input_ppar_net = 0.
     call mend_derivs_layer(npom, som_consts,  &
@@ -350,7 +298,7 @@ print*,water_supply_nl;stop
          som%plvars%vpup_plant(:,1), som_water_drainage_ps, &
          csite%mend%bulk_den(ipa), pi1, wfp)
 
-    call som2canopy_exchange(d_som%fluxes%co2_lost(1),  &
+    call mend_som2canopy_exchange(d_som%fluxes%co2_lost(1),  &
          csite%mend%bulk_den(ipa), som_consts, &
          d_can_co2, d_co2budget_storage, ccapcani)
 
@@ -359,18 +307,13 @@ print*,water_supply_nl;stop
 
   subroutine mend_update_diag(mend)
     use mend_state_vars, only: mend_model, nwood
-    use mend_consts_coms, only: som_consts, litt_consts, wood_consts
+    use mend_consts_coms, only: som_consts
     use mend_diagnose, only: mend_update_diag_layer
     implicit none
     type(mend_model) :: mend
     integer :: iwood
 
     call mend_update_diag_layer(mend%som, som_consts, 1, mend%bulk_den(1))
-!    call mend_update_diag_layer(mend%litt, litt_consts, 1, mend%bulk_den(1))
-!    do iwood = 1, nwood
-!       call mend_update_diag_layer(mend%wood(iwood), wood_consts(iwood), 1, &
-!            mend%bulk_den(1))
-!    enddo
 
     return
   end subroutine mend_update_diag
@@ -378,7 +321,7 @@ print*,water_supply_nl;stop
   subroutine mend_slow_P(mend, ipa)
     use mend_state_vars, only: mend_model, nwood
     use mend_derivs, only: mend_slow_P_layer
-    use mend_consts_coms, only: som_consts, litt_consts, wood_consts
+    use mend_consts_coms, only: som_consts
     use mend_diagnose, only: mend_update_diag_layer
     implicit none
     type(mend_model) :: mend

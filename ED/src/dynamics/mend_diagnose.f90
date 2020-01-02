@@ -530,14 +530,6 @@ Contains
     Potter_y = 0.477 * Potter_P**3 - 0.596 * Potter_P**2 +   &
          0.437 * Potter_P + 0.564
     consts%v_denitr = Potter_P**Potter_y
-!print*,Potter_P,Potter_y, consts%v_denitr;stop
-
-!   M = min(0.113,DFC)*(-3.05)+0.36
-!    myM = 0.01  ! but can be up to 0.1 for clay
-!    myA = 9.0 - myM * (d_co2_lost*86400.*1000.)
-!    water_function = 0.5 + atan(0.6*pi1*(0.1*(soil_water/slmsts*100.)-a))/pi1
-
-
 
     return
   end subroutine mend_update_parameters
@@ -567,16 +559,8 @@ Contains
 
     my_v = consts%vmax_surf / bulk_den
 
-!    my_b = my_k + my_v - my_total
-!    my_c = - my_k * my_total
-!    mvars%invars%psol(ipa) = (-my_b + sqrt(my_b**2-4.*my_c))*0.5
-!    mvars%invars%plab(ipa) = my_total - mvars%invars%psol(ipa)
-
     mvars%invars%plab(ipa) = my_v * my_total / (my_k + my_total)
     mvars%invars%psol(ipa) = my_total - mvars%invars%plab(ipa)
-!if(mvars%invars%psol(ipa) < 1.0e-12 .or. mvars%invars%plab(ipa) < 1.0e-12)then
-!write(*,*)'p values',my_total,mvars%invars%psol(ipa),mvars%invars%plab(ipa)
-!endif
 
     do ipom = 1, npom
        mvars%nvars%enz_pom(ipom,ipa) = mvars%cvars%enz_pom(ipom,ipa) / consts%enz_pom_c2n(ipom)

@@ -474,7 +474,7 @@ subroutine copy_patch_init(sourcesite,ipa,targetp,vels)
 
    if (print_detailed) call reset_rk4_fluxes(targetp)
 
-!   call copy_mendtype(sourcesite%mend, targetp%mend, ipa, 1)
+   call copy_mendtype(sourcesite%mend, targetp%mend, ipa, 1)
 
    return
 end subroutine copy_patch_init
@@ -1302,7 +1302,7 @@ subroutine update_diagnostic_vars(initp, csite,ipa)
    end if
    !---------------------------------------------------------------------------------------!
    
-!   call mend_update_diag(initp%mend)
+   call mend_update_diag(initp%mend)
 
    return
 end subroutine update_diagnostic_vars

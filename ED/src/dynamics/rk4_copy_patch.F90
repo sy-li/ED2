@@ -267,7 +267,7 @@ subroutine copy_rk4_patch(sourcep, targetp, cpatch)
       end do
    end if
 
-!   call copy_mendtype(sourcep%mend, targetp%mend, 1, 1)
+   call copy_mendtype(sourcep%mend, targetp%mend, 1, 1)
 
    return
 end subroutine copy_rk4_patch

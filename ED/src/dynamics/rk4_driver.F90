@@ -37,7 +37,7 @@ module rk4_driver
                                         , compute_budget       ! ! function
       use mend_coupler, only: mend_extern_forcing, mend_update_parameters_coupler
       use mend_rk4, only: mend_rk4_inc, mend_zero_fluxes
-      use mend_plant, only: som_plant_feedback
+      use mend_plant, only: mend_som_plant_feedback
       use mend_consts_coms, only: som_consts
       use mend_state_vars, only: mend_mm_time
 
@@ -138,13 +138,6 @@ module rk4_driver
             patchloop: do ipa = 1,csite%npatches
                cpatch => csite%patch(ipa)
 
-               call mend_extern_forcing(csite%mend, ipa, &
-                    cpatch%ncohorts, cpatch%broot, cpatch%nplant, &
-                    cpatch%pft, cpatch%krdepth, csite%mend%bulk_den(ipa), &
-                    cpatch%nstorage, cpatch%pstorage, cpatch%nstorage_max, &
-                    cpatch%pstorage_max, cpatch%water_supply_nl, cpatch%lai)
-               call mend_update_parameters_coupler(csite%soil_tempk(:,ipa), &
-                    csite%soil_water(:,ipa),cpoly%ntext_soil(:,isi), csite%mend%pH(ipa))
 
                ibuff = 1
                !$ ibuff = OMP_get_thread_num()+1
@@ -238,6 +231,15 @@ module rk4_driver
                !---------------------------------------------------------------------------!
 
 
+               call mend_update_parameters_coupler(csite%soil_tempk(:,ipa), &
+                    csite%soil_water(:,ipa),cpoly%ntext_soil(:,isi), csite%mend%pH(ipa))
+
+               call mend_extern_forcing(csite%mend, ipa, &
+                    cpatch%ncohorts, cpatch%broot, cpatch%nplant, &
+                    cpatch%pft, cpatch%krdepth, csite%mend%bulk_den(ipa), &
+                    cpatch%nstorage, cpatch%pstorage, cpatch%nstorage_max, &
+                    cpatch%pstorage_max, cpatch%water_supply_nl, cpatch%lai)
+
                !----- Get photosynthesis, stomatal conductance, and transpiration. --------!
                call canopy_photosynthesis(csite,cmet,nzg,ipa,cpoly%ntext_soil(:,isi)       &
                                          ,cpoly%leaf_aging_factor(:,isi)                   &
@@ -272,26 +274,24 @@ module rk4_driver
                                        ,wcurr_loss2runoff,ecurr_loss2runoff,nsteps)
                !---------------------------------------------------------------------------!
 
-
-!               call mend_som_plant_feedback( &
-!                    initp%mend%som%fluxes%nh4_plant(:,1), &
-!                    initp%mend%som%fluxes%no3_plant(:,1), &
-!                    initp%mend%som%fluxes%p_plant(:,1), &
-!                    csite%mend%bulk_den(ipa), &
-!                    som_consts, &
-!                    csite%patch(ipa)%ncohorts, &
-!                    csite%patch(ipa)%nstorage, &
-!                    csite%patch(ipa)%pstorage, &
-!                    csite%patch(ipa)%nstorage_max, &
-!                    csite%patch(ipa)%pstorage_max, &
-!                    csite%patch(ipa)%nplant, &
-!                    csite%patch(ipa)%broot, csite%rh(ipa), &
-!                    initp%mend%som%fluxes%co2_lost(1), &
-!                    csite%patch(ipa)%pft, &
-!                    csite%patch(ipa)%krdepth, &
-!                    csite%patch(ipa)%water_supply_nl, &
-!                    csite%patch(ipa)%lai)
-
+               call mend_som_plant_feedback( &
+                    initp%mend%som%fluxes%nh4_plant(:,1), &
+                    initp%mend%som%fluxes%no3_plant(:,1), &
+                    initp%mend%som%fluxes%p_plant(:,1), &
+                    csite%mend%bulk_den(ipa), &
+                    som_consts, &
+                    csite%patch(ipa)%ncohorts, &
+                    csite%patch(ipa)%nstorage, &
+                    csite%patch(ipa)%pstorage, &
+                    csite%patch(ipa)%nstorage_max, &
+                    csite%patch(ipa)%pstorage_max, &
+                    csite%patch(ipa)%nplant, &
+                    csite%patch(ipa)%broot, csite%rh(ipa), &
+                    initp%mend%som%fluxes%co2_lost(1), &
+                    csite%patch(ipa)%pft, &
+                    csite%patch(ipa)%krdepth, &
+                    csite%patch(ipa)%water_supply_nl, &
+                    csite%patch(ipa)%lai)
 
                !----- Add the number of steps into the step counter. ----------------------!
                !----- workload accumulation is order-independent, so this can stay shared
@@ -318,13 +318,13 @@ module rk4_driver
                                   ,cpoly%area(isi),cgrid%cbudget_nep(ipy),old_can_enthalpy &
                                   ,old_can_shv,old_can_co2,old_can_rhos,old_can_prss)
 
-!               call mend_rk4_inc(csite%mend_mm, csite%mend, dtlsm, ipa, ipa)
+               call mend_rk4_inc(csite%mend_mm, csite%mend, dtlsm, ipa, ipa)
 
                !---------------------------------------------------------------------------!
             end do patchloop
             !$OMP END PARALLEL DO
 
-!            call mend_zero_fluxes(csite%mend)
+            call mend_zero_fluxes(csite%mend)
 
             !------------------------------------------------------------------------------!
          end do siteloop
@@ -332,8 +332,8 @@ module rk4_driver
       end do polygonloop
       !------------------------------------------------------------------------------------!
 
-!      mend_mm_time = mend_mm_time + dtlsm
-
+      mend_mm_time = mend_mm_time + dtlsm
+print*,'mend_mm_time',mend_mm_time
       return
    end subroutine rk4_timestep
    !=======================================================================================!
@@ -1609,7 +1609,7 @@ module rk4_driver
       end do
       !------------------------------------------------------------------------------------!
 
-!      call copy_mendtype(initp%mend, csite%mend, 1, ipa)
+      call copy_mendtype(initp%mend, csite%mend, 1, ipa)
 
      return
    end subroutine initp2modelp

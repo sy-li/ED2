@@ -4847,7 +4847,6 @@ subroutine init_soil_coms
    !---------------------------------------------------------------------------------------!
 
 
-
    !---------------------------------------------------------------------------------------!
    !******** Correct soil_class table using sand and clay fractions (if provided)  ********!
    !      Based on Cosby et al 1984, using table 4 and equation 1 (which is incorrect it   !

@@ -3,7 +3,7 @@ Module mend_som
 
 Contains
 
-  subroutine som_init(npom,  &
+  subroutine mend_som_init(npom,  &
        pom_c, dom_c, enz_pom_c, mom_c, qom_c, enz_mom_c, amb_c, dmb_c,  &
        pom_n, dom_n, enz_pom_n, mom_n, qom_n, enz_mom_n, amb_n, dmb_n,  &
        pom_p, dom_p, enz_pom_p, mom_p, qom_p, enz_mom_p, amb_p, dmb_p,  &
@@ -208,9 +208,9 @@ Contains
     plant_input_P_dom = 0.
 
     return
-  end subroutine som_init
+  end subroutine mend_som_init
 
-  subroutine som_extern_forcing(ndep_rate, consts, slden, input_nh4, &
+  subroutine mend_som_extern_forcing(ndep_rate, consts, slden, input_nh4, &
        input_no3, pdep_rate, input_ppar, year, ndep_appl, pdep_appl)
 
     use mend_consts_coms, only: decomp_consts
@@ -234,12 +234,12 @@ Contains
 
     input_ppar = pdep_rate / (consts%eff_soil_depth * slden * 1000.)
 
-    if(year >= 2015)then
-       input_nh4 = input_nh4 + ndep_appl / (consts%eff_soil_depth * slden * 1000.)
-       input_ppar = input_ppar + pdep_appl / (consts%eff_soil_depth * slden * 1000.)
-    endif
+!    if(year >= 2015)then
+!       input_nh4 = input_nh4 + ndep_appl / (consts%eff_soil_depth * slden * 1000.)
+!       input_ppar = input_ppar + pdep_appl / (consts%eff_soil_depth * slden * 1000.)
+!    endif
 
     return
-  end subroutine som_extern_forcing
+  end subroutine mend_som_extern_forcing
 
 end Module mend_som
