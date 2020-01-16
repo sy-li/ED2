@@ -203,14 +203,8 @@ Contains
   subroutine mend_deallocate(mend)
     implicit none
     type(mend_model) :: mend
-!    integer :: iwood
 
     call mend_deallocate_type(mend%som)
-!    call mend_deallocate_type(mend%litt)
-!    do iwood = 1, nwood
-!       call mend_deallocate_type(mend%wood(iwood))
-!    enddo
-!    call mend_deallocate_exchange(mend%exchange)
 
     deallocate(mend%bulk_den)
     deallocate(mend%pH)
@@ -438,10 +432,10 @@ Contains
     implicit none
     
     type(mend_model) :: imend
-    integer, intent(in) :: masksz
-    logical, dimension(masksz), intent(in) :: logmask
-    type(mend_model) :: omend
     integer, intent(in) :: inc
+    integer, intent(in) :: masksz
+    logical, dimension(inc), intent(in) :: logmask
+    type(mend_model) :: omend
 !    integer :: iwood
 
     call copy_mendtype_mask_type(imend%som, omend%som, masksz, logmask, inc)
@@ -451,8 +445,8 @@ Contains
 !    enddo
 !    call copy_mendtype_mask_exchange(imend%exchange, omend%exchange, masksz, logmask, inc)
 
-    omend%bulk_den(1:inc) = pack(imend%bulk_den, logmask)
-    omend%pH(1:inc) = pack(imend%pH, logmask)
+    omend%bulk_den(1:masksz) = pack(imend%bulk_den, logmask)
+    omend%pH(1:masksz) = pack(imend%pH, logmask)
 
     return
   end subroutine copy_mendtype_mask
@@ -462,9 +456,9 @@ Contains
     implicit none
     type(mend_vars) :: imvars
     type(mend_vars) :: omvars
-    integer, intent(in) :: masksz
-    logical, dimension(masksz), intent(in) :: logmask
     integer, intent(in) :: inc
+    integer, intent(in) :: masksz
+    logical, dimension(inc), intent(in) :: logmask
     integer :: ipom
     integer :: ipft
 
@@ -472,50 +466,50 @@ Contains
     call copy_mendtype_mask_type_org(imvars%nvars, omvars%nvars, masksz, logmask, inc)
     call copy_mendtype_mask_type_org(imvars%pvars, omvars%pvars, masksz, logmask, inc)
 
-    omvars%invars%nh4(1:inc) = pack(imvars%invars%nh4,logmask)
-    omvars%invars%no3(1:inc) = pack(imvars%invars%no3,logmask)
-    omvars%invars%plab(1:inc) = pack(imvars%invars%plab,logmask)
-    omvars%invars%psol(1:inc) = pack(imvars%invars%psol,logmask)
-    omvars%invars%pocc(1:inc) = pack(imvars%invars%pocc,logmask)
-    omvars%invars%psec(1:inc) = pack(imvars%invars%psec,logmask)
-    omvars%invars%ppar(1:inc) = pack(imvars%invars%ppar,logmask)
+    omvars%invars%nh4(1:masksz) = pack(imvars%invars%nh4,logmask)
+    omvars%invars%no3(1:masksz) = pack(imvars%invars%no3,logmask)
+    omvars%invars%plab(1:masksz) = pack(imvars%invars%plab,logmask)
+    omvars%invars%psol(1:masksz) = pack(imvars%invars%psol,logmask)
+    omvars%invars%pocc(1:masksz) = pack(imvars%invars%pocc,logmask)
+    omvars%invars%psec(1:masksz) = pack(imvars%invars%psec,logmask)
+    omvars%invars%ppar(1:masksz) = pack(imvars%invars%ppar,logmask)
 
-    omvars%fluxes%co2_lost(1:inc) = pack(imvars%fluxes%co2_lost,logmask)
-    omvars%fluxes%ngas_lost(1:inc) = pack(imvars%fluxes%ngas_lost,logmask)
-    omvars%fluxes%nh4_dep(1:inc) = pack(imvars%fluxes%nh4_dep,logmask)
-    omvars%fluxes%no3_dep(1:inc) = pack(imvars%fluxes%no3_dep,logmask)
-    omvars%fluxes%ppar_dep(1:inc) = pack(imvars%fluxes%ppar_dep,logmask)
-    omvars%fluxes%c_leach(1:inc) = pack(imvars%fluxes%c_leach,logmask)
-    omvars%fluxes%n_leach(1:inc) = pack(imvars%fluxes%n_leach,logmask)
-    omvars%fluxes%p_leach(1:inc) = pack(imvars%fluxes%p_leach,logmask)
-    omvars%fluxes%nh4_bnf(1:inc) = pack(imvars%fluxes%nh4_bnf,logmask)
-    omvars%fluxes%nmin(1:inc) = pack(imvars%fluxes%nmin,logmask)
-    omvars%fluxes%nitr(1:inc) = pack(imvars%fluxes%nitr,logmask)
+    omvars%fluxes%co2_lost(1:masksz) = pack(imvars%fluxes%co2_lost,logmask)
+    omvars%fluxes%ngas_lost(1:masksz) = pack(imvars%fluxes%ngas_lost,logmask)
+    omvars%fluxes%nh4_dep(1:masksz) = pack(imvars%fluxes%nh4_dep,logmask)
+    omvars%fluxes%no3_dep(1:masksz) = pack(imvars%fluxes%no3_dep,logmask)
+    omvars%fluxes%ppar_dep(1:masksz) = pack(imvars%fluxes%ppar_dep,logmask)
+    omvars%fluxes%c_leach(1:masksz) = pack(imvars%fluxes%c_leach,logmask)
+    omvars%fluxes%n_leach(1:masksz) = pack(imvars%fluxes%n_leach,logmask)
+    omvars%fluxes%p_leach(1:masksz) = pack(imvars%fluxes%p_leach,logmask)
+    omvars%fluxes%nh4_bnf(1:masksz) = pack(imvars%fluxes%nh4_bnf,logmask)
+    omvars%fluxes%nmin(1:masksz) = pack(imvars%fluxes%nmin,logmask)
+    omvars%fluxes%nitr(1:masksz) = pack(imvars%fluxes%nitr,logmask)
 
     do ipft = 1, n_pft
-       omvars%plvars%enz_plant_n(ipft,1:inc) = pack(imvars%plvars%enz_plant_n(ipft,:),logmask)
-       omvars%plvars%enz_plant_p(ipft,1:inc) = pack(imvars%plvars%enz_plant_p(ipft,:),logmask)
-       omvars%fluxes%nh4_plant(ipft,1:inc) = pack(imvars%fluxes%nh4_plant(ipft,:),logmask)
-       omvars%fluxes%no3_plant(ipft,1:inc) = pack(imvars%fluxes%no3_plant(ipft,:),logmask)
-       omvars%fluxes%p_plant(ipft,1:inc) = pack(imvars%fluxes%p_plant(ipft,:),logmask)
-       omvars%plvars%vnh4up_plant(ipft,1:inc) = pack(imvars%plvars%vnh4up_plant(ipft,:),logmask)
-       omvars%plvars%vno3up_plant(ipft,1:inc) = pack(imvars%plvars%vno3up_plant(ipft,:),logmask)
-       omvars%plvars%vpup_plant(ipft,1:inc) = pack(imvars%plvars%vpup_plant(ipft,:),logmask)
+       omvars%plvars%enz_plant_n(ipft,1:masksz) = pack(imvars%plvars%enz_plant_n(ipft,:),logmask)
+       omvars%plvars%enz_plant_p(ipft,1:masksz) = pack(imvars%plvars%enz_plant_p(ipft,:),logmask)
+       omvars%fluxes%nh4_plant(ipft,1:masksz) = pack(imvars%fluxes%nh4_plant(ipft,:),logmask)
+       omvars%fluxes%no3_plant(ipft,1:masksz) = pack(imvars%fluxes%no3_plant(ipft,:),logmask)
+       omvars%fluxes%p_plant(ipft,1:masksz) = pack(imvars%fluxes%p_plant(ipft,:),logmask)
+       omvars%plvars%vnh4up_plant(ipft,1:masksz) = pack(imvars%plvars%vnh4up_plant(ipft,:),logmask)
+       omvars%plvars%vno3up_plant(ipft,1:masksz) = pack(imvars%plvars%vno3up_plant(ipft,:),logmask)
+       omvars%plvars%vpup_plant(ipft,1:masksz) = pack(imvars%plvars%vpup_plant(ipft,:),logmask)
     enddo
 
     do ipom = 1, npom
-       omvars%plvars%plant_input_C_pom(ipom,1:inc) =   &
+       omvars%plvars%plant_input_C_pom(ipom,1:masksz) =   &
             pack(imvars%plvars%plant_input_C_pom(ipom,:),logmask)
-       omvars%plvars%plant_input_N_pom(ipom,1:inc) =   &
+       omvars%plvars%plant_input_N_pom(ipom,1:masksz) =   &
             pack(imvars%plvars%plant_input_N_pom(ipom,:),logmask)
-       omvars%plvars%plant_input_P_pom(ipom,1:inc) =   &
+       omvars%plvars%plant_input_P_pom(ipom,1:masksz) =   &
             pack(imvars%plvars%plant_input_P_pom(ipom,:),logmask)
     enddo
-    omvars%plvars%plant_input_C_dom(1:inc) =   &
+    omvars%plvars%plant_input_C_dom(1:masksz) =   &
          pack(imvars%plvars%plant_input_C_dom,logmask)
-    omvars%plvars%plant_input_N_dom(1:inc) =   &
+    omvars%plvars%plant_input_N_dom(1:masksz) =   &
          pack(imvars%plvars%plant_input_N_dom,logmask)
-    omvars%plvars%plant_input_P_dom(1:inc) =   &
+    omvars%plvars%plant_input_P_dom(1:masksz) =   &
          pack(imvars%plvars%plant_input_P_dom,logmask)
 
     return
@@ -525,23 +519,23 @@ Contains
     implicit none
     type(org_vars) :: iovars
     type(org_vars) :: oovars
-    integer, intent(in) :: masksz
-    logical, dimension(masksz), intent(in) :: logmask
     integer, intent(in) :: inc
+    integer, intent(in) :: masksz
+    logical, dimension(inc), intent(in) :: logmask
     integer :: ipom
  
     do ipom = 1, npom
-       oovars%pom(ipom,1:inc) = pack(iovars%pom(ipom,:),logmask)
-       oovars%enz_pom(ipom,1:inc) = pack(iovars%enz_pom(ipom,:),logmask)
+       oovars%pom(ipom,1:masksz) = pack(iovars%pom(ipom,:),logmask)
+       oovars%enz_pom(ipom,1:masksz) = pack(iovars%enz_pom(ipom,:),logmask)
     enddo
 
-    oovars%dom(1:inc) = pack(iovars%dom,logmask)
-    oovars%mom(1:inc) = pack(iovars%mom,logmask)
-    oovars%qom(1:inc) = pack(iovars%qom,logmask)
-    oovars%enz_mom(1:inc) = pack(iovars%enz_mom,logmask)
-    oovars%amb(1:inc) = pack(iovars%amb,logmask)
-    oovars%dmb(1:inc) = pack(iovars%dmb,logmask)
-    oovars%enz_ptase(1:inc) = pack(iovars%enz_ptase,logmask)
+    oovars%dom(1:masksz) = pack(iovars%dom,logmask)
+    oovars%mom(1:masksz) = pack(iovars%mom,logmask)
+    oovars%qom(1:masksz) = pack(iovars%qom,logmask)
+    oovars%enz_mom(1:masksz) = pack(iovars%enz_mom,logmask)
+    oovars%amb(1:masksz) = pack(iovars%amb,logmask)
+    oovars%dmb(1:masksz) = pack(iovars%dmb,logmask)
+    oovars%enz_ptase(1:masksz) = pack(iovars%enz_ptase,logmask)
    
     return
   end subroutine copy_mendtype_mask_type_org

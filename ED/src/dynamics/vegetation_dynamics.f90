@@ -79,7 +79,6 @@ subroutine vegetation_dynamics(new_month,new_year)
          do isi = 1, cpoly%nsites
             csite => cpoly%site(isi)
             do ipa = 1, csite%npatches
-               call mend_print_vars(csite%mend%som, ipa)
                csite%plant_input_C(:,ipa) = 0.
                csite%plant_input_N(:,ipa) = 0.
                csite%plant_input_P(:,ipa) = 0.

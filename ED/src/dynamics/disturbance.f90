@@ -509,7 +509,6 @@ module disturbance_utils
             end do old_lu_l2nd
             !------------------------------------------------------------------------------!
 
-
             !------------------------------------------------------------------------------!
             !     Another loop over the new patches.  This time we define the patches      !
             ! that will be generated.                                                      !
@@ -1110,7 +1109,6 @@ module disturbance_utils
 
 
 
-
             !------------------------------------------------------------------------------!
             !      Reallocate the current site to fit the original patches, except         !
             ! those that lost all area through disturbance, and the new disturbed          !
@@ -1118,13 +1116,17 @@ module disturbance_utils
             !------------------------------------------------------------------------------!
             !----- Temporary site, with size equal to the patches that will remain. -------!
             call allocate_sitetype(tsite,count(disturb_mask))
+
             call copy_sitetype_mask(csite,tsite,disturb_mask,size(disturb_mask)            &
                                    ,count(disturb_mask))
+
             call deallocate_sitetype(csite)
 
             !----- Re-allocate the tracked site and copy data from temporary site. --------!
             call allocate_sitetype(csite,tsite%npatches)
+
             call copy_sitetype(tsite,csite,1,tsite%npatches,1,tsite%npatches)
+
             call deallocate_sitetype(tsite)
             !------------------------------------------------------------------------------!
 
