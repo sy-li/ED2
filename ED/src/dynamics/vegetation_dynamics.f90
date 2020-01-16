@@ -36,6 +36,7 @@ subroutine vegetation_dynamics(new_month,new_year)
                                , normalize_ed_todaynpp_vars & ! sub-routine
                                , zero_ed_today_vars         ! ! sub-routine
    use mend_coupler, only: mend_slow_P
+   use mend_diagnose, only: mend_print_vars
    implicit none
    !----- Arguments. ----------------------------------------------------------------------!
    logical          , intent(in)   :: new_month             !< First dtlsm of a new month?
@@ -78,9 +79,11 @@ subroutine vegetation_dynamics(new_month,new_year)
          do isi = 1, cpoly%nsites
             csite => cpoly%site(isi)
             do ipa = 1, csite%npatches
+               call mend_print_vars(csite%mend%som, ipa)
                csite%plant_input_C(:,ipa) = 0.
                csite%plant_input_N(:,ipa) = 0.
                csite%plant_input_P(:,ipa) = 0.
+               csite%rh(ipa) = 0.
                call mend_slow_P(csite%mend, ipa)
             enddo
          enddo

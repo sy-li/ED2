@@ -222,9 +222,9 @@ Contains
          csite%plant_input_C(:,ipa), csite%plant_input_N(:,ipa),  &
          csite%plant_input_P(:,ipa))
 
-    d_som%plvars%plant_input_C_pom(:,1) = plant2som%pom_c * gm2_mgg * 1000./86400.
-    d_som%plvars%plant_input_N_pom(:,1) = plant2som%pom_n * gm2_mgg * 1000./86400.
-    d_som%plvars%plant_input_P_pom(:,1) = plant2som%pom_p * gm2_mgg * 1000./86400.
+    d_som%plvars%plant_input_C_pom(:,ipa) = plant2som%pom_c * gm2_mgg * 1000./86400.
+    d_som%plvars%plant_input_N_pom(:,ipa) = plant2som%pom_n * gm2_mgg * 1000./86400.
+    d_som%plvars%plant_input_P_pom(:,ipa) = plant2som%pom_p * gm2_mgg * 1000./86400.
     d_som%plvars%plant_input_C_dom = plant2som%dom_c * gm2_mgg * 1000./86400.
     d_som%plvars%plant_input_N_dom = plant2som%dom_n * gm2_mgg * 1000./86400.
     d_som%plvars%plant_input_P_dom = plant2som%dom_p * gm2_mgg * 1000./86400.
@@ -248,57 +248,58 @@ Contains
     input_psol_net = (plant2som%psol) * &
          gm2_mgg  * 1000./86400. + som%fluxes%ppar_dep(1)
     input_ppar_net = 0.
+
     call mend_derivs_layer(npom, som_consts,  &
-         som%cvars%pom(:,1), input_pom_c_net, d_som%cvars%pom(:,1),  &
-         som%cvars%dom(1), input_dom_c_net, d_som%cvars%dom(1),  &
-         som%cvars%enz_pom(:,1), d_som%cvars%enz_pom(:,1),  &
-         som%cvars%mom(1), d_som%cvars%mom(1),  &
-         som%cvars%qom(1), d_som%cvars%qom(1),  &
-         som%cvars%enz_mom(1), d_som%cvars%enz_mom(1),  &
-         som%cvars%amb(1), d_som%cvars%amb(1),   &
-         som%cvars%dmb(1), d_som%cvars%dmb(1),   &
-         som%fluxes%co2_lost(1), d_som%fluxes%co2_lost(1),  &
-         som%fluxes%nmin(1), d_som%fluxes%nmin(1),  &
-         som%fluxes%nitr(1), d_som%fluxes%nitr(1),  &
-         som%nvars%pom(:,1), input_pom_n_net, d_som%nvars%pom(:,1),  &
-         som%nvars%dom(1), input_dom_n_net, d_som%nvars%dom(1),  &
-         som%nvars%enz_pom(:,1), d_som%nvars%enz_pom(:,1),  &
-         som%nvars%mom(1), d_som%nvars%mom(1),   &
-         som%nvars%qom(1), d_som%nvars%qom(1),   &
-         som%nvars%enz_mom(1), d_som%nvars%enz_mom(1),   &
-         som%nvars%amb(1), d_som%nvars%amb(1),  &
-         som%nvars%dmb(1), d_som%nvars%dmb(1),  &
-         som%invars%nh4(1), input_nh4_net, d_som%invars%nh4(1), &
-         som%invars%no3(1), input_no3_net, d_som%invars%no3(1),  &
-         som%pvars%pom(:,1), input_pom_p_net, d_som%pvars%pom(:,1),  &
-         som%pvars%dom(1), input_dom_p_net, d_som%pvars%dom(1),  &
-         som%pvars%enz_pom(:,1), d_som%pvars%enz_pom(:,1),  &
-         som%pvars%mom(1), d_som%pvars%mom(1),   &
-         som%pvars%qom(1), d_som%pvars%qom(1),  &
-         som%pvars%enz_mom(1), d_som%pvars%enz_mom(1),   &
-         som%pvars%amb(1), d_som%pvars%amb(1),  &
-         som%pvars%dmb(1), d_som%pvars%dmb(1),   &
-         som%invars%psol(1), input_psol_net, d_som%invars%psol(1),  &
-         som%invars%plab(1), d_som%invars%plab(1), &
-         som%fluxes%ngas_lost(1), d_som%fluxes%ngas_lost(1), &
-         som%cvars%enz_ptase(1), d_som%cvars%enz_ptase(1), &
-         som%nvars%enz_ptase(1), d_som%nvars%enz_ptase(1), &
-         som%pvars%enz_ptase(1), d_som%pvars%enz_ptase(1),  &
-         d_som%fluxes%nh4_plant(:,1), &
-         som%fluxes%nh4_bnf(1), d_som%fluxes%nh4_bnf(1), &
-         d_som%fluxes%no3_plant(:,1), &
-         som%fluxes%c_leach(1), d_som%fluxes%c_leach(1), &
-         som%fluxes%n_leach(1), d_som%fluxes%n_leach(1),  &
-         som%fluxes%p_leach(1), d_som%fluxes%p_leach(1), &
-         d_som%fluxes%p_plant(:,1), &
-         som%invars%pocc(1), d_som%invars%pocc(1), &
-         som%invars%ppar(1), d_som%invars%ppar(1), input_ppar_net,  &
-         som%plvars%enz_plant_n(:,1), som%plvars%enz_plant_p(:,1), &
-         som%plvars%vnh4up_plant(:,1), som%plvars%vno3up_plant(:,1),  &
-         som%plvars%vpup_plant(:,1), som_water_drainage_ps, &
+         som%cvars%pom(:,ipa), input_pom_c_net, d_som%cvars%pom(:,ipa),  &
+         som%cvars%dom(ipa), input_dom_c_net, d_som%cvars%dom(ipa),  &
+         som%cvars%enz_pom(:,ipa), d_som%cvars%enz_pom(:,ipa),  &
+         som%cvars%mom(ipa), d_som%cvars%mom(ipa),  &
+         som%cvars%qom(ipa), d_som%cvars%qom(ipa),  &
+         som%cvars%enz_mom(ipa), d_som%cvars%enz_mom(ipa),  &
+         som%cvars%amb(ipa), d_som%cvars%amb(ipa),   &
+         som%cvars%dmb(ipa), d_som%cvars%dmb(ipa),   &
+         som%fluxes%co2_lost(ipa), d_som%fluxes%co2_lost(ipa),  &
+         som%fluxes%nmin(ipa), d_som%fluxes%nmin(ipa),  &
+         som%fluxes%nitr(ipa), d_som%fluxes%nitr(ipa),  &
+         som%nvars%pom(:,ipa), input_pom_n_net, d_som%nvars%pom(:,ipa),  &
+         som%nvars%dom(ipa), input_dom_n_net, d_som%nvars%dom(ipa),  &
+         som%nvars%enz_pom(:,ipa), d_som%nvars%enz_pom(:,ipa),  &
+         som%nvars%mom(ipa), d_som%nvars%mom(ipa),   &
+         som%nvars%qom(ipa), d_som%nvars%qom(ipa),   &
+         som%nvars%enz_mom(ipa), d_som%nvars%enz_mom(ipa),   &
+         som%nvars%amb(ipa), d_som%nvars%amb(ipa),  &
+         som%nvars%dmb(ipa), d_som%nvars%dmb(ipa),  &
+         som%invars%nh4(ipa), input_nh4_net, d_som%invars%nh4(ipa), &
+         som%invars%no3(ipa), input_no3_net, d_som%invars%no3(ipa),  &
+         som%pvars%pom(:,ipa), input_pom_p_net, d_som%pvars%pom(:,ipa),  &
+         som%pvars%dom(ipa), input_dom_p_net, d_som%pvars%dom(ipa),  &
+         som%pvars%enz_pom(:,ipa), d_som%pvars%enz_pom(:,ipa),  &
+         som%pvars%mom(ipa), d_som%pvars%mom(ipa),   &
+         som%pvars%qom(ipa), d_som%pvars%qom(ipa),  &
+         som%pvars%enz_mom(ipa), d_som%pvars%enz_mom(ipa),   &
+         som%pvars%amb(ipa), d_som%pvars%amb(ipa),  &
+         som%pvars%dmb(ipa), d_som%pvars%dmb(ipa),   &
+         som%invars%psol(ipa), input_psol_net, d_som%invars%psol(ipa),  &
+         som%invars%plab(ipa), d_som%invars%plab(ipa), &
+         som%fluxes%ngas_lost(ipa), d_som%fluxes%ngas_lost(ipa), &
+         som%cvars%enz_ptase(ipa), d_som%cvars%enz_ptase(ipa), &
+         som%nvars%enz_ptase(ipa), d_som%nvars%enz_ptase(ipa), &
+         som%pvars%enz_ptase(ipa), d_som%pvars%enz_ptase(ipa),  &
+         d_som%fluxes%nh4_plant(:,ipa), &
+         som%fluxes%nh4_bnf(ipa), d_som%fluxes%nh4_bnf(ipa), &
+         d_som%fluxes%no3_plant(:,ipa), &
+         som%fluxes%c_leach(ipa), d_som%fluxes%c_leach(ipa), &
+         som%fluxes%n_leach(ipa), d_som%fluxes%n_leach(ipa),  &
+         som%fluxes%p_leach(ipa), d_som%fluxes%p_leach(ipa), &
+         d_som%fluxes%p_plant(:,ipa), &
+         som%invars%pocc(ipa), d_som%invars%pocc(ipa), &
+         som%invars%ppar(ipa), d_som%invars%ppar(ipa), input_ppar_net,  &
+         som%plvars%enz_plant_n(:,ipa), som%plvars%enz_plant_p(:,ipa), &
+         som%plvars%vnh4up_plant(:,ipa), som%plvars%vno3up_plant(:,ipa),  &
+         som%plvars%vpup_plant(:,ipa), som_water_drainage_ps, &
          csite%mend%bulk_den(ipa), pi1, wfp)
 
-    call mend_som2canopy_exchange(d_som%fluxes%co2_lost(1),  &
+    call mend_som2canopy_exchange(d_som%fluxes%co2_lost(ipa),  &
          csite%mend%bulk_den(ipa), som_consts, &
          d_can_co2, d_co2budget_storage, ccapcani)
 

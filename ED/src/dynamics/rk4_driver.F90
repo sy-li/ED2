@@ -275,9 +275,9 @@ module rk4_driver
                !---------------------------------------------------------------------------!
 
                call mend_som_plant_feedback( &
-                    initp%mend%som%fluxes%nh4_plant(:,1), &
-                    initp%mend%som%fluxes%no3_plant(:,1), &
-                    initp%mend%som%fluxes%p_plant(:,1), &
+                    initp%mend%som%fluxes%nh4_plant(:,ipa), &
+                    initp%mend%som%fluxes%no3_plant(:,ipa), &
+                    initp%mend%som%fluxes%p_plant(:,ipa), &
                     csite%mend%bulk_den(ipa), &
                     som_consts, &
                     csite%patch(ipa)%ncohorts, &
@@ -287,7 +287,7 @@ module rk4_driver
                     csite%patch(ipa)%pstorage_max, &
                     csite%patch(ipa)%nplant, &
                     csite%patch(ipa)%broot, csite%rh(ipa), &
-                    initp%mend%som%fluxes%co2_lost(1), &
+                    initp%mend%som%fluxes%co2_lost(ipa), &
                     csite%patch(ipa)%pft, &
                     csite%patch(ipa)%krdepth, &
                     csite%patch(ipa)%water_supply_nl, &

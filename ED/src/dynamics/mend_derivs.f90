@@ -475,7 +475,7 @@ Contains
     d_amb_n = d_amb_n + immob_amb_nh4
     d_amb_n = d_amb_n + immob_amb_no3
     d_amb_p = d_amb_p + immob_amb_psol
-!print*,immob_amb_nh4,f_plant_nh4,immob_amb_no3,f_plant_no3
+
     d_nh4 = d_nh4 - immob_amb_nh4
     d_no3 = d_no3 - immob_amb_no3
     d_psol = d_psol - immob_amb_psol
@@ -507,16 +507,12 @@ Contains
 
     do ipom = 1, npom
        d_enz_pom_c(ipom) = d_enz_pom_c(ipom) + enz_prod_pom_c(ipom)
-!       d_enz_pom_n(ipom) = d_enz_pom_n(ipom) + enz_prod_pom_n(ipom)
-!       d_enz_pom_p(ipom) = d_enz_pom_p(ipom) + enz_prod_pom_p(ipom)
 
        d_amb_c = d_amb_c - enz_prod_pom_c(ipom)
        d_amb_n = d_amb_n - enz_prod_pom_n(ipom)
        d_amb_p = d_amb_p - enz_prod_pom_p(ipom)
 
        d_enz_pom_c(ipom) = d_enz_pom_c(ipom) - turnover_enz_pom_c(ipom)
-!       d_enz_pom_n(ipom) = d_enz_pom_n(ipom) - turnover_enz_pom_n(ipom)
-!       d_enz_pom_p(ipom) = d_enz_pom_p(ipom) - turnover_enz_pom_p(ipom)
 
        d_dom_c = d_dom_c + turnover_enz_pom_c(ipom)
        d_dom_n = d_dom_n + turnover_enz_pom_n(ipom)
@@ -524,32 +520,24 @@ Contains
     enddo
 
     d_enz_mom_c = d_enz_mom_c + enz_prod_mom_c
-!    d_enz_mom_n = d_enz_mom_n + enz_prod_mom_n
-!    d_enz_mom_p = d_enz_mom_p + enz_prod_mom_p
 
     d_amb_c = d_amb_c - enz_prod_mom_c
     d_amb_n = d_amb_n - enz_prod_mom_n
     d_amb_p = d_amb_p - enz_prod_mom_p
 
     d_enz_mom_c = d_enz_mom_c - turnover_enz_mom_c
-!    d_enz_mom_n = d_enz_mom_n - turnover_enz_mom_n
-!    d_enz_mom_p = d_enz_mom_p - turnover_enz_mom_p
 
     d_dom_c = d_dom_c + turnover_enz_mom_c
     d_dom_n = d_dom_n + turnover_enz_mom_n
     d_dom_p = d_dom_p + turnover_enz_mom_p
 
     d_enz_ptase_c = d_enz_ptase_c + enz_prod_ptase_c
-!    d_enz_ptase_n = d_enz_ptase_n + enz_prod_ptase_n
-!    d_enz_ptase_p = d_enz_ptase_p + enz_prod_ptase_p
 
     d_amb_c = d_amb_c - enz_prod_ptase_c
     d_amb_n = d_amb_n - enz_prod_ptase_n
     d_amb_p = d_amb_p - enz_prod_ptase_p
 
     d_enz_ptase_c = d_enz_ptase_c - turnover_enz_ptase_c
-!    d_enz_ptase_n = d_enz_ptase_n - turnover_enz_ptase_n
-!    d_enz_ptase_p = d_enz_ptase_p - turnover_enz_ptase_p
 
     d_dom_c = d_dom_c + turnover_enz_ptase_c
     d_dom_n = d_dom_n + turnover_enz_ptase_n
@@ -578,12 +566,6 @@ Contains
     d_psol = d_psol + decomp_dom_p
     d_dom_p = d_dom_p - decomp_dom_p
 
-    ! Inorganic dynamics
-!    d_p_sum = d_psol
-!    d_psol = d_p_sum / (1. + consts%plab_max * consts%kmm_plang /   &
-!         (psol + consts%kmm_plang)**2)
-!    d_plab = d_p_sum - d_psol
-
     bnf_rate = 5.e-11 ! mgN/gSOIL/s
     d_nh4_bnf = d_nh4_bnf + bnf_rate
     d_nh4 = d_nh4 + bnf_rate
@@ -606,34 +588,6 @@ Contains
     if(no3 < 1.0e-12)no3_leach_rate = 0.
     d_no3 = d_no3 - no3_leach_rate
     d_psol = d_psol - psol_leach_rate
-
-! Turn off microbial and enzyme dynamics
-!d_amb_c = 0.
-!d_amb_n = 0.
-!d_amb_p = 0.
-!d_dmb_c = 0.
-!d_dmb_n = 0.
-!d_dmb_p = 0.
-
-!d_enz_pom_c(:) = 0.
-!d_enz_mom_c = 0.
-!d_enz_ptase_c = 0.
-
-    ! Inorganic dynamics
-!print*,psol,plab
-!print*,d_psol,f_lab_p
-!    d_plab = d_psol * f_lab_p 
-!    d_psol = d_psol - d_plab
-
-!print*,f_lab_p/(1.+f_lab_p),1./(1.+f_lab_p)    
-
-!    weath_flux = consts%weath_rate * ppar
-!    d_psol = d_psol + weath_flux
-!    d_ppar = d_ppar - weath_flux
-
-!    occlu_flux = consts%occlu_rate * plab
-!    d_plab = d_plab - occlu_flux
-!    d_pocc = d_pocc + occlu_flux
 
     return
   end subroutine mend_derivs_layer
@@ -918,7 +872,7 @@ Contains
          (consts%kmm_amb + dom_c)
     micr_uptake_n = micr_uptake_c * dom_n / dom_c
     micr_uptake_p = micr_uptake_c * dom_p / dom_c
-    
+
     dormancy_c = (1.0 - dom_c / (consts%kmm_amb + dom_c)) *   &
          consts%vmax_a2d * amb_c
     dormancy_n = dormancy_c * amb_n / amb_c

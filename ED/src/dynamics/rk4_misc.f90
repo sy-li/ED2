@@ -3714,6 +3714,7 @@ subroutine print_rk4patch(y,csite,ipa)
    use consts_coms           , only : pio1808               ! ! intent(in)
    use therm_lib8            , only : thetaeiv8             & ! function
                                     , vpdefil8              ! ! function
+   use mend_diagnose, only: mend_print_vars
    implicit none
    !----- Arguments -----------------------------------------------------------------------!
    type(rk4patchtype) , target     :: y
@@ -3766,6 +3767,10 @@ subroutine print_rk4patch(y,csite,ipa)
                 ,current_time%hour,':',current_time%min,':',current_time%sec,' UTC'
    write(unit=*,fmt='(a,1x,es12.4)') 'Attempted step size:',csite%htry(ipa)
    write (unit=*,fmt='(a,1x,i6)')    'Ncohorts: ',cpatch%ncohorts
+   write (unit=*,fmt='(80a)') ('-',k=1,80)
+
+   call mend_print_vars(csite%mend%som, ipa)
+
    write (unit=*,fmt='(80a)') ('-',k=1,80)
 
    write (unit=*,fmt='(80a)')         ('-',k=1,80)
@@ -3997,6 +4002,9 @@ subroutine print_rk4patch(y,csite,ipa)
 
    call fatal_error('IFLAG1 problem. The model didn''t converge!','print_rk4patch'&
                  &,'rk4_integ_utils.f90')
+
+   call mend_print_vars(csite%mend%som,ipa)
+
    return
 end subroutine print_rk4patch
 !==========================================================================================!

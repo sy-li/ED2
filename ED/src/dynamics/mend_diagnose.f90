@@ -574,4 +574,25 @@ Contains
     return
   end subroutine mend_update_diag_layer
 
+  subroutine mend_print_vars(som, ipa)
+    use mend_state_vars, only: mend_vars
+    implicit none
+    type(mend_vars) :: som
+    integer :: ipa
+
+    print*,'POM1, CNP',som%cvars%pom(1,ipa),som%nvars%pom(1,ipa),som%pvars%pom(1,ipa)
+    print*,'POM2, CNP',som%cvars%pom(2,ipa),som%nvars%pom(2,ipa),som%pvars%pom(2,ipa)
+    print*,'DOM, CNP',som%cvars%dom(ipa),som%nvars%dom(ipa),som%pvars%dom(ipa)
+    print*,'MOM, CNP',som%cvars%mom(ipa),som%nvars%mom(ipa),som%pvars%mom(ipa)
+    print*,'AMB, CNP',som%cvars%amb(ipa),som%nvars%amb(ipa),som%pvars%amb(ipa)
+    print*,'DMB, CNP',som%cvars%dmb(ipa),som%nvars%dmb(ipa),som%pvars%dmb(ipa)
+    print*,'INVARS, NH4,NO3,PSOL',som%invars%nh4(ipa),som%invars%no3(ipa),som%invars%psol(ipa)
+    print*,'ENZPOM1, CNP',som%cvars%enz_pom(1,ipa),som%nvars%enz_pom(1,ipa),som%pvars%enz_pom(1,ipa)
+    print*,'ENZPOM2, CNP',som%cvars%enz_pom(2,ipa),som%nvars%enz_pom(2,ipa),som%pvars%enz_pom(2,ipa)
+    print*,'ENZMOM, CNP',som%cvars%enz_mom(ipa),som%nvars%enz_mom(ipa),som%pvars%enz_mom(ipa)
+    print*,'ENZPTZ, CNP',som%cvars%enz_ptase(ipa),som%nvars%enz_ptase(ipa),som%pvars%enz_ptase(ipa)
+
+    return
+  end subroutine mend_print_vars
+
 end Module mend_diagnose

@@ -211,8 +211,6 @@ Contains
 
     total_n_activity = 0.
     total_p_activity = 0.
-    total_n_activity_nolimit = 0.
-    total_p_activity_nolimit = 0.
     do ico = 1, ncohorts
        broot_nl = broot(ico) * (1. - root_beta(pft(ico))**  &
             (-slz(nlsl)/(-slz(krdepth(ico)))))
@@ -224,34 +222,26 @@ Contains
             pstorage_max(ico))**consts%wexp
        p_limit_factor(ico) = max(min(1., p_limit_factor(ico)), 0.)
 
-       transp_fact = 1.
        total_n_activity(pft(ico)) = total_n_activity(pft(ico)) + nplant(ico) *   &
-            broot_nl * n_limit_factor(ico) * transp_fact
+            broot_nl * n_limit_factor(ico)
        total_p_activity(pft(ico)) = total_p_activity(pft(ico)) + nplant(ico) *   &
-            broot_nl * p_limit_factor(ico) * transp_fact
-       total_n_activity_nolimit(pft(ico)) = total_n_activity_nolimit(pft(ico)) + nplant(ico) *   &
-            broot_nl
-       total_p_activity_nolimit(pft(ico)) = total_p_activity_nolimit(pft(ico)) + nplant(ico) *   &
-            broot_nl
+            broot_nl * p_limit_factor(ico)
     enddo
 
     do ico = 1, ncohorts
        broot_nl = broot(ico) * (1. - root_beta(pft(ico))**  &
             (-slz(nlsl)/(-slz(krdepth(ico)))))
 
-       transp_fact = 1.
-
        if(total_n_activity(pft(ico)) > 1.e-30)then
           nstorage(ico) = nstorage(ico) + plant_n_uptake(pft(ico)) * broot_nl /  &
-               total_n_activity(pft(ico)) * n_limit_factor(ico) * transp_fact
+               total_n_activity(pft(ico)) * n_limit_factor(ico)
        endif
 
        if(total_p_activity(pft(ico)) > 1.e-30)then
           pstorage(ico) = pstorage(ico) + plant_p_uptake(pft(ico)) * broot_nl /  &
-               total_p_activity(pft(ico)) * p_limit_factor(ico) * transp_fact
+               total_p_activity(pft(ico)) * p_limit_factor(ico)
        endif
     enddo
-
 
     ! gC/kgSoil
     co2_lost_units = co2_lost
@@ -268,11 +258,6 @@ Contains
 
     ! Averaging this over the day.
     rh = rh + co2_lost_units * dtlsm / 86400.
-
-!    nh4_plant = 0.
-!    no3_plant = 0.
-!    p_plant = 0.
-!    co2_lost = 0.
 
     return
   end subroutine mend_som_plant_feedback
