@@ -3755,6 +3755,9 @@ module average_utils
          cgrid%mmean_leaf_drop       (:,:,ipy) = cgrid%mmean_leaf_drop        (:,:,ipy)    &
                                                + cgrid%leaf_drop              (:,:,ipy)    &
                                                * ndaysi
+         cgrid%mmean_root_drop       (:,:,ipy) = cgrid%mmean_root_drop        (:,:,ipy)    &
+                                               + cgrid%root_drop              (:,:,ipy)    &
+                                               * ndaysi
          cgrid%mmean_fast_soil_c         (ipy) = cgrid%mmean_fast_soil_c          (ipy)    &
                                                + cgrid%fast_soil_c                (ipy)    &
                                                * ndaysi
@@ -4644,6 +4647,8 @@ module average_utils
 
                   cpatch%mmean_leaf_drop       (ico) = cpatch%mmean_leaf_drop       (ico)  &
                                                      + cpatch%leaf_drop             (ico)
+                  cpatch%mmean_root_drop       (ico) = cpatch%mmean_root_drop       (ico)  &
+                                                     + cpatch%root_drop             (ico)
 
                   cpatch%mmean_cb              (ico) = cpatch%mmean_cb              (ico)  &
                                                      + ( cpatch%dmean_gpp           (ico)  &
@@ -4651,6 +4656,7 @@ module average_utils
                                                        - cpatch%leaf_maintenance    (ico)  &
                                                        - cpatch%root_maintenance    (ico)  &
                                                        - cpatch%leaf_drop           (ico)  &
+                                                       - cpatch%root_drop           (ico)  &
                                                        ) / yr_day * ndaysi
                   !------------------------------------------------------------------------!
 
@@ -5323,6 +5329,7 @@ module average_utils
          cgrid%mmean_leaf_maintenance(:,:,ipy) = 0.0
          cgrid%mmean_root_maintenance(:,:,ipy) = 0.0
          cgrid%mmean_leaf_drop       (:,:,ipy) = 0.0
+         cgrid%mmean_root_drop       (:,:,ipy) = 0.0
          cgrid%mmean_fast_soil_c         (ipy) = 0.0 
          cgrid%mmean_slow_soil_c         (ipy) = 0.0 
          cgrid%mmean_struct_soil_c       (ipy) = 0.0 
@@ -5641,6 +5648,7 @@ module average_utils
                   cpatch%mmean_leaf_maintenance  (ico) = 0.0
                   cpatch%mmean_root_maintenance  (ico) = 0.0
                   cpatch%mmean_leaf_drop         (ico) = 0.0
+                  cpatch%mmean_root_drop         (ico) = 0.0
                   select case (iddmort_scheme)
                   case (0)
                      cpatch%mmean_cb             (ico) = 0.0

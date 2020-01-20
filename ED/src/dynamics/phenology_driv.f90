@@ -259,6 +259,7 @@ subroutine update_phenology(doy, cpoly, isi, lat)
          
          !----- Initially, we assume all leaves stay. -------------------------------------!
          cpatch%leaf_drop(ico) = 0.0
+         cpatch%root_drop(ico) = 0.0
          delta_bleaf = 0.
          delta_broot = 0.
 
@@ -736,6 +737,8 @@ subroutine update_phenology(doy, cpoly, isi, lat)
             ! for now we do not record the root_drop
             if (delta_broot < 0.0) then
 
+               cpatch%root_drop (ico) = -(1.0 - C_resorption_fraction(ipft)) * delta_broot
+
                !---------------------------------------------------------------------------!
                !     Send the lost roots  to soil carbon and nitrogen pools.               !
                !---------------------------------------------------------------------------!
@@ -979,6 +982,7 @@ subroutine update_phenology_eq_0(doy, cpoly, isi, lat)
          
          !----- Initially, we assume all leaves stay. -------------------------------------!
          cpatch%leaf_drop(ico) = 0.0
+         cpatch%root_drop(ico) = 0.
 
          !----- Find cohort-specific thresholds. ------------------------------------------!
          select case (iphen_scheme)
@@ -1357,6 +1361,7 @@ subroutine update_phenology_eq_0(doy, cpoly, isi, lat)
 
             ! deal with broot
             if (delta_broot > 0.0) then
+               cpatch%root_drop (ico) = (1.0 - C_resorption_fraction(ipft)) * delta_broot
                cpatch%broot     (ico) = broot_new
                cpatch%balive    (ico) = cpatch%balive(ico)   - delta_broot
                cpatch%bstorage  (ico) = cpatch%bstorage(ico)                               &

@@ -562,6 +562,7 @@ subroutine update_polygon_derived_props(cgrid)
       cgrid%leaf_maintenance    (:,:,ipy) = 0.0
       cgrid%root_maintenance    (:,:,ipy) = 0.0
       cgrid%leaf_drop           (:,:,ipy) = 0.0
+      cgrid%root_drop           (:,:,ipy) = 0.0
       cgrid%fast_soil_c             (ipy) = 0.0
       cgrid%slow_soil_c             (ipy) = 0.0
       cgrid%struct_soil_c           (ipy) = 0.0
@@ -791,6 +792,10 @@ subroutine update_polygon_derived_props(cgrid)
                                                * patch_wgt
                cgrid%leaf_drop       (p,d,ipy) = cgrid%leaf_drop       (p,d,ipy)           &
                                                + cpatch%leaf_drop          (ico)           &
+                                               * cpatch%nplant             (ico)           &
+                                               * patch_wgt
+               cgrid%root_drop       (p,d,ipy) = cgrid%root_drop       (p,d,ipy)           &
+                                               + cpatch%root_drop          (ico)           &
                                                * cpatch%nplant             (ico)           &
                                                * patch_wgt
                !---------------------------------------------------------------------------!

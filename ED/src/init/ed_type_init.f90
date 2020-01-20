@@ -254,6 +254,7 @@ subroutine init_ed_cohort_vars(cpatch,ico, lsl)
    cpatch%leaf_maintenance      (ico) = 0.0
    cpatch%root_maintenance      (ico) = 0.0
    cpatch%leaf_drop             (ico) = 0.0
+   cpatch%root_drop             (ico) = 0.0
    cpatch%paw_avg               (ico) = 0.0
    cpatch%elongf                (ico) = 0.0
    cpatch%new_recruit_flag      (ico) = 0
@@ -533,6 +534,7 @@ subroutine init_ed_cohort_vars(cpatch,ico, lsl)
       cpatch%mmean_leaf_maintenance    (ico) = 0.0
       cpatch%mmean_root_maintenance    (ico) = 0.0
       cpatch%mmean_leaf_drop           (ico) = 0.0
+      cpatch%mmean_root_drop           (ico) = 0.0
       cpatch%mmean_cb                  (ico) = 0.0
       cpatch%mmean_nppleaf             (ico) = 0.0
       cpatch%mmean_nppfroot            (ico) = 0.0
@@ -1534,6 +1536,7 @@ subroutine init_ed_poly_vars(cgrid)
       cgrid%leaf_maintenance        (:,:,ipy) = 0.0
       cgrid%root_maintenance        (:,:,ipy) = 0.0
       cgrid%leaf_drop               (:,:,ipy) = 0.0
+      cgrid%root_drop               (:,:,ipy) = 0.0
       cgrid%fast_soil_c                 (ipy) = 0.0
       cgrid%slow_soil_c                 (ipy) = 0.0
       cgrid%struct_soil_c               (ipy) = 0.0
@@ -1975,6 +1978,7 @@ subroutine init_ed_poly_vars(cgrid)
          cgrid%mmean_leaf_maintenance (:,:,ipy) = 0.0
          cgrid%mmean_root_maintenance (:,:,ipy) = 0.0
          cgrid%mmean_leaf_drop        (:,:,ipy) = 0.0
+         cgrid%mmean_root_drop        (:,:,ipy) = 0.0
          cgrid%mmean_fast_soil_c          (ipy) = 0.0
          cgrid%mmean_slow_soil_c          (ipy) = 0.0
          cgrid%mmean_struct_soil_c        (ipy) = 0.0

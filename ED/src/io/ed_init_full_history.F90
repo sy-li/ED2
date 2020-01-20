@@ -2401,6 +2401,8 @@ subroutine fill_history_grid_p146(cgrid,ipy,py_index)
                      ,'ROOT_MAINTENANCE_PY          ',dsetrank,iparallel,.true. ,foundvar)
    call hdf_getslab_r(cgrid%leaf_drop                (:,:,ipy)                             &
                      ,'LEAF_DROP_PY                 ',dsetrank,iparallel,.true. ,foundvar)
+   call hdf_getslab_r(cgrid%root_drop                (:,:,ipy)                             &
+                     ,'ROOT_DROP_PY                 ',dsetrank,iparallel,.true. ,foundvar)
    if (writing_eorq) then
       call hdf_getslab_r(cgrid%mmean_lai             (:,:,ipy)                             &
                         ,'MMEAN_LAI_PY              ',dsetrank,iparallel,.false.,foundvar)
@@ -2422,6 +2424,8 @@ subroutine fill_history_grid_p146(cgrid,ipy,py_index)
                         ,'MMEAN_ROOT_MAINTENANCE_PY ',dsetrank,iparallel,.false.,foundvar)
       call hdf_getslab_r(cgrid%mmean_leaf_drop       (:,:,ipy)                             &
                         ,'MMEAN_LEAF_DROP_PY        ',dsetrank,iparallel,.false.,foundvar)
+      call hdf_getslab_r(cgrid%mmean_root_drop       (:,:,ipy)                             &
+                        ,'MMEAN_ROOT_DROP_PY        ',dsetrank,iparallel,.false.,foundvar)
    end if
    !---------------------------------------------------------------------------------------!
    !---------------------------------------------------------------------------------------!
@@ -4600,6 +4604,8 @@ subroutine fill_history_patch(cpatch,paco_index,ncohorts_global)
                      ,'ROOT_MAINTENANCE          ',dsetrank,iparallel,.true. ,foundvar)
    call hdf_getslab_r(cpatch%leaf_drop                                                     &
                      ,'LEAF_DROP                 ',dsetrank,iparallel,.true. ,foundvar)
+   call hdf_getslab_r(cpatch%root_drop                                                     &
+                     ,'ROOT_DROP                 ',dsetrank,iparallel,.true. ,foundvar)
    call hdf_getslab_r(cpatch%leaf_respiration                                              &
                      ,'LEAF_RESPIRATION          ',dsetrank,iparallel,.true. ,foundvar)
    call hdf_getslab_r(cpatch%root_respiration                                              &
@@ -4814,6 +4820,8 @@ subroutine fill_history_patch(cpatch,paco_index,ncohorts_global)
                         ,'MMEAN_ROOT_MAINTENANCE_CO ',dsetrank,iparallel,.false.,foundvar)
       call hdf_getslab_r(cpatch%mmean_leaf_drop                                            &
                         ,'MMEAN_LEAF_DROP_CO        ',dsetrank,iparallel,.false.,foundvar)
+      call hdf_getslab_r(cpatch%mmean_root_drop                                            &
+                        ,'MMEAN_ROOT_DROP_CO        ',dsetrank,iparallel,.false.,foundvar)
       call hdf_getslab_r(cpatch%mmean_cb                                                   &
                         ,'MMEAN_CB_CO               ',dsetrank,iparallel,.false.,foundvar)
       call hdf_getslab_r(cpatch%mmean_gpp                                                  &

@@ -522,6 +522,9 @@ module ed_state_vars
       real , pointer, dimension(:) :: leaf_drop
       !<Leaf loss to litter layer due to phenology [kgC/plant]
 
+      real , pointer, dimension(:) :: root_drop
+      !<Root loss to litter layer due to phenology [kgC/plant]
+
       real ,pointer,dimension(:) :: leaf_respiration
       !<Instantaneous values of leaf respiration [&mu;mol/m2g/s]
       real ,pointer,dimension(:) :: root_respiration
@@ -703,6 +706,7 @@ module ed_state_vars
       real,pointer,dimension(:)   :: mmean_leaf_maintenance !<Leaf maintenance  [ kgC/pl/yr]
       real,pointer,dimension(:)   :: mmean_root_maintenance !<Root mainten.     [ kgC/pl/yr]
       real,pointer,dimension(:)   :: mmean_leaf_drop        !<Leaf drop         [ kgC/pl/yr]
+      real,pointer,dimension(:)   :: mmean_root_drop        !<Root drop         [ kgC/pl/yr]
       real,pointer,dimension(:)   :: mmean_cb               !<12-mon C balance  [    kgC/pl]
       !----- Daily mean (same units as fast mean). ----------------------------------------!
       real,pointer,dimension(:)     :: dmean_gpp
@@ -2360,6 +2364,7 @@ module ed_state_vars
       real,pointer,dimension(:,:,:) :: leaf_maintenance
       real,pointer,dimension(:,:,:) :: root_maintenance
       real,pointer,dimension(:,:,:) :: leaf_drop
+      real,pointer,dimension(:,:,:) :: root_drop
       !------------------------------------------------------------------------------------!
 
 
@@ -2597,6 +2602,7 @@ module ed_state_vars
       real,pointer,dimension(:,:,:) :: mmean_leaf_maintenance !<Leaf maintenance[ kgC/m2/yr]
       real,pointer,dimension(:,:,:) :: mmean_root_maintenance !<Root maintenance[ kgC/m2/yr]
       real,pointer,dimension(:,:,:) :: mmean_leaf_drop        !<Leaf shedding   [ kgC/m2/yr]
+      real,pointer,dimension(:,:,:) :: mmean_root_drop        !<Root shedding   [ kgC/m2/yr]
       real,pointer,dimension(:)     :: mmean_fast_soil_c      !<Fast soil C     [    kgC/m2]
       real,pointer,dimension(:)     :: mmean_slow_soil_c      !<Slow soil C     [    kgC/m2]
       real,pointer,dimension(:)     :: mmean_struct_soil_c    !<Struct. soil C  [    kgC/m2]
@@ -3308,6 +3314,7 @@ module ed_state_vars
       allocate(cgrid%leaf_maintenance           (   n_pft,     n_dbh,npolygons))
       allocate(cgrid%root_maintenance           (   n_pft,     n_dbh,npolygons))
       allocate(cgrid%leaf_drop                  (   n_pft,     n_dbh,npolygons))
+      allocate(cgrid%root_drop                  (   n_pft,     n_dbh,npolygons))
       allocate(cgrid%fast_soil_c                (                    npolygons))
       allocate(cgrid%slow_soil_c                (                    npolygons))
       allocate(cgrid%struct_soil_c              (                    npolygons))
@@ -3638,6 +3645,7 @@ module ed_state_vars
          allocate(cgrid%mmean_leaf_maintenance (   n_pft,      n_dbh,npolygons))
          allocate(cgrid%mmean_root_maintenance (   n_pft,      n_dbh,npolygons))
          allocate(cgrid%mmean_leaf_drop        (   n_pft,      n_dbh,npolygons))
+         allocate(cgrid%mmean_root_drop        (   n_pft,      n_dbh,npolygons))
          allocate(cgrid%mmean_fast_soil_c      (                     npolygons)) 
          allocate(cgrid%mmean_slow_soil_c      (                     npolygons)) 
          allocate(cgrid%mmean_struct_soil_c    (                     npolygons)) 
@@ -4852,6 +4860,7 @@ module ed_state_vars
       allocate(cpatch%leaf_maintenance             (                    ncohorts))
       allocate(cpatch%root_maintenance             (                    ncohorts))
       allocate(cpatch%leaf_drop                    (                    ncohorts))
+      allocate(cpatch%root_drop                    (                    ncohorts))
       allocate(cpatch%leaf_respiration             (                    ncohorts))
       allocate(cpatch%root_respiration             (                    ncohorts))
       allocate(cpatch%gpp                          (                    ncohorts))
@@ -5050,6 +5059,7 @@ module ed_state_vars
          allocate(cpatch%mmean_leaf_maintenance    (                    ncohorts))
          allocate(cpatch%mmean_root_maintenance    (                    ncohorts))
          allocate(cpatch%mmean_leaf_drop           (                    ncohorts))
+         allocate(cpatch%mmean_root_drop           (                    ncohorts))
          allocate(cpatch%mmean_cb                  (                    ncohorts))
          allocate(cpatch%mmean_gpp                 (                    ncohorts))
          allocate(cpatch%mmean_npp                 (                    ncohorts))
@@ -5320,6 +5330,7 @@ module ed_state_vars
       nullify(cgrid%leaf_maintenance        )
       nullify(cgrid%root_maintenance        )
       nullify(cgrid%leaf_drop               )
+      nullify(cgrid%root_drop               )
       nullify(cgrid%fast_soil_c             )
       nullify(cgrid%slow_soil_c             )
       nullify(cgrid%struct_soil_c           )
@@ -5630,6 +5641,7 @@ module ed_state_vars
       nullify(cgrid%mmean_leaf_maintenance  )
       nullify(cgrid%mmean_root_maintenance  )
       nullify(cgrid%mmean_leaf_drop         )
+      nullify(cgrid%mmean_root_drop         )
       nullify(cgrid%mmean_fast_soil_c       )
       nullify(cgrid%mmean_slow_soil_c       )
       nullify(cgrid%mmean_struct_soil_c     )
@@ -6727,6 +6739,7 @@ module ed_state_vars
       nullify(cpatch%leaf_maintenance      )
       nullify(cpatch%root_maintenance      )
       nullify(cpatch%leaf_drop             )
+      nullify(cpatch%root_drop             )
       nullify(cpatch%leaf_respiration      )
       nullify(cpatch%root_respiration      )
       nullify(cpatch%gpp                   )
@@ -6915,6 +6928,7 @@ module ed_state_vars
       nullify(cpatch%mmean_leaf_maintenance)
       nullify(cpatch%mmean_root_maintenance)
       nullify(cpatch%mmean_leaf_drop       )
+      nullify(cpatch%mmean_root_drop       )
       nullify(cpatch%mmean_cb              )
       nullify(cpatch%mmean_gpp             )
       nullify(cpatch%mmean_npp             )
@@ -7725,6 +7739,7 @@ module ed_state_vars
       if(associated(cpatch%leaf_maintenance    )) deallocate(cpatch%leaf_maintenance    )
       if(associated(cpatch%root_maintenance    )) deallocate(cpatch%root_maintenance    )
       if(associated(cpatch%leaf_drop           )) deallocate(cpatch%leaf_drop           )
+      if(associated(cpatch%root_drop           )) deallocate(cpatch%root_drop           )
       if(associated(cpatch%leaf_respiration    )) deallocate(cpatch%leaf_respiration    )
       if(associated(cpatch%root_respiration    )) deallocate(cpatch%root_respiration    )
       if(associated(cpatch%gpp                 )) deallocate(cpatch%gpp                 )
@@ -7922,6 +7937,7 @@ module ed_state_vars
       if(associated(cpatch%mmean_root_maintenance))                                        &
                                                 deallocate(cpatch%mmean_root_maintenance)
       if(associated(cpatch%mmean_leaf_drop     )) deallocate(cpatch%mmean_leaf_drop     )
+      if(associated(cpatch%mmean_root_drop     )) deallocate(cpatch%mmean_root_drop     )
       if(associated(cpatch%mmean_cb            )) deallocate(cpatch%mmean_cb            )
       if(associated(cpatch%mmean_gpp           )) deallocate(cpatch%mmean_gpp           )
       if(associated(cpatch%mmean_npp           )) deallocate(cpatch%mmean_npp           )
@@ -9649,6 +9665,7 @@ module ed_state_vars
          opatch%leaf_maintenance      (oco) = ipatch%leaf_maintenance      (ico)
          opatch%root_maintenance      (oco) = ipatch%root_maintenance      (ico)
          opatch%leaf_drop             (oco) = ipatch%leaf_drop             (ico)
+         opatch%root_drop             (oco) = ipatch%root_drop             (ico)
          opatch%leaf_respiration      (oco) = ipatch%leaf_respiration      (ico)
          opatch%root_respiration      (oco) = ipatch%root_respiration      (ico)
          opatch%gpp                   (oco) = ipatch%gpp                   (ico)
@@ -9899,6 +9916,7 @@ module ed_state_vars
             opatch%mmean_leaf_maintenance(oco) = ipatch%mmean_leaf_maintenance(ico)
             opatch%mmean_root_maintenance(oco) = ipatch%mmean_root_maintenance(ico)
             opatch%mmean_leaf_drop       (oco) = ipatch%mmean_leaf_drop       (ico)
+            opatch%mmean_root_drop       (oco) = ipatch%mmean_root_drop       (ico)
             opatch%mmean_cb              (oco) = ipatch%mmean_cb              (ico)
             opatch%mmean_gpp             (oco) = ipatch%mmean_gpp             (ico)
             opatch%mmean_npp             (oco) = ipatch%mmean_npp             (ico)
@@ -10331,6 +10349,7 @@ module ed_state_vars
       opatch%leaf_maintenance      (1:z) = pack(ipatch%leaf_maintenance          ,lmask)
       opatch%root_maintenance      (1:z) = pack(ipatch%root_maintenance          ,lmask)
       opatch%leaf_drop             (1:z) = pack(ipatch%leaf_drop                 ,lmask)
+      opatch%root_drop             (1:z) = pack(ipatch%root_drop                 ,lmask)
       opatch%leaf_respiration      (1:z) = pack(ipatch%leaf_respiration          ,lmask)
       opatch%root_respiration      (1:z) = pack(ipatch%root_respiration          ,lmask)
       opatch%gpp                   (1:z) = pack(ipatch%gpp                       ,lmask)
@@ -10670,6 +10689,7 @@ module ed_state_vars
       opatch%mmean_leaf_maintenance(1:z) = pack(ipatch%mmean_leaf_maintenance    ,lmask)
       opatch%mmean_root_maintenance(1:z) = pack(ipatch%mmean_root_maintenance    ,lmask)
       opatch%mmean_leaf_drop       (1:z) = pack(ipatch%mmean_leaf_drop           ,lmask)
+      opatch%mmean_root_drop       (1:z) = pack(ipatch%mmean_root_drop           ,lmask)
       opatch%mmean_cb              (1:z) = pack(ipatch%mmean_cb                  ,lmask)
       opatch%mmean_gpp             (1:z) = pack(ipatch%mmean_gpp                 ,lmask)
       opatch%mmean_npp             (1:z) = pack(ipatch%mmean_npp                 ,lmask)
@@ -18151,6 +18171,16 @@ module ed_state_vars
          call metadata_edio(nvar,igr,'Leaf drop'                                           &
                            ,   '[kgC/m2/yr]','(n_pft,n_dbh,ipoly)')
       end if
+
+      if (associated(cgrid%root_drop)) then
+         nvar = nvar + 1
+         call vtable_edio_r(npts,cgrid%root_drop                                           &
+                           ,nvar,igr,init,cgrid%pyglob_id,var_len,var_len_global,max_ptrs  &
+                           ,'ROOT_DROP_PY    :146:hist:anal:dail')
+         call metadata_edio(nvar,igr,'root drop'                                           &
+                           ,   '[kgC/m2/yr]','(n_pft,n_dbh,ipoly)')
+      end if
+
       if (associated(cgrid%mmean_lai)) then
          nvar = nvar + 1
          call vtable_edio_r(npts,cgrid%mmean_lai                                           &
@@ -18229,6 +18259,15 @@ module ed_state_vars
                            ,nvar,igr,init,cgrid%pyglob_id,var_len,var_len_global,max_ptrs  &
                            ,'MMEAN_LEAF_DROP_PY       :146:'//trim(eorq_keys))
          call metadata_edio(nvar,igr,'Monthly mean - Leaf drop'                            &
+                           ,   '[kgC/m2/yr]','(n_pft,n_dbh,ipoly)')
+      end if
+
+      if (associated(cgrid%mmean_root_drop)) then
+         nvar = nvar + 1
+         call vtable_edio_r(npts,cgrid%mmean_root_drop                                     &
+                           ,nvar,igr,init,cgrid%pyglob_id,var_len,var_len_global,max_ptrs  &
+                           ,'MMEAN_ROOT_DROP_PY       :146:'//trim(eorq_keys))
+         call metadata_edio(nvar,igr,'Monthly mean - Root drop'                            &
                            ,   '[kgC/m2/yr]','(n_pft,n_dbh,ipoly)')
       end if
       !------------------------------------------------------------------------------------!
@@ -19833,7 +19872,7 @@ module ed_state_vars
          nvar=nvar+1
          call vtable_edio_r(npts,cpoly%agb_growth                                          &
                            ,nvar,igr,init,cpoly%siglob_id,var_len,var_len_global,max_ptrs  &
-                           ,'AGB_GROWTH :246:hist:year') 
+                           ,'AGB_GROWTH :246:hist:year:mont') 
          call metadata_edio(nvar,igr,'No metadata available','[NA]','NA') 
       end if
 
@@ -25080,6 +25119,13 @@ module ed_state_vars
          call metadata_edio(nvar,igr,'No metadata available','[NA]','NA') 
       end if
 
+      if (associated(cpatch%root_drop)) then
+         nvar=nvar+1
+           call vtable_edio_r(npts,cpatch%root_drop,nvar,igr,init,cpatch%coglob_id, &
+           var_len,var_len_global,max_ptrs,'ROOT_DROP :41:hist:dail') 
+         call metadata_edio(nvar,igr,'No metadata available','[NA]','NA') 
+      end if
+
       if (associated(cpatch%bseeds)) then
          nvar=nvar+1
            call vtable_edio_r(npts,cpatch%bseeds,nvar,igr,init,cpatch%coglob_id, &
@@ -27342,6 +27388,17 @@ module ed_state_vars
                            ,'Monthly mean - Leaf drop'                                     &
                            ,'[  kgC/pl/yr]','(icohort)'            )
       end if
+
+      if (associated(cpatch%mmean_root_drop       )) then
+         nvar = nvar+1
+         call vtable_edio_r(npts,cpatch%mmean_root_drop                                    &
+                           ,nvar,igr,init,cpatch%coglob_id,var_len,var_len_global,max_ptrs &
+                           ,'MMEAN_ROOT_DROP_CO            :41:'//trim(eorq_keys))
+         call metadata_edio(nvar,igr                                                       &
+                           ,'Monthly mean - Root drop'                                     &
+                           ,'[  kgC/pl/yr]','(icohort)'            )
+      end if
+
       if (associated(cpatch%mmean_cb              )) then
          nvar = nvar+1
          call vtable_edio_r(npts,cpatch%mmean_cb                                           &

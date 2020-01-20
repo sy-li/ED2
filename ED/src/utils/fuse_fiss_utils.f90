@@ -1231,6 +1231,8 @@ module fuse_fiss_utils
                                      + cpatch%root_maintenance(donc) * dnplant
       cpatch%leaf_drop        (recc) = cpatch%leaf_drop       (recc) * rnplant             &
                                      + cpatch%leaf_drop       (donc) * dnplant
+      cpatch%root_drop        (recc) = cpatch%root_drop       (recc) * rnplant             &
+                                     + cpatch%root_drop       (donc) * dnplant
       !------------------------------------------------------------------------------------!
 
 
@@ -2414,6 +2416,10 @@ module fuse_fiss_utils
          cpatch%mmean_leaf_drop       (recc) = cpatch%mmean_leaf_drop       (recc)         &
                                              * rnplant                                     &
                                              + cpatch%mmean_leaf_drop       (donc)         &
+                                             * dnplant
+         cpatch%mmean_root_drop       (recc) = cpatch%mmean_root_drop       (recc)         &
+                                             * rnplant                                     &
+                                             + cpatch%mmean_root_drop       (donc)         &
                                              * dnplant
          cpatch%mmean_cb              (recc) = cpatch%mmean_cb              (recc)         &
                                              * rnplant                                     &
