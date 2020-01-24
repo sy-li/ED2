@@ -187,6 +187,9 @@ module ed_state_vars
       real ,pointer,dimension(:) :: dbh
       !<Plant diameter at breast height (cm)
 
+      real ,pointer,dimension(:) :: census_agb
+      real ,pointer,dimension(:) :: census_dbh
+
       real ,pointer,dimension(:) :: bdead
       !<Biomass of the structural wood (kgC/plant)
 
@@ -4745,6 +4748,8 @@ module ed_state_vars
       allocate(cpatch%ddbh_dt                      (                    ncohorts))
       allocate(cpatch%dlndbh_dt                    (                    ncohorts))
       allocate(cpatch%dbh                          (                    ncohorts))
+      allocate(cpatch%census_agb                          (                    ncohorts))
+      allocate(cpatch%census_dbh                   (                    ncohorts))
       allocate(cpatch%bdead                        (                    ncohorts))
       allocate(cpatch%bleaf                        (                    ncohorts))
       allocate(cpatch%balive                       (                    ncohorts))
@@ -6625,6 +6630,8 @@ module ed_state_vars
       nullify(cpatch%ddbh_dt               )
       nullify(cpatch%dlndbh_dt             )
       nullify(cpatch%dbh                   )
+      nullify(cpatch%census_agb                   )
+      nullify(cpatch%census_dbh               )
       nullify(cpatch%bdead                 )
       nullify(cpatch%bleaf                 )
       nullify(cpatch%balive                )
@@ -7625,6 +7632,8 @@ module ed_state_vars
       if(associated(cpatch%ddbh_dt             )) deallocate(cpatch%ddbh_dt             )
       if(associated(cpatch%dlndbh_dt           )) deallocate(cpatch%dlndbh_dt           )
       if(associated(cpatch%dbh                 )) deallocate(cpatch%dbh                 )
+      if(associated(cpatch%census_agb                 )) deallocate(cpatch%census_agb                 )
+      if(associated(cpatch%census_dbh                 )) deallocate(cpatch%census_dbh            )
       if(associated(cpatch%bdead               )) deallocate(cpatch%bdead               )
       if(associated(cpatch%bleaf               )) deallocate(cpatch%bleaf               )
       if(associated(cpatch%balive              )) deallocate(cpatch%balive              )
@@ -9557,6 +9566,8 @@ module ed_state_vars
          opatch%ddbh_dt               (oco) = ipatch%ddbh_dt               (ico)
          opatch%dlndbh_dt             (oco) = ipatch%dlndbh_dt             (ico)
          opatch%dbh                   (oco) = ipatch%dbh                   (ico)
+         opatch%census_agb                (oco) = ipatch%census_agb            (ico)
+         opatch%census_dbh              (oco) = ipatch%census_dbh       (ico)
          opatch%bdead                 (oco) = ipatch%bdead                 (ico)
          opatch%bleaf                 (oco) = ipatch%bleaf                 (ico)
          opatch%balive                (oco) = ipatch%balive                (ico)
@@ -10241,6 +10252,8 @@ module ed_state_vars
       opatch%ddbh_dt               (1:z) = pack(ipatch%ddbh_dt                   ,lmask)
       opatch%dlndbh_dt             (1:z) = pack(ipatch%dlndbh_dt                 ,lmask)
       opatch%dbh                   (1:z) = pack(ipatch%dbh                       ,lmask)
+      opatch%census_agb              (1:z) = pack(ipatch%census_agb            ,lmask)
+      opatch%census_dbh              (1:z) = pack(ipatch%census_dbh            ,lmask)
       opatch%bdead                 (1:z) = pack(ipatch%bdead                     ,lmask)
       opatch%bleaf                 (1:z) = pack(ipatch%bleaf                     ,lmask)
       opatch%balive                (1:z) = pack(ipatch%balive                    ,lmask)
@@ -24411,6 +24424,20 @@ module ed_state_vars
          nvar=nvar+1
            call vtable_edio_r(npts,cpatch%dbh,nvar,igr,init,cpatch%coglob_id, &
            var_len,var_len_global,max_ptrs,'DBH :41:hist:anal:year:dail:mont:dcyc') 
+         call metadata_edio(nvar,igr,'Diameter at breast height','[cm]','icohort') 
+      end if
+
+      if (associated(cpatch%census_agb)) then
+         nvar=nvar+1
+           call vtable_edio_r(npts,cpatch%census_agb,nvar,igr,init,cpatch%coglob_id, &
+           var_len,var_len_global,max_ptrs,'CENSUS_AGB :41:hist:anal:year:dail:mont:dcyc') 
+         call metadata_edio(nvar,igr,'Diameter at breast height','[cm]','icohort') 
+      end if
+
+      if (associated(cpatch%census_dbh)) then
+         nvar=nvar+1
+           call vtable_edio_r(npts,cpatch%census_dbh,nvar,igr,init,cpatch%coglob_id, &
+           var_len,var_len_global,max_ptrs,'CENSUS_DBH :41:hist:anal:year:dail:mont:dcyc') 
          call metadata_edio(nvar,igr,'Diameter at breast height','[cm]','icohort') 
       end if
 

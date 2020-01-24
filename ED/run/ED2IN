@@ -41,7 +41,7 @@ $ED_NL
    !---------------------------------------------------------------------------------------!
    !     End of simulation. Information must be given in UTC time.                         !
    !---------------------------------------------------------------------------------------!
-   NL%IMONTHZ  = 01    ! Month
+   NL%IMONTHZ  = 06    ! Month
    NL%IDATEZ   = 01    ! Day
    NL%IYEARZ   = 2018  ! Year
    NL%ITIMEZ   = 0000  ! UTC
@@ -563,7 +563,7 @@ $ED_NL
    NL%LU_DATABASE       = ''
    NL%PLANTATION_FILE   = ''
    NL%THSUMS_DATABASE   = '/afs/crc/group/dmedvigy/'
-   NL%ED_MET_DRIVER_DB  = '/afs/crc/group/dmedvigy/HEADER/PV_MET_HEADER'
+   NL%ED_MET_DRIVER_DB  = '/afs/crc/group/dmedvigy/HEADER/CR_MET_DRIVER_HEADER_station'
    NL%OBSTIME_DB        = '' !Reference file: /ED/run/obstime_template.time
    NL%SOILSTATE_DB      = '/n/gstore/Labs/moorcroft_lab_protected/data/ed2_data/ed_inputs/STW1996OCT.dat'
    NL%SOILDEPTH_DB      = '/n/gstore/Labs/moorcroft_lab_protected/data/ed2_data/ed_inputs/soil_depths.dat'
@@ -1514,8 +1514,8 @@ $ED_NL
    !---------------------------------------------------------------------------------------!
    NL%IMETTYPE    = 1
    NL%ISHUFFLE    = 0
-   NL%METCYC1     = 2009
-   NL%METCYCF     = 2009
+   NL%METCYC1     = 2015
+   NL%METCYCF     = 2018
    NL%IMETAVG     = 0
    NL%IMETRAD     = 0
    NL%INITIAL_CO2 = 390.
@@ -1574,7 +1574,7 @@ $ED_NL
    NL%DT_CENSUS       = 1.
    NL%YR1ST_CENSUS    = 2008
    NL%MON1ST_CENSUS   = 1
-   NL%MIN_RECRUIT_DBH = 10
+   NL%MIN_RECRUIT_DBH = 5
    !---------------------------------------------------------------------------------------!
 
 

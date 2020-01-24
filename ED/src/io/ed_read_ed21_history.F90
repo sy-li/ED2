@@ -788,6 +788,8 @@ subroutine read_ed21_history_file
 
                            !----- Compute the above-ground biomass. -----------------------!
                            cpatch%agb(ico) = ed_biomass(cpatch, ico)
+                           cpatch%census_agb(ico) = cpatch%agb(ico)
+                           cpatch%census_dbh(ico) = cpatch%dbh(ico)
                            cpatch%basarea(ico)  = pio4 * cpatch%dbh(ico) * cpatch%dbh(ico)
 
                            !----- Update the derived patch-level variables. ---------------!
@@ -2017,6 +2019,8 @@ subroutine read_ed21_history_unstruct
 
                            !----- Compute the above-ground biomass. -----------------------!
                            cpatch%agb(ico) = ed_biomass(cpatch, ico)
+                           cpatch%census_agb(ico) = cpatch%agb(ico)
+                           cpatch%census_dbh(ico) = cpatch%dbh(ico)
 
                            cpatch%basarea(ico)  = pio4 * cpatch%dbh(ico) * cpatch%dbh(ico)
 
@@ -3225,6 +3229,8 @@ subroutine read_ed21_polyclone
 
                            !----- Compute the above-ground biomass. -----------------------!
                            cpatch%agb(ico) = ed_biomass(cpatch, ico)
+                           cpatch%census_agb(ico) = cpatch%agb(ico)
+                           cpatch%census_dbh(ico) = cpatch%dbh(ico)
 
                            cpatch%basarea(ico)  = pio4 * cpatch%dbh(ico) * cpatch%dbh(ico)
 

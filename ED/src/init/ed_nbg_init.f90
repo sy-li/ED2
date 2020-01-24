@@ -244,6 +244,8 @@ subroutine init_nbg_cohorts(csite,lsl,ipa_a,ipa_z)
 
          !----- Find the above-ground biomass and basal area. -----------------------------!
          cpatch%agb(ico) = ed_biomass(cpatch, ico)
+         cpatch%census_agb(ico) = cpatch%agb(ico)
+         cpatch%census_dbh(ico) = cpatch%dbh(ico)
          cpatch%basarea(ico) = pio4 * cpatch%dbh(ico)*cpatch%dbh(ico)
 
          !----- Initialize other cohort-level variables. ----------------------------------!
@@ -387,6 +389,8 @@ subroutine init_cohorts_by_layers(csite,lsl,ipa_a,ipa_z)
 
          !----- Find the above-ground biomass and basal area. -----------------------------!
          cpatch%agb(ico) = ed_biomass(cpatch, ico)
+         cpatch%census_agb(ico) = cpatch%agb(ico)
+         cpatch%census_dbh(ico) = cpatch%dbh(ico)
          cpatch%basarea(ico) = pio4 * cpatch%dbh(ico) * cpatch%dbh(ico)
 
          !----- Initialize other cohort-level variables. ----------------------------------!
@@ -564,6 +568,8 @@ subroutine near_bare_ground_big_leaf_init(cgrid)
 
                !----- Find the above-ground biomass and basal area. -----------------------!
                cpatch%agb(ico) = ed_biomass(cpatch, ico)
+               cpatch%census_agb(ico) = cpatch%agb(ico)
+               cpatch%census_dbh(ico) = cpatch%dbh(ico)
                cpatch%basarea(ico) = pio4 * cpatch%dbh(ico)*cpatch%dbh(ico)
 
                !----- Initialize other cohort-level variables. ----------------------------!

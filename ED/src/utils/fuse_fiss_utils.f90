@@ -1550,6 +1550,10 @@ module fuse_fiss_utils
       !------------------------------------------------------------------------------------!
       cpatch%agb      (recc) = cpatch%agb      (recc) * rnplant                            &
                              + cpatch%agb      (donc) * dnplant
+      cpatch%census_agb      (recc) = cpatch%census_agb      (recc) * rnplant                            &
+                             + cpatch%census_agb      (donc) * dnplant
+      cpatch%census_dbh      (recc) = cpatch%census_dbh      (recc) * rnplant                            &
+                             + cpatch%census_dbh      (donc) * dnplant
       cpatch%basarea  (recc) = cpatch%basarea  (recc) * rnplant                            &
                              + cpatch%basarea  (donc) * dnplant
       cpatch%dagb_dt  (recc) = cpatch%dagb_dt  (recc) * rnplant                            &

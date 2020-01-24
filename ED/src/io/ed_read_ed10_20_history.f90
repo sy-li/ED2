@@ -861,6 +861,8 @@ subroutine read_ed10_ed20_history_file
 
                         !----- Above ground biomass, use the allometry. -------------------!
                         cpatch%agb(ic2) = ed_biomass(cpatch, ic2)
+                        cpatch%census_agb(ic2) = cpatch%agb(ic2)
+                        cpatch%census_dbh(ic2) = cpatch%dbh(ic2)
                         cpatch%basarea(ic2)  = pio4 * cpatch%dbh(ic2) * cpatch%dbh(ic2)
 
                         !----- Growth rates, start with zero. -----------------------------!

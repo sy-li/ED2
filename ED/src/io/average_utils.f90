@@ -7704,20 +7704,6 @@ module average_utils
                !---------------------------------------------------------------------------!
                cohortloop: do ico = 1,cpatch%ncohorts
 
-                  if (cpatch%new_recruit_flag(ico) == 1) then
-                     cgrid%total_agb_recruit       (ipy) =                                 &
-                            cgrid%total_agb_recruit      (ipy)                             &
-                          + cpatch%agb                   (ico)                             &
-                          * cpatch%nplant                (ico)                             &
-                          * patch_wgt
-                     cgrid%total_basal_area_recruit(ipy) =                                 &
-                            cgrid%total_basal_area_recruit(ipy)                            &
-                          + cpatch%basarea(ico)                                            &
-                          * cpatch%nplant (ico)                                            &
-                          * patch_wgt
-                     cpatch%new_recruit_flag       (ico) = 0
-                  end if
-                  cpatch%first_census (ico) = 1
                end do cohortloop
                !---------------------------------------------------------------------------!
             end do patchloop
@@ -7746,7 +7732,7 @@ module average_utils
       use ed_max_dims  , only : n_pft       & ! intent(in)
                               , n_dbh       ! ! intent(in)
       use ed_state_vars, only : edtype      & ! structure
-                              , polygontype ! ! structure
+                              , polygontype,sitetype,patchtype ! ! structure
 
       implicit none
       !------ Arguments. ------------------------------------------------------------------!
@@ -7755,6 +7741,10 @@ module average_utils
       integer                    :: ipy
       integer                    :: isi
       type(polygontype), pointer :: cpoly
+      type(sitetype)   , pointer :: csite
+      type(patchtype)  , pointer :: cpatch
+      integer                    :: ipa
+      integer                    :: ico
       !------------------------------------------------------------------------------------!
 
 
@@ -7775,7 +7765,19 @@ module average_utils
             cpoly%basal_area_growth (:,:,isi) = 0.0
             cpoly%basal_area_mort   (:,:,isi) = 0.0
             cpoly%basal_area_cut    (:,:,isi) = 0.0
-         end do
+            csite => cpoly%site(isi)
+            patchloop: do ipa = 1,csite%npatches
+               cpatch => csite%patch(ipa)
+               cohortloop: do ico = 1,cpatch%ncohorts
+                  if (cpatch%new_recruit_flag(ico) == 1) then
+                     cpatch%new_recruit_flag       (ico) = 0
+                  end if
+                  cpatch%first_census (ico) = 1
+                  cpatch%census_agb(ico) = cpatch%agb(ico)
+                  cpatch%census_dbh(ico) = cpatch%dbh(ico)
+               enddo cohortloop
+            enddo patchloop
+         enddo
          !---------------------------------------------------------------------------------!
       end do
       !------------------------------------------------------------------------------------!

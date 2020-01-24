@@ -4386,6 +4386,10 @@ subroutine fill_history_patch(cpatch,paco_index,ncohorts_global)
                      ,'ROOT2LEAF                      ',dsetrank,iparallel,.true. ,foundvar)
    call hdf_getslab_r(cpatch%agb                                                           &
                      ,'AGB_CO                    ',dsetrank,iparallel,.true. ,foundvar)
+   call hdf_getslab_r(cpatch%census_agb                                                           &
+                     ,'CENSUS_AGB_CO                    ',dsetrank,iparallel,.true. ,foundvar)
+   call hdf_getslab_r(cpatch%census_dbh                                                           &
+                     ,'CENSUS_DBH_CO                    ',dsetrank,iparallel,.true. ,foundvar)
    call hdf_getslab_r(cpatch%basarea                                                       &
                      ,'BA_CO                     ',dsetrank,iparallel,.true. ,foundvar)
    call hdf_getslab_r(cpatch%dagb_dt                                                       &

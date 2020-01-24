@@ -1605,7 +1605,7 @@ subroutine update_vital_rates(cpatch,ico,dbh_in,nplant_in,agb_in,ba_in,area,basa
                                 * (cpatch%dbh(ico) * cpatch%dbh(ico) - dbh_in * dbh_in)
    agb_growth(ipft,idbh)        = agb_growth(ipft,idbh)                                    &
                                 + area * cpatch%nplant(ico)                                &
-                                * (cpatch%agb(ico) - agb_in)
+                                * (cpatch%agb(ico) - cpatch%census_agb(ico))
 
    !---------------------------------------------------------------------------------------!
    !    Computed for plants alive at past census but dead at current census.  These        !

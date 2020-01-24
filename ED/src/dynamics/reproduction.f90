@@ -442,6 +442,8 @@ subroutine reproduction(cgrid,month)
                      cpatch%dlnba_dt (ico) = 0.0
                      cpatch%ddbh_dt  (ico) = 0.0
                      cpatch%dlndbh_dt(ico) = 0.0
+                     cpatch%census_agb(ico) = 0.
+                     cpatch%census_dbh(ico) = 0.
                      !---------------------------------------------------------------------!
 
 
