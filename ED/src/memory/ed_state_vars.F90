@@ -19716,7 +19716,7 @@ module ed_state_vars
          nvar=nvar+1
          call vtable_edio_r(npts,cpoly%agb_growth                                          &
                            ,nvar,igr,init,cpoly%siglob_id,var_len,var_len_global,max_ptrs  &
-                           ,'AGB_GROWTH :246:hist:year') 
+                           ,'AGB_GROWTH :246:hist:year:mont') 
          call metadata_edio(nvar,igr,'No metadata available','[NA]','NA') 
       end if
 

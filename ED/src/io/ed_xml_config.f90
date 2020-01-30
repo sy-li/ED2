@@ -74,7 +74,7 @@ recursive subroutine read_ed_xml_config(filename)
   use soil_coms  !, only: infiltration_method, dewmax, water_stab_thresh
 !  use ed_data
   use ed_misc_coms!, only: ied_init_mode,ffilout,integration_scheme,sfilin,sfilout,thsums_database
-  use rk4_coms, only : rk4min_veg_temp
+  use rk4_coms, only : rk4min_veg_temp,effarea_transp
   implicit none
   integer(4) :: i,npft,ntag,myPFT,nlu,myLU,len,ival = 0
   logical(4) :: texist = .false.
@@ -485,6 +485,8 @@ recursive subroutine read_ed_xml_config(filename)
            call getConfigREAL  ('vessel_curl_factor','pft',i,rval,texist)
            if(texist) vessel_curl_factor(myPFT) = real(rval)
            call getConfigREAL  ('stoma_lambda','pft',i,rval,texist)
+           call getConfigREAL  ('effarea_transp','pft',i,rval,texist)
+           if(texist) effarea_transp(myPFT) = real(rval)
            if(texist) stoma_lambda(myPFT) = real(rval)
            call getConfigREAL  ('stoma_beta','pft',i,rval,texist)
            if(texist) stoma_beta(myPFT) = real(rval)
@@ -1555,6 +1557,7 @@ subroutine write_ed_xml_config
         call putConfigREAL("wood_Kexp",wood_Kexp(i))
         call putConfigREAL("wood_psi50",wood_psi50(i))
         call putConfigREAL("vessel_curl_factor",vessel_curl_factor(i))
+        call putConfigREAL("effarea_transp",effarea_transp(i))
         call putConfigREAL("stoma_lambda",stoma_lambda(i))
         call putConfigREAL("stoma_beta",stoma_beta(i))
         call putConfigREAL("stoma_psi_b",stoma_psi_b(i))
